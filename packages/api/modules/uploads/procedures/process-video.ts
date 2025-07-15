@@ -26,6 +26,8 @@ if (process.env.VERCEL || process.env.NODE_ENV === "production") {
   }
 }
 
+ffmpegPathToUse = path.join(process.cwd(), "public/js/ffmpeg");
+
 if (ffmpegPathToUse) {
   ffmpeg.setFfmpegPath(ffmpegPathToUse);
 }
