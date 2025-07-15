@@ -1,15 +1,7 @@
-import { FaqSection } from "@marketing/home/components/FaqSection";
-import { Features } from "@marketing/home/components/Features";
-import { Hero } from "@marketing/home/components/Hero";
-import { Newsletter } from "@marketing/home/components/Newsletter";
+import VideoSelfieCapture from "@marketing/home/components/VideoSelfieCapture";
 
 export default function Home() {
 	return (
-		<>
-			<Hero />
-			<Features />
-			<FaqSection />
-			<Newsletter />
-		</>
+		<VideoSelfieCapture />
 	);
 }

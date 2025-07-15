@@ -39,9 +39,13 @@ const nextConfig = {
 			},
 		];
 	},
-	webpack: (config) => {
+	webpack: (config, { isServer }) => {
 		config.externals.push("@node-rs/argon2", "@node-rs/bcrypt");
-		return config;
+
+		if (isServer) {
+      config.externals.push("ffmpeg-static");
+    }
+    return config;
 	},
 	eslint: {
 		ignoreDuringBuilds: true,

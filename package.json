@@ -23,5 +23,10 @@
 		"tsconfig": "workspace:*",
 		"turbo": "^2.0.11",
 		"typescript": "5.5.4"
+	},
+	"dependencies": {
+		"@supabase/supabase-js": "^2.51.0",
+		"ffmpeg-static": "^5.2.0",
+		"fluent-ffmpeg": "^2.1.3"
 	}
 }
