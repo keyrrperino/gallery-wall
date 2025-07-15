@@ -12,7 +12,7 @@
 		"db:studio": "pnpm --filter database run db:studio",
 		"mail:preview": "pnpm --filter mail run preview",
 		"e2e": "pnpm --filter web e2e",
-        "postinstall": "chmod +x ./public/js/ffmpeg"
+        "postinstall": "chmod +x ./apps/web/public/js/ffmpeg"
 	},
 	"engines": {
 		"node": ">=20"
