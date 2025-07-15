@@ -11,7 +11,6 @@ export default function VideoSelfieCapture() {
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
-  const [gifUrl, setGifUrl] = React.useState<string | null>(null);
   const router = useRouter();
 
   const getSignedUploadUrlMutation = apiClient.uploads.signedUploadUrl.useMutation();
@@ -46,21 +45,18 @@ export default function VideoSelfieCapture() {
     }, 3000);
   };
 
-  // Upload video to S3, then process to GIF via Firebase Function
+  // Upload video to S3, then process to GIF via tRPC
   const uploadVideoAndProcess = async (videoBlob: Blob) => {
     setLoading(true);
     setError(null);
-    setGifUrl(null);
     try {
       const path = `videos/${uuid()}.webm`;
       const bucket = "gifs";
-      // Get signed upload URL
       const uploadUrl = await getSignedUploadUrlMutation.mutateAsync({
         path,
         bucket,
       });
 
-      // Upload the video
       const response = await fetch(uploadUrl, {
         method: "PUT",
         body: videoBlob,
@@ -70,18 +66,15 @@ export default function VideoSelfieCapture() {
       });
       if (!response.ok) throw new Error("Failed to upload video");
 
-      // Construct the public video URL (adjust if your S3 setup is different)
-      const publicVideoUrl = `https://${bucket}.s3.amazonaws.com/${path}`;
+      // Call tRPC to process the video into a GIF
+      const { gifKey } = await processVideoMutation.mutateAsync({
+        key: path,
+        bucket,
+      });
 
-      // Call Firebase function to process video to GIF
-      const firebaseUrl = `https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${encodeURIComponent(publicVideoUrl)}`;
-      const gifResponse = await fetch(firebaseUrl);
-      if (!gifResponse.ok) throw new Error("Failed to generate GIF");
-      // Assume the function returns a JSON with { gifUrl }
-      const gifData = await gifResponse.json();
-      if (!gifData.gifUrl) throw new Error("GIF URL not found in response");
-      setGifUrl(gifData.gifUrl);
       setLoading(false);
+      // Pass the GIF key to the next page
+      router.push(`/choose-sticker?gif=${encodeURIComponent(gifKey)}`);
     } catch (err: any) {
       setError(err.message || "Upload or processing failed.");
       setLoading(false);
@@ -123,9 +116,6 @@ export default function VideoSelfieCapture() {
       {error && <div className="text-red-500">{error}</div>}
       {previewUrl && (
         <video src={previewUrl} controls className="rounded-lg border w-full max-w-xs aspect-video" />
-      )}
-      {gifUrl && (
-        <img src={gifUrl} alt="Generated GIF" className="rounded-lg border w-full max-w-xs aspect-video" />
       )}
       <button
         onClick={handleRecord}
