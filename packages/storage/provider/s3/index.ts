@@ -9,6 +9,7 @@ import type {
 	GetSignedUploadUrlHandler,
 	GetSignedUrlHander,
 } from "../../types";
+import { Readable } from "stream";
 
 let s3Client: S3Client | null = null;
 
@@ -83,5 +84,33 @@ export const getSignedUrl: GetSignedUrlHander = async (
 	} catch (e) {
 		logger.error(e);
 		throw new Error("Could not get signed url");
+	}
+};
+
+export const uploadStreamToS3 = async ({
+	bucket,
+	key,
+	stream,
+	contentType,
+}: {
+	bucket: string;
+	key: string;
+	stream: Readable;
+	contentType: string;
+}) => {
+	const s3Client = getS3Client();
+	try {
+		await s3Client.send(
+			new PutObjectCommand({
+				Bucket: bucket,
+				Key: key,
+				Body: stream,
+				ContentType: contentType,
+			})
+		);
+		return true;
+	} catch (e) {
+		logger.error(e);
+		throw new Error("Could not upload stream to S3");
 	}
 };
