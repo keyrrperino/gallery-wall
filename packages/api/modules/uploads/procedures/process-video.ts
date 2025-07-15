@@ -2,15 +2,39 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { publicProcedure } from "../../../trpc/base";
 import ffmpeg from "fluent-ffmpeg";
-import ffmpegPath from "ffmpeg-static";
-import { tmpdir } from "os";
-import { join } from "path";
-import { randomUUID } from "crypto";
-import { unlink } from "fs/promises";
-import { Readable, PassThrough } from "stream";
+import path from "path";
+import { PassThrough } from "stream";
 import { getSignedUrl, uploadStreamToS3 } from "storage";
+import os from "os";
 
-ffmpeg.setFfmpegPath(ffmpegPath!);
+let ffmpegPathToUse: string | undefined = undefined;
+
+if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+  // On Vercel (production, Linux)
+  ffmpegPathToUse = path.join(process.cwd(), "public/js/ffmpeg");
+} else if (os.platform() === "darwin") {
+  // Local development on macOS
+  ffmpegPathToUse = "/opt/homebrew/bin/ffmpeg"; // or result of `which ffmpeg`
+} else {
+  // Fallback: use ffmpeg-static or system ffmpeg
+  try {
+    // Only import if available
+    // @ts-ignore
+    ffmpegPathToUse = require("ffmpeg-static");
+  } catch {
+    ffmpegPathToUse = "/usr/bin/ffmpeg";
+  }
+}
+
+if (ffmpegPathToUse) {
+  ffmpeg.setFfmpegPath(ffmpegPathToUse);
+}
+
+// const ffmpegPath = path.join(process.cwd(), "public/js/ffmpeg");
+// ffmpeg.setFfmpegPath(ffmpegPath);
+
+// import ffmpegPath from "ffmpeg-static";
+// ffmpeg.setFfmpegPath(ffmpegPath!);
 
 export const processVideo = publicProcedure
   .input(
