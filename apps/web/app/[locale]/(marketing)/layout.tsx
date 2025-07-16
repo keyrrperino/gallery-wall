@@ -6,9 +6,9 @@ import type { PropsWithChildren } from "react";
 export default function MarketingLayout({ children }: PropsWithChildren) {
 	return (
 		<UserContextProvider initialUser={null}>
-			<NavBar />
+			{/* <NavBar /> */}
 			<main className="min-h-screen">{children}</main>
-			<Footer />
+			{/* <Footer /> */}
 		</UserContextProvider>
 	);
 }

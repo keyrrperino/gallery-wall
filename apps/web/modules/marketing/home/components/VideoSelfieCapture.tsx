@@ -15,6 +15,7 @@ export default function VideoSelfieCapture() {
   const router = useRouter();
 
   const getSignedUploadUrlMutation = apiClient.uploads.signedUploadUrl.useMutation();
+  const getSupabaseSignedUrlMutation = apiClient.uploads.supabaseSignedUrl.useMutation();
   const processVideoMutation = apiClient.uploads.processVideo.useMutation();
 
   // Record 3 seconds
@@ -68,19 +69,30 @@ export default function VideoSelfieCapture() {
           "Content-Type": "video/webm",
         },
       });
+
       if (!response.ok) throw new Error("Failed to upload video");
 
-      // Construct the public video URL (adjust if your S3 setup is different)
-      const publicVideoUrl = `https://${bucket}.s3.amazonaws.com/${path}`;
+      // Get the signed URL for the uploaded video (valid for 1 day)
+      const { url } = await getSupabaseSignedUrlMutation.mutateAsync({
+        bucket,
+        path,
+        // expiresIn: 86400 // 1 day, optional if default
+      });
 
       // Call Firebase function to process video to GIF
-      const firebaseUrl = `https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${encodeURIComponent(publicVideoUrl)}`;
-      const gifResponse = await fetch(firebaseUrl);
-      if (!gifResponse.ok) throw new Error("Failed to generate GIF");
-      // Assume the function returns a JSON with { gifUrl }
-      const gifData = await gifResponse.json();
-      if (!gifData.gifUrl) throw new Error("GIF URL not found in response");
-      setGifUrl(gifData.gifUrl);
+
+      console.log(url);
+      console.log(`https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}`);
+
+      const firebaseUrl = `https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}`;
+
+      setGifUrl(firebaseUrl);
+      // const gifResponse = await fetch(firebaseUrl);
+      // if (!gifResponse.ok) throw new Error("Failed to generate GIF");
+      // // Assume the function returns a JSON with { gifUrl }
+      // const gifData = await gifResponse.json();
+      // if (!gifData.gifUrl) throw new Error("GIF URL not found in response");
+      // setGifUrl(gifData.gifUrl);
       setLoading(false);
     } catch (err: any) {
       setError(err.message || "Upload or processing failed.");
