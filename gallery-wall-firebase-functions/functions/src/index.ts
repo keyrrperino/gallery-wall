@@ -15,6 +15,10 @@ import {z} from "zod";
 import cors from "cors";
 import stream from "stream";
 import { createClient } from '@supabase/supabase-js';
+import { removeBackground } from '@imgly/background-removal-node';
+import fs from 'fs';
+import path from 'path';
+import sharp from 'sharp';
 
 setGlobalOptions({maxInstances: 10});
 
@@ -144,6 +148,105 @@ export const convertAndUploadVideoUrlToGIF = onRequest(async (req, res) => {
           // No need to call res.end() here, as error response is sent
         })
         .pipe(passThrough, { end: true });
+    } catch (err: any) {
+      logger.error("Unexpected error", err);
+      if (!responseSent) {
+        res.status(500).json({error: err.message});
+      }
+    }
+  });
+});
+
+export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest(async (req, res) => {
+  cors({origin: true})(req, res, async () => {
+    let responseSent = false; // Track if response is already sent
+    try {
+      const parsed = inputSchema.safeParse(req.query);
+      if (!parsed.success) {
+        res.status(400).json({
+          error: "Invalid input",
+          details: parsed.error.flatten(),
+        });
+        responseSent = true;
+        return;
+      }
+      const { videoUrl } = parsed.data;
+
+      // Prepare temp directories
+      const framesDir = '/tmp/frames';
+      if (fs.existsSync(framesDir)) {
+        fs.rmSync(framesDir, { recursive: true, force: true });
+      }
+      fs.mkdirSync(framesDir);
+      const outputGifPath = '/tmp/output.gif';
+      if (fs.existsSync(outputGifPath)) fs.unlinkSync(outputGifPath);
+
+      // 1. Extract frames from video (as PNG for compatibility)
+      await new Promise((resolve, reject) => {
+        ffmpeg(videoUrl)
+          .outputOptions([
+            '-vf', 'fps=10',
+            '-t', '5',
+            '-pix_fmt', 'rgb24'
+          ])
+          .save(path.join(framesDir, 'frame-%03d.png'))
+          .on('end', resolve)
+          .on('error', reject);
+      });
+
+      // 2. Remove background from each frame (PNG, check with sharp, try file path then buffer)
+      const frameFiles = fs.readdirSync(framesDir).filter(f => f.endsWith('.png'));
+      for (const file of frameFiles) {
+        const filePath = path.join(framesDir, file);
+        // Log file info for debugging
+        const stats = fs.statSync(filePath);
+        console.log('Processing:', filePath, 'size:', stats.size);
+        // Check PNG validity with sharp
+        try {
+          await sharp(filePath).metadata();
+        } catch (e) {
+          console.error('Sharp could not decode:', filePath, e);
+          continue; // skip this frame
+        }
+        // Try removeBackground with file path, then buffer
+        let blob;
+        try {
+          blob = await removeBackground(filePath);
+        } catch (e1) {
+          console.error('removeBackground failed with file path:', filePath, e1);
+          try {
+            const inputBuffer = fs.readFileSync(filePath);
+            blob = await removeBackground(inputBuffer);
+          } catch (e2) {
+            console.error('removeBackground failed with buffer:', filePath, e2);
+            continue; // skip this frame
+          }
+        }
+        const outputBuffer = Buffer.from(await blob.arrayBuffer());
+        fs.writeFileSync(filePath, outputBuffer);
+      }
+
+      // 3. Re-encode frames into a GIF
+      await new Promise((resolve, reject) => {
+        ffmpeg()
+          .input(path.join(framesDir, 'frame-%03d.png'))
+          .outputOptions(['-vf', 'fps=10', '-pix_fmt', 'rgb24'])
+          .toFormat('gif')
+          .save(outputGifPath)
+          .on('end', resolve)
+          .on('error', reject);
+      });
+
+      // 4. Upload the GIF to Supabase
+      const buffer = fs.readFileSync(outputGifPath);
+      const key = `gifs/${Date.now()}-${Math.floor(Math.random()*1e6)}.gif`;
+      try {
+        const uploadResponse = await uploadGIFToSupabase(buffer, key);
+        res.status(200).json(uploadResponse);
+      } catch (uploadErr: any) {
+        logger.error("Supabase upload error", uploadErr);
+        res.status(500).json({ error: "Failed to upload GIF to Supabase" });
+      }
     } catch (err: any) {
       logger.error("Unexpected error", err);
       if (!responseSent) {
