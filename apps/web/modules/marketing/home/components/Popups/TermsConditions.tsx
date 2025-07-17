@@ -3,7 +3,6 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
-import PopupBackground from "../../../../../public/images/popup-background.svg";
 import SimpleButton from "../Button";
 
 const TermsAndConditionsPopup: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -22,13 +21,7 @@ const TermsAndConditionsPopup: React.FC<{ onClose: () => void }> = ({ onClose })
 
       <div className="absolute inset-0 h-full xl:-translate-y-16 xl:scale-[0.8]">
         {/* Background Image */}
-        <Image
-          src={PopupBackground}
-          alt="Popup Background"
-          layout="fill"
-          objectFit="contain"
-          className={`z-auto transition-all duration-300 ${isOpen ? "scale-100" : "scale-[1.7]"}`}
-        />
+        Background Image
       </div>
 
       <div className="relative max-w-[700px] p-2 xl:max-w-[450px] xl:scale-75">

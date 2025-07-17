@@ -14,8 +14,6 @@ import { useUser } from "@saas/auth/hooks/use-user";
 import SimpleButton from "../../../../../modules/marketing/home/components/Button";
 
 import SnapButton from "../../../../../modules/marketing/home/components/SnapButton";
-import GlowingArrowDown from "../../../../../public/images/button-assets/camera/arrow-small-down.svg";
-import GlowingArrowLeft from "../../../../../public/images/button-assets/camera/arrow-small-left.svg";
 
 import Processing from "@marketing/home/components/Modal-content/Processing";
 import Modal from "@marketing/home/components/Popups/Modal";
@@ -326,13 +324,7 @@ export default function TakeASelfie(props) {
           className="w-32"
           onClick={() => { onClickBack() }}
         >
-          <Image
-            src={GlowingArrowLeft}
-            alt="Back"
-            className=""
-            height={200}
-            width={200}
-          />
+          Click Me
         </button>
         <div className="relative flex size-24 items-center">
           <CircularCountdown timer={timer} />
@@ -375,12 +367,7 @@ export default function TakeASelfie(props) {
                       textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
                     }}>PRESS TO TAKE A PHOTO</p>
                   <div className="mt-4 flex justify-center text-green-500">
-                    <Image
-                      src={GlowingArrowDown}
-                      alt="Back"
-                      className="animate-bounce"
-                      width={80}
-                    />
+                    Click Me
                   </div>
                 </div>
               )}

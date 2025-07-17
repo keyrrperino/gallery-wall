@@ -2,8 +2,6 @@
 
 import Image from "next/image";
 
-import PopupBackground from "../../../../../public/images/bg-modal-3.svg";
-
 import type { PropsWithChildren } from "react";
 
 type ModalPropTypes = {
@@ -16,13 +14,7 @@ export default function Modal({ children, isOpen }: ModalPropTypes & PropsWithCh
       {/* Popup Content */}
       <div className="relative size-full md:size-[64rem]">
         <div className="absolute inset-0 flex items-center justify-center">
-          <Image
-            src={PopupBackground}
-            alt="Popup Background"
-            layout="fill"
-            objectFit="scale-down"
-            className="z-auto"
-          />
+          Image here
           <div className="relative z-10">
             {children}
           </div>
