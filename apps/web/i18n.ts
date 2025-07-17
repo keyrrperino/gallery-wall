@@ -1,14 +1,30 @@
-import { type Locale, config } from "@config";
-import { getMessagesForLocale } from "i18n/lib";
+import { appConfig } from "@config";
+import deepmerge from "deepmerge";
+import type { AbstractIntlMessages } from "next-intl";
 import { getRequestConfig } from "next-intl/server";
-import { notFound } from "next/navigation";
 
-export default getRequestConfig(async ({ locale }) => {
-	if (!Object.keys(config.i18n.locales).includes(locale as Locale)) {
-		notFound();
-	}
+export const importLocale = async (
+  locale: string,
+): Promise<AbstractIntlMessages> => {
+  return (
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    (await import(`./locales/${locale}.json`)).default as AbstractIntlMessages
+  );
+};
 
-	return {
-		messages: await getMessagesForLocale(locale),
-	};
-});
+export const getMessagesForLocale = async (
+  locale: string,
+): Promise<AbstractIntlMessages> => {
+  const localeMessages = await importLocale(locale);
+  if (locale === appConfig.i18n.defaultLocale) {
+    return localeMessages;
+  }
+  const defaultLocaleMessages = await importLocale(
+    appConfig.i18n.defaultLocale,
+  );
+  return deepmerge(defaultLocaleMessages, localeMessages);
+};
+
+export default getRequestConfig(async ({ locale }) => ({
+  messages: await getMessagesForLocale(locale),
+}));

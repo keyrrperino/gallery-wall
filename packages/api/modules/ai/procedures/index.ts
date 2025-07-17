@@ -1,1 +1,2 @@
-export * from "./generate-product-names";
+export * from "./facegen";
+

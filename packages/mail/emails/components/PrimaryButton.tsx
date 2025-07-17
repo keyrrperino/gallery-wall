@@ -1,18 +1,18 @@
 import { Button } from "@react-email/components";
-import type { PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 
 export default function PrimaryButton({
-	href,
-	children,
+  href,
+  children,
 }: PropsWithChildren<{
-	href: string;
+  href: string;
 }>) {
-	return (
-		<Button
-			href={href}
-			className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-		>
-			{children}
-		</Button>
-	);
+  return (
+    <Button
+      href={href}
+      className="bg-primary text-primary-foreground rounded-md px-4 py-2"
+    >
+      {children}
+    </Button>
+  );
 }

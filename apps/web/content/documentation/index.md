@@ -2,7 +2,7 @@
 title: Documentation
 ---
 
-Welcome to the documentation of acme. Here you will find all the information you need to work with our software. 
+Welcome to the documentation of Epic Generator. Here you will find all the information you need to work with our software. 
 
 
 ## 1.1 Getting started - Overview

@@ -1,63 +1,35 @@
-import { type Locale, config } from "@config";
+import type { inferAsyncReturnType } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { lucia } from "auth";
-import { db } from "database";
 import { cookies } from "next/headers";
-import { getSignedUrl } from "storage";
-import { defineAbilitiesFor } from "../modules/auth/abilities";
 
 export async function createContext(
-	params?: FetchCreateContextFnOptions | { isAdmin?: boolean },
+  params?: FetchCreateContextFnOptions | { isAdmin?: boolean },
 ) {
-	const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-	const { user, session } = sessionId
-		? await lucia.validateSession(sessionId)
-		: { user: null, session: null };
+  console.log("lucia.sessionCookieName: ", lucia.sessionCookieName);
+  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
 
-	const teamMemberships = user
-		? await Promise.all(
-				(
-					await db.teamMembership.findMany({
-						where: {
-							userId: user.id,
-						},
-						include: {
-							team: true,
-						},
-					})
-				).map(async (membership) => ({
-					...membership,
-					team: {
-						...membership.team,
-						avatarUrl: membership.team.avatarUrl
-							? await getSignedUrl(membership.team.avatarUrl, {
-									bucket: "avatars",
-									expiresIn: 360,
-								})
-							: null,
-					},
-				})),
-			)
-		: null;
+  console.log("sessionId: ", sessionId)
 
-	const abilities = defineAbilitiesFor({
-		user,
-		teamMemberships,
-	});
+  let luciaSession;
 
-	const locale = (cookies().get(config.i18n.cookieName)?.value ??
-		config.i18n.defaultLocale) as Locale;
+  try {
+    luciaSession = sessionId
+      ? await lucia.validateSession(sessionId)
+      : { user: null, session: null };
 
-	return {
-		user,
-		teamMemberships,
-		abilities,
-		session,
-		locale,
-		responseHeaders:
-			params && "resHeaders" in params ? params.resHeaders : undefined,
-		isAdmin: params && "isAdmin" in params ? params.isAdmin : false,
-	};
+  } catch {
+    luciaSession = { user: null, session: null };
+  }
+
+  return {
+    user: luciaSession?.user,
+    session: luciaSession?.session,
+    responseHeaders:
+      params && "resHeaders" in params ? params.resHeaders : undefined,
+    req:
+      params && "req" in params ? params.req : undefined,
+  };
 }
 
-export type Context = Awaited<ReturnType<typeof createContext>>;
+export type Context = inferAsyncReturnType<typeof createContext>;

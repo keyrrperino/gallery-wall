@@ -14,11 +14,11 @@ import ffmpeg from "fluent-ffmpeg";
 import {z} from "zod";
 import cors from "cors";
 import stream from "stream";
-import { createClient } from '@supabase/supabase-js';
-import { removeBackground } from '@imgly/background-removal-node';
-import fs from 'fs';
-import path from 'path';
-import sharp from 'sharp';
+import {createClient} from "@supabase/supabase-js";
+import {removeBackground} from "@imgly/background-removal-node";
+import fs from "fs";
+import path from "path";
+import sharp from "sharp";
 
 setGlobalOptions({maxInstances: 10});
 
@@ -26,29 +26,49 @@ setGlobalOptions({maxInstances: 10});
 
 const inputSchema = z.object({
   videoUrl: z.string().url(),
-  width: z.string()
+  width: z.string(),
 });
+
+const keyPart1 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.";
+const keyPart2 = "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxicnhmZnJnY2Nkb2pudWd3a2";
+const keyPart3 = "duIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjU0ODE0OCwi";
+const keyPart4 = "ZXhwIjoyMDY4MTI0MTQ4fQ.eLxwP-";
+const keyPart5 = "fJbkW_m7gzJ3t73Z6U0epdnjPLumqt9ZuN9rg";
 
 // Supabase client setup
 const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://lbrxffrgccdojnugwkgn.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxicnhmZnJnY2Nkb2pudWd3a2duIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjU0ODE0OCwiZXhwIjoyMDY4MTI0MTQ4fQ.eLxwP-fJbkW_m7gzJ3t73Z6U0epdnjPLumqt9ZuN9rg'
+  process.env.SUPABASE_URL || "https://lbrxffrgccdojnugwkgn.supabase.co",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || (
+    keyPart1+keyPart2+keyPart3+keyPart4+keyPart5)
 );
 
-const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || 'gifs';
+const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || "gifs";
 
-async function uploadGIFToSupabase(buffer: Buffer, key: string): Promise<{url: string; path: key}> {
-  const { data, error } = await supabase.storage
+/**
+ * Uploads a GIF buffer to Supabase Storage and returns
+ * a signed URL and storage path.
+ *
+ * @param {Buffer} buffer - The GIF file buffer to upload.
+ * @param {string} key - The storage key (path) for the GIF
+ * in the Supabase bucket.
+ * @return {Promise<{url: string, path: string}>} An object
+ * containing the signed URL and storage path.
+ * @throws Will throw an error if the upload or signed
+ * URL creation fails.
+ */
+async function uploadGIFToSupabase(
+  buffer: Buffer, key: string): Promise<{url: string; path: string}> {
+  const {error} = await supabase.storage
     .from(SUPABASE_BUCKET)
     .upload(key, buffer, {
-      contentType: 'image/gif',
+      contentType: "image/gif",
       upsert: true,
     });
 
   if (error) throw error;
 
   // Get a signed URL valid for 1 hour (3600 seconds)
-  const { data: signedData, error: signedError } = await supabase
+  const {data: signedData, error: signedError} = await supabase
     .storage
     .from(SUPABASE_BUCKET)
     .createSignedUrl(key, 631152000);
@@ -56,13 +76,15 @@ async function uploadGIFToSupabase(buffer: Buffer, key: string): Promise<{url: s
   if (signedError) throw signedError;
   return {
     url: signedData.signedUrl,
-    path: key
+    path: key,
   };
 }
 
 export const convertVideoUrlToGIF = onRequest(async (req, res) => {
   // Enable CORS for all origins
-  cors({origin: true})(req, res, async () => {
+  cors({
+    origin: true,
+  })(req, res, async () => {
     try {
       const parsed = inputSchema.safeParse(req.query);
       if (!parsed.success) {
@@ -114,7 +136,7 @@ export const convertAndUploadVideoUrlToGIF = onRequest(async (req, res) => {
         responseSent = true;
         return;
       }
-      const { videoUrl } = parsed.data;
+      const {videoUrl} = parsed.data;
 
       const passThrough = new stream.PassThrough();
       const chunks: Buffer[] = [];
@@ -129,7 +151,7 @@ export const convertAndUploadVideoUrlToGIF = onRequest(async (req, res) => {
           res.status(200).json(uploadResponse);
         } catch (uploadErr: any) {
           logger.error("Supabase upload error", uploadErr);
-          res.status(500).json({ error: "Failed to upload GIF to Supabase" });
+          res.status(500).json({error: "Failed to upload GIF to Supabase"});
         }
       });
 
@@ -147,7 +169,7 @@ export const convertAndUploadVideoUrlToGIF = onRequest(async (req, res) => {
           }
           // No need to call res.end() here, as error response is sent
         })
-        .pipe(passThrough, { end: true });
+        .pipe(passThrough, {end: true});
     } catch (err: any) {
       logger.error("Unexpected error", err);
       if (!responseSent) {
@@ -157,7 +179,10 @@ export const convertAndUploadVideoUrlToGIF = onRequest(async (req, res) => {
   });
 });
 
-export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest(async (req, res) => {
+export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest({
+  timeoutSeconds: 540,
+  memory: "1GiB",
+}, async (req, res) => {
   cors({origin: true})(req, res, async () => {
     let responseSent = false; // Track if response is already sent
     try {
@@ -170,42 +195,43 @@ export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest(async (req, res) 
         responseSent = true;
         return;
       }
-      const { videoUrl } = parsed.data;
+      const {videoUrl} = parsed.data;
 
       // Prepare temp directories
-      const framesDir = '/tmp/frames';
+      const framesDir = "/tmp/frames";
       if (fs.existsSync(framesDir)) {
-        fs.rmSync(framesDir, { recursive: true, force: true });
+        fs.rmSync(framesDir, {recursive: true, force: true});
       }
       fs.mkdirSync(framesDir);
-      const outputGifPath = '/tmp/output.gif';
+      const outputGifPath = "/tmp/output.gif";
       if (fs.existsSync(outputGifPath)) fs.unlinkSync(outputGifPath);
 
       // 1. Extract frames from video (as PNG for compatibility)
       await new Promise((resolve, reject) => {
         ffmpeg(videoUrl)
           .outputOptions([
-            '-vf', 'fps=10',
-            '-t', '5',
-            '-pix_fmt', 'rgb24'
+            "-t", "3",
+            "-vf", "fps=30,scale=1080:-1:flags=lanczos",
           ])
-          .save(path.join(framesDir, 'frame-%03d.png'))
-          .on('end', resolve)
-          .on('error', reject);
+          .save(path.join(framesDir, "frame-%03d.png"))
+          .on("end", resolve)
+          .on("error", reject);
       });
 
-      // 2. Remove background from each frame (PNG, check with sharp, try file path then buffer)
-      const frameFiles = fs.readdirSync(framesDir).filter(f => f.endsWith('.png'));
+      // 2. Remove background from each frame
+      // (PNG, check with sharp, try file path then buffer)
+      const frameFiles = fs.readdirSync(framesDir)
+        .filter((f) => f.endsWith(".png"));
       for (const file of frameFiles) {
         const filePath = path.join(framesDir, file);
         // Log file info for debugging
         const stats = fs.statSync(filePath);
-        console.log('Processing:', filePath, 'size:', stats.size);
+        console.log("Processing:", filePath, "size:", stats.size);
         // Check PNG validity with sharp
         try {
           await sharp(filePath).metadata();
         } catch (e) {
-          console.error('Sharp could not decode:', filePath, e);
+          console.error("Sharp could not decode:", filePath, e);
           continue; // skip this frame
         }
         // Try removeBackground with file path, then buffer
@@ -213,28 +239,38 @@ export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest(async (req, res) 
         try {
           blob = await removeBackground(filePath);
         } catch (e1) {
-          console.error('removeBackground failed with file path:', filePath, e1);
+          console.error(
+            "removeBackground failed with file path:", filePath, e1
+          );
           try {
             const inputBuffer = fs.readFileSync(filePath);
             blob = await removeBackground(inputBuffer);
           } catch (e2) {
-            console.error('removeBackground failed with buffer:', filePath, e2);
+            console.error(
+              "removeBackground failed with buffer:", filePath, e2)
+            ;
             continue; // skip this frame
           }
         }
+        // Composite the result over a solid color (white) background
         const outputBuffer = Buffer.from(await blob.arrayBuffer());
-        fs.writeFileSync(filePath, outputBuffer);
+        const composited = await sharp(outputBuffer)
+          .flatten({background: {r: 255, g: 255, b: 255}}) // white background
+          .png()
+          .toBuffer();
+        fs.writeFileSync(filePath, composited);
       }
 
       // 3. Re-encode frames into a GIF
       await new Promise((resolve, reject) => {
         ffmpeg()
-          .input(path.join(framesDir, 'frame-%03d.png'))
-          .outputOptions(['-vf', 'fps=10', '-pix_fmt', 'rgb24'])
-          .toFormat('gif')
+          .input(path.join(framesDir, "frame-%03d.png"))
+          .outputOptions(["-t", "3",
+            "-vf", "fps=30,scale=1080:-1:flags=lanczos"])
+          .toFormat("gif")
           .save(outputGifPath)
-          .on('end', resolve)
-          .on('error', reject);
+          .on("end", resolve)
+          .on("error", reject);
       });
 
       // 4. Upload the GIF to Supabase
@@ -245,7 +281,7 @@ export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest(async (req, res) 
         res.status(200).json(uploadResponse);
       } catch (uploadErr: any) {
         logger.error("Supabase upload error", uploadErr);
-        res.status(500).json({ error: "Failed to upload GIF to Supabase" });
+        res.status(500).json({error: "Failed to upload GIF to Supabase"});
       }
     } catch (err: any) {
       logger.error("Unexpected error", err);
@@ -255,3 +291,4 @@ export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest(async (req, res) 
     }
   });
 });
+

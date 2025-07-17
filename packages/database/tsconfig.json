@@ -1,5 +1,8 @@
 {
-	"extends": "tsconfig/base.json",
-	"include": ["**/*.ts"],
-	"exclude": ["dist", "build", "node_modules", "src/zod/**/*.ts"]
+  "extends": "tsconfig/react-library.json",
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"],
+  "compilerOptions": {
+    "baseUrl": "."
+  }
 }

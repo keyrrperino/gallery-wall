@@ -1,5 +1,4 @@
-import type { Messages } from "i18n/types";
+// Use type safe message keys with `next-intl`
+type Messages = typeof import("./locales/en.json");
 
-declare global {
-	interface IntlMessages extends Messages {}
-}
+declare interface IntlMessages extends Messages {}

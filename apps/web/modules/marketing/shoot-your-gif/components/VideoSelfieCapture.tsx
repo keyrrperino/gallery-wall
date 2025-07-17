@@ -14,7 +14,7 @@ export default function VideoSelfieCapture() {
   const [gifUrl, setGifUrl] = React.useState<string | null>(null);
   const router = useRouter();
 
-  const getSignedUploadUrlMutation = apiClient.uploads.signedUploadUrl.useMutation();
+  const getSignedUploadUrlMutation = apiClient.uploads.signedUploadUrlGifs.useMutation();
   const getSupabaseSignedUrlMutation = apiClient.uploads.supabaseSignedUrl.useMutation();
   const processVideoMutation = apiClient.uploads.processVideo.useMutation();
 
@@ -84,7 +84,7 @@ export default function VideoSelfieCapture() {
       console.log(url);
       console.log(`https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}`);
 
-      const firebaseUrl = `https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}`;
+      const firebaseUrl = `https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}&width=1080`;
 
       setGifUrl(firebaseUrl);
       // const gifResponse = await fetch(firebaseUrl);
