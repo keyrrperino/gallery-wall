@@ -43,7 +43,7 @@ export default function Results(props) {
   const { searchParams } = props ?? {};
 
   const { requestId } = searchParams ?? {};
-  const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
+  const [, setIsSendingEmail] = useState<boolean>(false);
   const [selectedImageWithFrame, setSelectedImageWithFrame] = useState<string | null>(null);
 
   const [modalState, setIsModalState] = useState<MODAL_STATE>(MODAL_STATE.EMPTY);
@@ -130,12 +130,9 @@ export default function Results(props) {
   const {
     handleSubmit,
     register,
-    watch,
-    formState: { isValid }
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
-  const watchEmail = watch("email");
 
   const onBackMenuClick = () => {
     router.push("/");
@@ -316,7 +313,7 @@ export default function Results(props) {
           </div>
         </div>
 
-        <h2 className="h1-bold my-4 text-[4vh] uppercase">
+        <h2 className="my-4 text-[4vh] uppercase">
           <span className="text-[#42FF00]">Select</span> <span className="text-white">a photo</span>
         </h2>
         <div className="flex h-[20vh] w-full flex-row justify-center gap-4 object-cover">

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 import SimpleButon from "../Button";

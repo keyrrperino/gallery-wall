@@ -1,7 +1,6 @@
-'use client';
+"use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { apiClient } from "@shared/lib/api-client";
 import { v4 as uuid } from "uuid";
 
@@ -12,11 +11,9 @@ export default function VideoSelfieCapture() {
   const [loading, setLoading] = React.useState(false);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [gifUrl, setGifUrl] = React.useState<string | null>(null);
-  const router = useRouter();
 
   const getSignedUploadUrlMutation = apiClient.uploads.signedUploadUrlGifs.useMutation();
   const getSupabaseSignedUrlMutation = apiClient.uploads.supabaseSignedUrl.useMutation();
-  const processVideoMutation = apiClient.uploads.processVideo.useMutation();
 
   // Record 3 seconds
   const handleRecord = async () => {
@@ -33,7 +30,9 @@ export default function VideoSelfieCapture() {
     const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
     const chunks: BlobPart[] = [];
     recorder.ondataavailable = (e) => {
-      if (e.data.size > 0) chunks.push(e.data);
+      if (e.data.size > 0) {
+        chunks.push(e.data);
+      }
     };
     recorder.onstop = async () => {
       const videoBlob = new Blob(chunks, { type: "video/webm" });
@@ -70,7 +69,9 @@ export default function VideoSelfieCapture() {
         },
       });
 
-      if (!response.ok) throw new Error("Failed to upload video");
+      if (!response.ok) {
+        throw new Error("Failed to upload video");
+      }
 
       // Get the signed URL for the uploaded video (valid for 1 day)
       const { url } = await getSupabaseSignedUrlMutation.mutateAsync({
@@ -94,8 +95,12 @@ export default function VideoSelfieCapture() {
       // if (!gifData.gifUrl) throw new Error("GIF URL not found in response");
       // setGifUrl(gifData.gifUrl);
       setLoading(false);
-    } catch (err: any) {
-      setError(err.message || "Upload or processing failed.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err?.message || "Upload or processing failed.");
+      } else {
+        setError("Upload or processing failed.");
+      }
       setLoading(false);
     }
   };
@@ -103,7 +108,7 @@ export default function VideoSelfieCapture() {
   // Start camera on mount
   React.useEffect(() => {
     let stream: MediaStream;
-    (async () => {
+    void (async () => {
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "user" },
@@ -134,7 +139,13 @@ export default function VideoSelfieCapture() {
       />
       {error && <div className="text-red-500">{error}</div>}
       {previewUrl && (
-        <video src={previewUrl} controls className="rounded-lg border w-full max-w-xs aspect-video" />
+        <video
+          src={previewUrl}
+          controls
+          className="rounded-lg border w-full max-w-xs aspect-video"
+        >
+          <track kind="captions" />
+        </video>
       )}
       {gifUrl && (
         <img src={gifUrl} alt="Generated GIF" className="rounded-lg border w-full max-w-xs aspect-video" />

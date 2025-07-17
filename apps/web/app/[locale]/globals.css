@@ -113,6 +113,11 @@ pre.shiki {
   font-weight: bolder;
 }
 
+.h1-bold {
+  font-family: 'Novecento CondBold', sans-serif;
+  font-weight: bolder;
+}
+
 .h1-regular {
   font-family: 'Brothers-Regular', sans-serif;
 }

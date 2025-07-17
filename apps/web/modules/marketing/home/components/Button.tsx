@@ -12,7 +12,6 @@ type SimpleButtonProps = {
 const SimpleButton: React.FC<SimpleButtonProps> = ({
   children,
   onClick,
-  variant = "primary",
   className = "",
   disabled = false,
 }) => {
@@ -22,7 +21,7 @@ const SimpleButton: React.FC<SimpleButtonProps> = ({
 
   return (
     <button
-      className={cn(base, className, disabled && 'bg-[#8fa0cd]')}
+      className={cn(base, className, disabled && "bg-[#8fa0cd]")}
       onClick={onClick}
       disabled={disabled}
     >

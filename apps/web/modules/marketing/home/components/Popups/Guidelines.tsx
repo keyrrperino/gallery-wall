@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 import SimpleButton from "../Button";
@@ -26,7 +25,7 @@ const GuidelinesPopup: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       <div className="relative max-w-[750px] p-2 xl:max-w-[450px] xl:scale-75">
         <div className="relative z-10">
-          <h2 className="h1-bold mb-12 pt-10 text-[3vh] uppercase leading-none xl:text-4xl">
+          <h2 className="mb-12 pt-10 text-[3vh] uppercase leading-none xl:text-4xl">
             <span className="text-[#42FF00]">Hey dude!</span> <span className="text-white">before we proceed, HERE ARE SOME GUIDELINES TO follow:</span>
           </h2>
           <h3 className="font-text-base mb-8 text-[1.7vh] uppercase  tracking-[.1em] text-[#42FF00] xl:text-2xl">

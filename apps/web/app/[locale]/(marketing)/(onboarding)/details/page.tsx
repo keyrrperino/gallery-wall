@@ -36,7 +36,7 @@ export default function StepThree() {
   const [showTermsPopup, setShowTermsPopup] = useState(false);
   const [showPrivatePopup, setShowPrivatePopup] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const { user: sessionuser, updateUser: updateSessionUser } = useUser();
   console.log({ sessionuser })
@@ -44,14 +44,10 @@ export default function StepThree() {
   const {
     handleSubmit,
     register,
-    formState: { isValid },
-    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
   const createUser = apiClient.auth.createUser.useMutation();
-
-  const watchAgree = watch("agree");
 
   const onClickProceed = async ({ name, gender, agree }: FormValues) => {
     setIsSaving(true);

@@ -1,7 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useRef } from "react";
-import { CONNECTED, DETERMINED, EMPOWERED, GRATEFUL, HOPEFUL, INSPIRED, POSIVITE, PROUD, RESPONSIBLE, WORRIED } from "@saas/shared/constants";
+import { useState } from "react";
 import { Button } from "@ui/components/button";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
@@ -10,10 +9,10 @@ import { PlegeItemType } from "../types";
 
 export default function Section() {
   const PLEDGES: PlegeItemType[] = [
-    { topText: 'TIDE TO OUR FUTURE', bottomText: 'FOR GENERATIONS TO COME' },
-    { topText: 'I SUPPORT', bottomText: 'COASTAL PROECTION' },
-    { topText: 'I CARE', bottomText: 'ABOUT OUR COASTS' },
-    { topText: 'COASTAL PROTECTION', bottomText: 'NOW!' }
+    { topText: "TIDE TO OUR FUTURE", bottomText: "FOR GENERATIONS TO COME" },
+    { topText: "I SUPPORT", bottomText: "COASTAL PROECTION" },
+    { topText: "I CARE", bottomText: "ABOUT OUR COASTS" },
+    { topText: "COASTAL PROTECTION", bottomText: "NOW!" }
   ];
 
   const [selected, setSelected] = useState<string | null>(null);

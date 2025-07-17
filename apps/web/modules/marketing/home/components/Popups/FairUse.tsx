@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 import SimpleButton from "../Button";
@@ -27,7 +26,7 @@ const FairUsePopup: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <div className="relative max-w-[700px] p-2 xl:max-w-[450px] xl:scale-75">
         {/* Popup Text */}
         <div className="relative z-10 flex flex-col">
-          <h2 className="h1-bold mb-8 pt-10 text-7xl uppercase text-[#42FF00] xl:text-5xl">Fair Use Policy</h2>
+          <h2 className="mb-8 pt-10 text-7xl uppercase text-[#42FF00] xl:text-5xl">Fair Use Policy</h2>
           <p className="font-text-normal mb-24 text-2xl text-white xl:text-lg">
           To protect your privacy while you use our site and let you know what types of information we are collecting and how we are using it, we have developed this Privacy Policy. As we update our services and technologies and as we expand or change our offerings, this Privacy Policy may change from time to time, so please check it periodically.
           <br/><br/>At Green Rebel Brewing Co., we&rsquo;re committed to protecting your privacy. Federal and various state laws require us to tell you how we collect, use, share, and protect your personal information. These laws also limit how we can use your personal information. Please read this Policy carefully to understand what we do with the personal information we collect.

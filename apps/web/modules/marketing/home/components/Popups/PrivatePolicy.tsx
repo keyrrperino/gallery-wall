@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 import SimpleButton from "../Button";
@@ -27,7 +26,7 @@ const PrivatePolicyPopup: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <div className="relative max-w-[700px] p-2 xl:max-w-[450px] xl:scale-75">
         {/* Popup Text */}
         <div className="relative z-10 flex flex-col">
-          <h2 className="h1-bold mb-8 pt-10 text-7xl uppercase text-[#42FF00] lg:text-[4.5vh] xl:text-5xl">Privacy Policy</h2>
+          <h2 className="mb-8 pt-10 text-7xl uppercase text-[#42FF00] lg:text-[4.5vh] xl:text-5xl">Privacy Policy</h2>
           
           <div className="flex justify-center">
             <SimpleButton

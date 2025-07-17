@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useRef } from "react";
 import { FeelItem } from "@marketing/how-do-you-feel/components/FeelItem";
@@ -25,14 +25,16 @@ export default function Section() {
       setSelected([...selected, feel]);
     } else {
       setFlash(true);
-      if (flashTimeout.current) clearTimeout(flashTimeout.current);
+      if (flashTimeout.current) {
+        clearTimeout(flashTimeout.current);
+      }
       flashTimeout.current = setTimeout(() => setFlash(false), 500);
     }
   };
 
   const handleNext = () => {
     if (selected.length === 3) {
-      const params = selected.map(f => `feelings=${encodeURIComponent(f)}`).join('&');
+      const params = selected.map(f => `feelings=${encodeURIComponent(f)}`).join("&");
       router.push(`/what-is-your-pledge?${params}`);
     }
   };

@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import Image from "next/image";
-
 import type { PropsWithChildren } from "react";
 
 type ModalPropTypes = {
