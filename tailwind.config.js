@@ -9,12 +9,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'button-base': ['DINPro-CondBlack', 'sans-serif',],
-        'text-base': ['DINPro-Medium', 'sans-serif',],
-        'h1-bold': ['Brothers-Bold', 'sans-serif',],
-        'h1-regular': ['Brothers-Regular', 'sans-serif',],
+        headline: ['"Novecento Sans"', 'sans-serif'],
+        body: ['"Neue Haas Grotesk"', 'sans-serif'],
       },
     },
   },
-  plugins: [],
 };

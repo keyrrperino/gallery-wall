@@ -1,15 +1,13 @@
-import { UserFaceGenRequestsSchema, UserSessionSchema, db } from "database";
+import { UserGifRequestSchema, UserSessionSchema, db } from "database";
 import { z } from "zod";
 import { publicProcedure } from "../../../trpc/base";
 
 export const request = publicProcedure
   .input(z.void())
   .output(
-    UserFaceGenRequestsSchema.pick({
+    UserGifRequestSchema.pick({
       id: true,
       requestStatus: true,
-      requestType: true,
-      imageUrls: true,
     })
       .extend({
         session: UserSessionSchema.pick({
@@ -26,7 +24,7 @@ export const request = publicProcedure
     }
 
     const requestresult = session?.id
-      ? await db.userFaceGenRequests.findFirst({
+      ? await db.userGifRequest.findFirst({
         where: {
           userId: session.userId,
         },

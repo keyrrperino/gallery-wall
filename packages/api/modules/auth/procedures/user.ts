@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { lucia } from "auth";
-import { UserFaceGenRequestsSchema, UserSchema, UserTypeSchema, db } from "database";
+import { UserGifRequestSchema, UserSchema, UserTypeSchema, db } from "database";
 import { FEMALE, MALE } from "utils";
 import { z } from "zod";
 import { publicProcedure } from "../../../trpc/base";
@@ -8,15 +8,11 @@ import { publicProcedure } from "../../../trpc/base";
 const outputSchema = UserSchema.pick({
   id: true,
   name: true,
-  gender: true,
-  isEighteenAndAbove: true
 })
   .extend({
-    request: UserFaceGenRequestsSchema.pick({
+    request: UserGifRequestSchema.pick({
       id: true,
       requestStatus: true,
-      requestType: true,
-      imageUrls: true
     }).nullish(),
   })
   .nullable();
@@ -34,7 +30,7 @@ export const user = publicProcedure
 
       let requestResult;
       try {
-        requestResult = await db.userFaceGenRequests.findFirst({
+        requestResult = await db.userGifRequest.findFirst({
           where: {
             userId: user?.id
           }
@@ -47,8 +43,8 @@ export const user = publicProcedure
         id: user?.id ?? "",
         name: user?.name ?? null,
         request: requestResult ?? null,
-        gender: user?.gender ?? null,
-        isEighteenAndAbove: user?.isEighteenAndAbove ?? false
+        gender: '',
+        isEighteenAndAbove: false
       };
     });
 
@@ -62,17 +58,15 @@ export const createUser = publicProcedure
   )
   .output(outputSchema)
   .mutation(
-    async ({ ctx: { session, responseHeaders }, input: { gender, name, isEighteenAndAbove } }) => {
+    async ({ ctx: { session, responseHeaders }, input: {name } }) => {
       if (session?.id) {
         await lucia.invalidateSession(session?.id);
       }
 
       const newUser = await db.user.create({
         data: {
-          gender,
           name,
-          isEighteenAndAbove,
-          userType: UserTypeSchema.Values.KIOSK
+          userType: UserTypeSchema.Values.IPAD
         },
       });
 
@@ -98,7 +92,7 @@ export const updateUser = publicProcedure
   .output(
     outputSchema
   )
-  .mutation(async ({ ctx: { user, session }, input: { gender, name, isEighteenAndAbove } }) => {
+  .mutation(async ({ ctx: { user, session }, input: { name } }) => {
     console.log({ session, user })
 
     if (user) {
@@ -107,9 +101,7 @@ export const updateUser = publicProcedure
           id: user.id
         },
         data: {
-          gender,
           name,
-          isEighteenAndAbove
         }
       });
 

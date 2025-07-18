@@ -75,7 +75,7 @@ export default function TakeASelfie(props) {
   }, [countdownState]);
 
   const { data: faceGenRequestImages, isLoading } = apiClient.images.getImages.useQuery({
-    userFaceGenRequestId: requestId ?? ""
+    userRequestId: requestId ?? ""
   },
     {
       enabled: !!requestId,
@@ -132,7 +132,7 @@ export default function TakeASelfie(props) {
 
   useEffect(() => {
     if (user !== null) {
-      if (!(user?.gender ?? user?.name ?? user?.isEighteenAndAbove)) {
+      if (!(user?.name)) {
         router.push("/");
       }
     }

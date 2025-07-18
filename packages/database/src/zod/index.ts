@@ -14,13 +14,11 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const UserSessionScalarFieldEnumSchema = z.enum(['id','userId','createdAt','expiresAt']);
 
-export const ImagesScalarFieldEnumSchema = z.enum(['id','userFaceGenRequestId','imageResult','prompt','gcpStoragePath','gcpSignedUrl','createdAt','updatedAt']);
+export const FrameScalarFieldEnumSchema = z.enum(['id','userRequestId','imageUrl','frameStatus','createdAt','updatedAt']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','facebookUserId','name','gender','isEighteenAndAbove','email','userType','imageGenerationState','conversationId','createdAt','updatedAt','iAgreeToPrivacyPolicyTermsAndConditions']);
+export const UserScalarFieldEnumSchema = z.enum(['id','email','name','userType','createdAt','updatedAt']);
 
-export const UserFaceGenRequestsScalarFieldEnumSchema = z.enum(['id','userId','facebookUserId','imageResult','requestType','requestStatus','imageUrls','prompt','tune','createdAt','updatedAt']);
-
-export const UserTicketsScalarFieldEnumSchema = z.enum(['id','userId','createdAt','updatedAt']);
+export const UserGifRequestScalarFieldEnumSchema = z.enum(['id','userId','gifUrl','requestStatus','createdAt','updatedAt']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -28,21 +26,21 @@ export const QueryModeSchema = z.enum(['default','insensitive']);
 
 export const NullsOrderSchema = z.enum(['first','last']);
 
-export const RequestTypeSchema = z.enum(['KIOSK','MESSENGER']);
-
-export type RequestTypeType = `${z.infer<typeof RequestTypeSchema>}`
-
-export const UserTypeSchema = z.enum(['KIOSK','MESSENGER']);
+export const UserTypeSchema = z.enum(['PC','IPAD']);
 
 export type UserTypeType = `${z.infer<typeof UserTypeSchema>}`
 
-export const RequestStatusSchema = z.enum(['PENDING','FAILED','SUCCESS']);
+export const RequestStatusSchema = z.enum(['PENDING','EXTRACTING_FRAMES','DONE_EXTRACTING_FRAMES','FAILED','SUCCESS']);
 
 export type RequestStatusType = `${z.infer<typeof RequestStatusSchema>}`
 
-export const GenderSchema = z.enum(['MALE','FEMALE']);
+export const FrameStatusSchema = z.enum(['PENDING','FAILED','SUCCESS']);
 
-export type GenderType = `${z.infer<typeof GenderSchema>}`
+export type FrameStatusType = `${z.infer<typeof FrameStatusSchema>}`
+
+export const GifStatusSchema = z.enum(['PENDING','FAILED','SUCCESS']);
+
+export type GifStatusType = `${z.infer<typeof GifStatusSchema>}`
 
 /////////////////////////////////////////
 // MODELS
@@ -62,72 +60,46 @@ export const UserSessionSchema = z.object({
 export type UserSession = z.infer<typeof UserSessionSchema>
 
 /////////////////////////////////////////
-// IMAGES SCHEMA
+// FRAME SCHEMA
 /////////////////////////////////////////
 
-export const ImagesSchema = z.object({
-  id: z.number().int(),
-  userFaceGenRequestId: z.string(),
-  imageResult: z.string(),
-  prompt: z.string(),
-  gcpStoragePath: z.string().nullable(),
-  gcpSignedUrl: z.string().nullable(),
+export const FrameSchema = z.object({
+  frameStatus: FrameStatusSchema,
+  id: z.string(),
+  userRequestId: z.string(),
+  imageUrl: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
 
-export type Images = z.infer<typeof ImagesSchema>
+export type Frame = z.infer<typeof FrameSchema>
 
 /////////////////////////////////////////
 // USER SCHEMA
 /////////////////////////////////////////
 
 export const UserSchema = z.object({
-  gender: GenderSchema.nullable(),
   userType: UserTypeSchema,
   id: z.string().cuid(),
-  facebookUserId: z.string().nullable(),
-  name: z.string().nullable(),
-  isEighteenAndAbove: z.boolean().nullable(),
   email: z.string().nullable(),
-  imageGenerationState: z.string().nullable(),
-  conversationId: z.string().nullable(),
+  name: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  iAgreeToPrivacyPolicyTermsAndConditions: z.boolean().nullable(),
 })
 
 export type User = z.infer<typeof UserSchema>
 
 /////////////////////////////////////////
-// USER FACE GEN REQUESTS SCHEMA
+// USER GIF REQUEST SCHEMA
 /////////////////////////////////////////
 
-export const UserFaceGenRequestsSchema = z.object({
-  requestType: RequestTypeSchema,
+export const UserGifRequestSchema = z.object({
   requestStatus: RequestStatusSchema,
   id: z.string(),
   userId: z.string(),
-  facebookUserId: z.string().nullable(),
-  imageResult: z.string().nullable(),
-  imageUrls: z.string().array(),
-  prompt: z.string().nullable(),
-  tune: z.string().nullable(),
+  gifUrl: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
 
-export type UserFaceGenRequests = z.infer<typeof UserFaceGenRequestsSchema>
-
-/////////////////////////////////////////
-// USER TICKETS SCHEMA
-/////////////////////////////////////////
-
-export const UserTicketsSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-})
-
-export type UserTickets = z.infer<typeof UserTicketsSchema>
+export type UserGifRequest = z.infer<typeof UserGifRequestSchema>

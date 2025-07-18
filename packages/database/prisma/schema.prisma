@@ -26,79 +26,61 @@ model UserSession {
   @@index([userId])
 }
 
-enum RequestType {
-  KIOSK
-  MESSENGER
-}
-
 enum UserType {
-  KIOSK
-  MESSENGER
+  PC
+  IPAD
 }
 
 enum RequestStatus {
+  PENDING
+  EXTRACTING_FRAMES
+  DONE_EXTRACTING_FRAMES
+  FAILED
+  SUCCESS
+}
+
+enum FrameStatus {
   PENDING
   FAILED
   SUCCESS
 }
 
-enum Gender {
-  MALE
-  FEMALE
+enum GifStatus {
+  PENDING
+  FAILED
+  SUCCESS
 }
 
-model Images {
-  id                   Int                 @id @default(autoincrement())
-  userFaceGenRequestId String
-  user                 UserFaceGenRequests @relation(fields: [userFaceGenRequestId], references: [id])
-  imageResult          String
-  prompt               String
-  gcpStoragePath       String?
-  gcpSignedUrl         String?
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @default(now())
+model Frame {
+  id            String         @id
+  userRequestId String
+  userRequest   UserGifRequest @relation(fields: [userRequestId], references: [id])
+  imageUrl      String
+  frameStatus   FrameStatus
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now())
 }
 
 model User {
-  id                                      String                @id @default(cuid())
-  facebookUserId                          String?               @unique
-  name                                    String?
-  gender                                  Gender?
-  isEighteenAndAbove                      Boolean?
-  email                                   String?
-  userType                                UserType
-  sessions                                UserSession[]
-  requests                                UserFaceGenRequests[]
-  imageGenerationState                    String?
-  conversationId                          String?
-  createdAt                               DateTime              @default(now())
-  updatedAt                               DateTime              @default(now())
-  UserTickets                             UserTickets[]
-  iAgreeToPrivacyPolicyTermsAndConditions Boolean?
+  id        String           @id @default(cuid())
+  email     String?
+  name      String?
+  userType  UserType
+  sessions  UserSession[]
+  requests  UserGifRequest[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now())
 }
 
-model UserFaceGenRequests {
-  id             String        @id
-  userId         String
-  user           User          @relation(fields: [userId], references: [id])
-  facebookUserId String?
-  imageResult    String?
-  requestType    RequestType
-  requestStatus  RequestStatus
-  imageUrls      String[]
-  prompt         String?
-  tune           String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now())
-  Images         Images[]
+model UserGifRequest {
+  id            String        @id
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  gifUrl        String?
+  requestStatus RequestStatus
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now())
+  Frames        Frame[]
 
   @@index([userId])
-}
-
-model UserTickets {
-  id        String   @id
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
 }

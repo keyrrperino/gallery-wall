@@ -1,4 +1,4 @@
-import { RequestStatusSchema, RequestTypeSchema, db } from "database";
+import { RequestStatusSchema, db } from "database";
 import { DEFAULT_NEGATIVE_PROMPT, FEMALE, GUIDE_TEXT_PROMPTS, MALE, createFineTune } from "utils";
 import { v4 } from "uuid";
 import { z } from "zod";
@@ -29,20 +29,12 @@ export const faceGen = protectedProcedure
 
     const requestId = v4();
 
-    console.log({ requestId })
-
-    const {
-      gender,
-    } = user;
-
-    await db.userFaceGenRequests.upsert({
+    await db.userGifRequest.upsert({
       where: {
         id: requestId
       },
       update: {
         // Fields to update if the record exists
-        imageUrls: imageUrls,
-        requestType: RequestTypeSchema.Values.KIOSK,
         requestStatus: RequestStatusSchema.Values.PENDING,
         // Assuming you want to update imageUrls and other fields as needed
       },
@@ -50,8 +42,6 @@ export const faceGen = protectedProcedure
         // Fields to update if the record exists
         id: requestId,
         userId: user.id,
-        imageUrls: imageUrls,
-        requestType: RequestTypeSchema.Values.KIOSK,
         requestStatus: RequestStatusSchema.Values.PENDING,
         // Assuming you want to update imageUrls and other fields as needed
       }
@@ -66,7 +56,7 @@ export const faceGen = protectedProcedure
       "Content-Type": "application/json"
     };
 
-    const newGender = gender ?? MALE;
+    const newGender = MALE;
 
     const genderToTuneName = {
       [MALE]: "man",
@@ -180,19 +170,6 @@ export const faceGen = protectedProcedure
     })).catch(() => {
       throw new Error("Something went wrong!")
     })
-
-    await db.userFaceGenRequests.update({
-      where: {
-        id: requestId
-      },
-      data: {
-        prompt: JSON.stringify(arrayOfPrompt),
-        tune: JSON.stringify({
-          faceIdTuenResponse,
-          loraTuneResponse: ""
-        })
-      },
-    });
 
     // end astria
     return { requestId };

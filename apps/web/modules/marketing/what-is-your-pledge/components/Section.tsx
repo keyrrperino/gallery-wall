@@ -2,26 +2,49 @@
 
 import { useState } from "react";
 import { Button } from "@ui/components/button";
-import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import { PledgeItem } from "./PlegeItem";
-import { PlegeItemType } from "../types";
+import { PledgeSlider } from "./PledgeSlider";
+import { ProgressBar } from "@marketing/shared/components/ProgressBar";
+import { BackButton } from "@marketing/shared/components/BackButton";
+
+export enum PledgeStyleEnum {
+  SUPPORT = "support",
+  FUTURE = "future",
+  CARE = "care",
+}
+
+const PLEDGES: {
+  topText: string;
+  bottomText: string;
+  style: PledgeStyleEnum;
+  active?: boolean;
+}[] = [
+  {
+    topText: "I SUPPORT",
+    bottomText: "COASTAL PROTECTION",
+    style: PledgeStyleEnum.SUPPORT, // beige, bottom text bold
+    active: false
+  },
+  {
+    topText: "TIDE TO OUR FUTURE",
+    bottomText: "FOR GENERATIONS TO COME",
+    style: PledgeStyleEnum.FUTURE, // green, top and bottom bar
+    active: false
+  },
+  {
+    topText: "I CARE",
+    bottomText: "ABOUT OUR COASTS",
+    style: PledgeStyleEnum.CARE, // blue, all text bottom right
+    active: false
+  },
+];
 
 export default function Section() {
-  const PLEDGES: PlegeItemType[] = [
-    { topText: "TIDE TO OUR FUTURE", bottomText: "FOR GENERATIONS TO COME" },
-    { topText: "I SUPPORT", bottomText: "COASTAL PROECTION" },
-    { topText: "I CARE", bottomText: "ABOUT OUR COASTS" },
-    { topText: "COASTAL PROTECTION", bottomText: "NOW!" }
-  ];
-
   const [selected, setSelected] = useState<string | null>(null);
 
   const router = useRouter();
 
-  const handlePick = (feel: string) => {
-    setSelected(selected === feel ? null : feel);
-  };
+  const handlePick = (val: string) => setSelected(selected === val ? null : val);
 
   const handleNext = () => {
     if (selected) {
@@ -29,31 +52,28 @@ export default function Section() {
     }
   };
 
-  const renderFeelings = PLEDGES.map(({ topText, bottomText }: PlegeItemType) => (
-    <PledgeItem
-      key={topText + bottomText}
-      topText={topText}
-      bottomText={bottomText}
-      selected={selected === bottomText}
-      onClick={handlePick}
-    />
-  ));
+
 
   return (
-    <div className="container max-w-6xl pb-16">
-      <div className="mb-12 pt-8 text-center">
-        <h1 className="mb-2 font-bold text-xl">
-        Lorem ipsum dolor sit amet consectetur. Est pharetra morbi in amet id. In diam faucibus viverra quam. Amet felis leo venenatis augue quis blandit. 
-        </h1>
+    <div className="min-h-screen bg-white flex flex-col items-center py-8">
+      <div className="w-full max-w-3xl">
+        <ProgressBar value={40} />
+        <div className="flex items-center mb-6">
+          <BackButton />
+        </div>
       </div>
-      <div className="grid gap-8 grid-cols-2 mb-5">
-        {renderFeelings}
-      </div>
-      <div className="flex items-center justify-center">
+      <div className="w-full max-w-2xl mx-auto">
+        <h1 className="text-3xl md:text-4xl mb-8">
+          Pick a Frame and your pledge message
+        </h1>        
+        <p className="mb-5 text-gray-400">Choose one pledge to appear with your frame!</p>
+        <PledgeSlider
+          pledges={PLEDGES}
+          selected={selected}
+          onPick={handlePick}
+        />
         <Button
-          className={clsx(
-            "bg-[#7ecbff] text-black font-bold uppercase w-32 h-10 rounded-none shadow-none border-none",
-          )}
+          className="w-full max-w-xs mx-auto mt-8 py-4 text-lg rounded-full bg-sea text-white"
           disabled={!selected}
           onClick={handleNext}
         >

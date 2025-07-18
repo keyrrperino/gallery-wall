@@ -1,4 +1,4 @@
-import { UserFaceGenRequestsSchema, db } from "database";
+import { UserGifRequestSchema, db } from "database";
 import { z } from "zod";
 import { publicProcedure } from "../../../trpc/base";
 
@@ -13,10 +13,8 @@ export const requests = publicProcedure
   .output(
     z.object({
       requests: z.array(
-        UserFaceGenRequestsSchema.pick({
-          imageUrls: true,
+        UserGifRequestSchema.pick({
           requestStatus: true,
-          requestType: true,
           id: true,
         })
       ),
@@ -30,12 +28,12 @@ export const requests = publicProcedure
       ? {
         OR: [
           {
-            facebookUserId: {
+            userId: {
               contains: sanitizedSearchTerm,
             },
           },
           {
-            facebookUserId: {
+            userId: {
               contains: sanitizedSearchTerm,
             },
           },
@@ -43,19 +41,17 @@ export const requests = publicProcedure
       }
       : {};
 
-    const requests = await db.userFaceGenRequests.findMany({
+    const requests = await db.userGifRequest.findMany({
       where,
       select: {
-        imageUrls: true,
         requestStatus: true,
-        requestType: true,
         id: true,
       },
       take: limit,
       skip: offset,
     });
 
-    const total = await db.userFaceGenRequests.count({
+    const total = await db.userGifRequest.count({
       where,
     });
 

@@ -2,14 +2,22 @@
 
 import { Button } from "@ui/components/button";
 
-export function FeelItem(props: { displayText: string; selected?: boolean; onClick?: () => void }) {
-  const { displayText, selected, onClick } = props;
+type FeelItemProps = {
+  displayText: string;
+  selected?: boolean;
+  onClick?: () => void;
+};
 
+export function FeelItem({ displayText, selected, onClick }: FeelItemProps) {
   return (
     <Button
       variant={selected ? "default" : "secondary"}
       onClick={onClick}
-      className={selected ? "ring-2 ring-blue-500 cursor-pointer" : "cursor-pointer"}
+      className={`rounded-full px-6 py-2 text-base font-medium ${
+        selected
+          ? "bg-primary text-white"
+          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+      } transition`}
     >
       {displayText}
     </Button>

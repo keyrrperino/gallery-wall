@@ -97,7 +97,7 @@ export function createOauthCallbackHandler(
       const newUser = await db.user.create({
         data: {
           name: oauthUser.name ?? "",
-          userType: UserTypeSchema.Values.KIOSK
+          userType: UserTypeSchema.Values.IPAD
         },
       });
 

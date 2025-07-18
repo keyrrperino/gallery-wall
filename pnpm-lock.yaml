@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      keen-slider:
+        specifier: ^6.8.6
+        version: 6.8.6
     devDependencies:
       dotenv-cli:
         specifier: ^7.3.0
@@ -8811,6 +8815,10 @@ packages:
     dependencies:
       jwa: 2.0.0
       safe-buffer: 5.2.1
+    dev: false
+
+  /keen-slider@6.8.6:
+    resolution: {integrity: sha512-dcEQ7GDBpCjUQA8XZeWh3oBBLLmyn8aoeIQFGL/NTVkoEOsmlnXqA4QykUm/SncolAZYGsEk/PfUhLZ7mwMM2w==}
     dev: false
 
   /keyv@4.5.4:

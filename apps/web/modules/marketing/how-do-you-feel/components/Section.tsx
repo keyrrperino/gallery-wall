@@ -1,18 +1,20 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FeelItem } from "@marketing/how-do-you-feel/components/FeelItem";
-import { CONNECTED, DETERMINED, EMPOWERED, GRATEFUL, HOPEFUL, INSPIRED, POSIVITE, PROUD, RESPONSIBLE, WORRIED } from "@saas/shared/constants";
 import { Button } from "@ui/components/button";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import { ProgressBar } from "@marketing/shared/components/ProgressBar";
+import { BackButton } from "@marketing/shared/components/BackButton";
+import { FeelingsGrid } from "./FeelingsGrid";
 
-export default function Section() {
-  const FEELINGS: string[] = [
-    PROUD, HOPEFUL, RESPONSIBLE, EMPOWERED, GRATEFUL,
-    WORRIED, INSPIRED, DETERMINED, CONNECTED, POSIVITE
-  ];
+const FEELINGS = [
+  "Hopeful", "Safe", "Concerned", "Embracing", "Proud", "Responsible", "Empowered", "Grateful",
+  "Worried", "Inspired", "Determined", "Connected", "Protective", "Curious", "Motivated",
+  "Involved", "Anxious", "Passionate", "Informed", "Supportive", "Encouraged", "Engaged"
+];
 
+export default function HowDoYouFeelSection() {
   const [selected, setSelected] = useState<string[]>([]);
   const [flash, setFlash] = useState(false);
   const flashTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -32,41 +34,36 @@ export default function Section() {
     }
   };
 
-  const handleNext = () => {
+  const handleContinue = () => {
     if (selected.length === 3) {
       const params = selected.map(f => `feelings=${encodeURIComponent(f)}`).join("&");
-      router.push(`/what-is-your-pledge?${params}`);
+      router.push(`/pick-a-frame?${params}`);
     }
   };
 
-  const renderFeelings = FEELINGS.map((feel: string) => (
-    <FeelItem
-      key={feel}
-      displayText={feel}
-      selected={selected.includes(feel)}
-      onClick={() => handlePick(feel)}
-    />
-  ));
-
   return (
-    <div className="container max-w-6xl pb-16">
-      <div className="mb-12 pt-8 text-center">
-        <h1 className="mb-2 font-bold text-xl">
-          Lorem ipsum dolor sit amet consectetur. Est pharetra morbi in amet id. In diam faucibus viverra quam. Amet felis leo venenatis augue quis blandit. Ut consectetur senectus eget scelerisque nec gravida sit at. Id massa non sed mi non proin felis a. In sit feugiat augue arcu mattis vel viverra tellus metus.
+    <div className="min-h-screen bg-white flex flex-col items-center px-4 py-8">
+      <div className="w-full max-w-3xl">
+        <ProgressBar value={20} />
+        <div className="flex items-center mb-6">
+          <BackButton />
+        </div>
+        <h1 className="text-3xl md:text-4xl font-extrabold mb-2 leading-tight text-wrap">
+          HOW DO YOU FEEL ABOUT <br />
+          COASTAL PROTECTION IN <br />
+          SINGAPORE NOW?
         </h1>
-      </div>
-      <div className="grid gap-8 grid-cols-3 mb-5">
-        {renderFeelings}
-      </div>
-      <div className="flex items-center justify-center">
+        <p className="text-gray-500 mb-6">Select up to 3 that apply</p>
+        <FeelingsGrid feelings={FEELINGS} selected={selected} onPick={handlePick} />
         <Button
           className={clsx(
-            flash && "animate-pulse border-2 border-red-500 cursor-pointer"
+            "w-full max-w-xs mx-auto mt-8 py-4 text-lg rounded-full",
+            flash && "animate-pulse border-2 border-red-500"
           )}
-          disabled={selected.length !== 3}
-          onClick={handleNext}
+          disabled={selected.length === 0}
+          onClick={handleContinue}
         >
-          Next
+          Continue
         </Button>
       </div>
     </div>

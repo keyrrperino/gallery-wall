@@ -19,8 +19,9 @@ import {removeBackground} from "@imgly/background-removal-node";
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
+import pLimit from "p-limit";
 
-setGlobalOptions({maxInstances: 10});
+setGlobalOptions({maxInstances: 60});
 
 // ffmpeg.setFfmpegPath(ffmpegPath!);
 
@@ -292,3 +293,172 @@ export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest({
   });
 });
 
+export const extractFramesFromVideoUrl = onRequest(async (req, res) => {
+  cors({origin: true})(req, res, async () => {
+    try {
+      const {videoUrl, width, userGifRequestId, userId} = req.query;
+      if (
+        typeof videoUrl !== "string" ||
+        typeof width !== "string" ||
+        typeof userGifRequestId !== "string" ||
+        typeof userId !== "string"
+      ) {
+        res.status(400).json({
+          error:
+            "Missing or invalid required parameters: "+
+            "videoUrl, width, userGifRequestId, userId",
+        });
+        return;
+      }
+
+      supabase
+        .from("UserGifRequest")
+        .update({
+          requestStatus: "EXTRACTING_FRAMES",
+        }).eq("id", userGifRequestId).then((value) => {
+          console.log(value);
+        });
+
+      // Respond immediately
+      res.status(202).json({
+        status: "processing",
+        code: 202,
+        message: "Frame extraction started. Check frame statuses in DB.",
+      });
+
+      // Start background processing (do not await)
+      (async () => {
+        /**
+         * Extracts WebP images from a buffer.
+         * @param {Buffer} buffer - The buffer containing WebP images.
+         * @return {Buffer[]} Array of WebP image buffers.
+         */
+        function extractWebPs(buffer: Buffer): Buffer[] {
+          const webpHeader = Buffer.from("RIFF");
+          const webpType = Buffer.from("WEBP");
+          let offset = 0;
+          const results: Buffer[] = [];
+          while (offset < buffer.length) {
+            const riffIndex = buffer.indexOf(webpHeader, offset);
+            if (riffIndex === -1 || riffIndex + 12 > buffer.length) break;
+            // Get chunk size (bytes 4-7, little endian)
+            const size = buffer.readUInt32LE(riffIndex + 4);
+            // Check for WEBP type
+            if (
+              buffer.slice(riffIndex + 8, riffIndex + 12).equals(webpType) &&
+              riffIndex + 8 + size <= buffer.length
+            ) {
+              const end = riffIndex + 8 + size;
+              results.push(buffer.slice(riffIndex, end));
+              offset = end;
+            } else {
+              break;
+            }
+          }
+          return results;
+        }
+
+        const frameStream = new stream.PassThrough();
+        const frameBuffers: Buffer[] = [];
+        let leftover = Buffer.alloc(0);
+        let count = 0;
+
+        frameStream.on("data", (chunk: Buffer) => {
+          leftover = Buffer.concat([leftover, chunk]);
+          const webps = extractWebPs(leftover);
+          let totalLength = 0;
+
+          webps.forEach((webp) => {
+            count++;
+            const key = `frames/${
+              userId}/${userGifRequestId}/${count}.webp`;
+            try {
+              supabase.storage
+                .from(SUPABASE_BUCKET)
+                .upload(key, webp, {
+                  contentType: "image/webp",
+                  upsert: true,
+                });
+
+              supabase.storage
+                .from(SUPABASE_BUCKET)
+                .createSignedUrl(key, 631152000).then((value) => {
+                  supabase
+                    .from("Frame")
+                    .upsert([
+                      {
+                        id: `${userId}${userGifRequestId}${count}`,
+                        userRequestId: userGifRequestId,
+                        imageUrl: value?.data?.signedUrl,
+                        frameStatus: "SUCCESS",
+                      },
+                    ]).then((value) => {
+                      console.log(value);
+                    });
+                }).catch(() => {
+                  supabase
+                    .from("Frame")
+                    .upsert([
+                      {
+                        id: `${userId}${userGifRequestId}${count}`,
+                        userRequestId: userGifRequestId,
+                        frameStatus: "FAILED",
+                      },
+                    ]).then((value) => {
+                      console.log(value);
+                    });
+                });
+            } catch (err) {
+              logger.error("Unexpected error in background frame save", err);
+            }
+
+            frameBuffers.push(webp);
+            totalLength += webp.length;
+          });
+
+          leftover = leftover.slice(totalLength);
+        });
+
+        frameStream.on("error", (err) => {
+          logger.error("Frame stream error", err);
+        });
+        frameStream.on("end", () => {
+          supabase
+            .from("UserGifRequest")
+            .update({
+              requestStatus: "DONE_EXTRACTING_FRAMES",
+            }).eq("id", userGifRequestId).then((value) => {
+              console.log(value);
+            });
+        });
+
+        // Start ffmpeg process
+        ffmpeg(videoUrl as string)
+          .outputOptions([
+            "-t",
+            "2",
+            "-vf",
+            `fps=30,scale=${width}:-1:flags=lanczos`,
+            "-f",
+            "image2pipe",
+            "-vcodec",
+            "libwebp",
+            "-lossless", "1", // or remove for lossy, or use "-qscale", "80"
+          ])
+          .format("image2pipe")
+          .on("error", (err) => {
+            logger.error("ffmpeg error", err);
+          })
+          .pipe(frameStream, {end: true});
+      })();
+    } catch (err) {
+      logger.error(
+        "Unexpected error",
+        err instanceof Error ? err : String(err)
+      );
+      res.status(500).json({
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  });
+});

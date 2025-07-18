@@ -1,28 +1,24 @@
-import { ImagesSchema, db } from "database";
+import { FrameSchema, db } from "database";
 import { z } from "zod";
 import { publicProcedure } from "../../../trpc/base";
 
 
 export const getImages = publicProcedure
   .input(z.object({
-    userFaceGenRequestId: z.string()
+    userRequestId: z.string()
   }))
   .output(
     z.array(
-      ImagesSchema.pick({
+      FrameSchema.pick({
         id: true,
-        userFaceGenRequestId: true,
-        imageResult: true,
-        gcpSignedUrl: true,
-        gcpStoragePath: true
       })
     ).nullable()
   )
-  .query(async ({ input: { userFaceGenRequestId } }) => {
+  .query(async ({ input: { userRequestId } }) => {
     const requestresults = await db
-      .images.findMany({
+      .frame.findMany({
         where: {
-          userFaceGenRequestId: userFaceGenRequestId,
+          userRequestId: userRequestId,
         },
       })
 

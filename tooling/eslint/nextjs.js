@@ -13,7 +13,13 @@ const config = {
       { props: "never", children: "never" },
     ],
     "tailwindcss/no-custom-classname": [2, {
-      "whitelist": ["font-button-base", "h1-heading-bold"]
+      "whitelist": [
+        "font-button-base",
+        "h1-heading-bold",
+        "number-slide",
+        "keen-slider__slide",
+        "keen-slider"
+      ]
     }]
   },
 };

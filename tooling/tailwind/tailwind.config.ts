@@ -28,7 +28,14 @@ export const lightVariables = {
     popover: "#ffffff",
     "popover-foreground": "#020817",
     card: "#ffffff",
-    "card-foreground": "#020817"
+    "card-foreground": "#020817",
+    sea: '#21409A',
+    sky: '#0072BC',
+    turquoise: '#009B90',
+    lightturquoise: '#86C8E6',
+    coral: '#E37889',
+    sand: '#F4E3B8',
+    blue: '#2B90D0',
   },
 };
 
@@ -54,7 +61,14 @@ export const darkVariables = {
     popover: "#121924",
     "popover-foreground": "#f8fafc",
     card: "#121924",
-    "card-foreground": "#f8fafc"
+    "card-foreground": "#f8fafc",
+    sea: '#21409A',
+    sky: '#0072BC',
+    turquoise: '#009B90',
+    lightturquoise: '#86C8E6',
+    coral: '#E37889',
+    sand: '#F4E3B8',
+    blue: '#2B90D0',
   },
 };
 
@@ -86,6 +100,9 @@ export default {
       fontFamily: {
         sans: ["var(--font-sans)", "sans-serif"],
       },
+      font: {
+        headline: "",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -101,6 +118,13 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       colors: {
+        sea: '#21409A',
+        sky: '#0072BC',
+        turquoise: '#009B90',
+        lightturquoise: '#86C8E6',
+        coral: '#E37889',
+        sand: '#F4E3B8',
+        blue: '#2B90D0',
         border: colorVariable("--colors-border"),
         input: colorVariable("--colors-input"),
         ring: colorVariable("--colors-ring"),
