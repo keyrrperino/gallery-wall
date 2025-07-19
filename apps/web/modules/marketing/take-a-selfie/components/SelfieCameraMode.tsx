@@ -314,7 +314,7 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModeProps) {
                 </button>
                 <button
                   className="text-4xl font-text-bold text-white text-[80px]"
-                  onClick={generateFace}
+                  onClick={() => {generateFace(); router.push("/enter-pin-code");}}
                 >
                   USE THIS SELFIE {">"}
                 </button>
