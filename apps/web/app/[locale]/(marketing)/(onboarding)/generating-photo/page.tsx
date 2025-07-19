@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
+import LoadingScreen from "@marketing/generating-photo/components/LoadingScreen";
 
-import PinEntry from "@marketing/enter-pin-code/components/PinEntry";
-
-export default function EnterPinCode() {
+export default function GeneratingPhoto() {
 
   return (
     <div className="absolute top-0 flex h-screen w-screen">
-      <PinEntry />
+      <LoadingScreen />
     </div>
   );
 }
