@@ -38,3 +38,5 @@ dist/
 
 # typescript
 *.tsbuildinfo
+
+*.onnx
