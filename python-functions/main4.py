@@ -9,8 +9,8 @@ import requests
 from supabase import create_client, Client
 from typing import List
 import asyncio
-from fastapi import UploadFile, File, Form
-from tempfile import TemporaryDirectory
+from fastapi import UploadFile
+import tempfile
 from PIL import ImageSequence
 import subprocess
 from fastapi.middleware.cors import CORSMiddleware
@@ -95,15 +95,15 @@ async def remove_image_background(request: Request):
 
 
 @app.post("/process-frames-to-gif")
-async def process_frames_to_gif(
-    userGifRequestId: str = Form(...),
-    userId: str = Form(...),
-    images: List[UploadFile] = File(...)
-):
-    if not images or not userGifRequestId or not userId:
+async def process_frames_to_gif(request: Request):
+    data = await request.json()
+    image_base64s: List[str] = data.get("imageBase64s")
+    user_gif_request_id = data.get("userGifRequestId")
+    user_id = data.get("userId")
+    if not image_base64s or not user_gif_request_id or not user_id:
         raise HTTPException(status_code=400, detail="Missing required parameters.")
-    if len(images) != 12 and len(images) != 24:
-        raise HTTPException(status_code=400, detail="Exactly 12 or 24 images required.")
+    if len(image_base64s) != 24:
+        raise HTTPException(status_code=400, detail="Exactly 24 base64 images required for 24 frames.")
 
     # Load the overlay frame (should be 1080p, RGBA, transparent)
     try:
@@ -111,38 +111,42 @@ async def process_frames_to_gif(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to load overlay frame: {e}")
 
-    async def process_single_image(idx, upload_file):
+    import base64
+    def decode_base64_image(b64str):
+        if b64str.startswith("data:image"):
+            b64str = b64str.split(",", 1)[1]
+        return base64.b64decode(b64str)
+
+    async def process_single_image(idx, b64str):
         try:
-            img_bytes = await upload_file.read()
+            img_bytes = await asyncio.to_thread(decode_base64_image, b64str)
             img = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
             # Remove background
             out_img = await asyncio.to_thread(remove, img, session=session)
-            # Center the 672x672 image on a 720x720 canvas
-            if out_img.width != 672 or out_img.height != 672:
-                out_img = out_img.resize((672, 672), Image.LANCZOS)
-            base_canvas = Image.new("RGBA", (720, 720), (0, 0, 0, 0))
-            offset = ((720 - 672) // 2, (720 - 672) // 2)
-            base_canvas.paste(out_img, offset, out_img)
-            # Overlay the frame (overlay_frame should be 720x720)
-            composited = Image.alpha_composite(base_canvas, overlay_frame)
-            # Remove transparency: paste on solid background
-            background = Image.new("RGB", composited.size, (43, 144, 208))
-            background.paste(composited, mask=composited.split()[-1])
-            return background
+            # Resize out_img to match overlay_frame size if needed
+            if out_img.size != overlay_frame.size:
+                out_img = out_img.resize(overlay_frame.size, Image.LANCZOS)
+            # Overlay the frame
+            composited = Image.alpha_composite(out_img, overlay_frame)
+            # Resize to 1080p if needed
+            if composited.width != 1080:
+                h = int(composited.height * (1080 / composited.width))
+                composited = composited.resize((1080, h), Image.LANCZOS)
+            return composited
         except Exception as e:
             raise Exception(f"Frame {idx+1} failed: {e}")
 
     # Process all images in parallel
     try:
         processed_images = await asyncio.gather(*[
-            process_single_image(idx, upload_file) for idx, upload_file in enumerate(images)
+            process_single_image(idx, b64str) for idx, b64str in enumerate(image_base64s)
         ])
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image processing failed: {e}")
 
-    # Save as GIF (12 or 24 frames)
-    if len(processed_images) not in (12, 24):
-        raise HTTPException(status_code=500, detail=f"Expected 12 or 24 processed images, got {len(processed_images)}")
+    # Save as GIF (24fps)
+    if len(processed_images) != 24:
+        raise HTTPException(status_code=500, detail=f"Expected 24 processed images, got {len(processed_images)}")
     base_size = processed_images[0].size
     for idx, img in enumerate(processed_images):
         if not isinstance(img, Image.Image):
@@ -150,26 +154,19 @@ async def process_frames_to_gif(
         if img.size != base_size:
             raise HTTPException(status_code=500, detail=f"Frame {idx+1} size {img.size} does not match first frame size {base_size}")
 
+    # Save all processed frames as PNGs to a temp directory and use ImageMagick for GIF encoding
     import tempfile, os
-    frame_buffers = []
-    for idx, img in enumerate(processed_images):
-        buf = io.BytesIO()
-        img.save(buf, format="WEBP")
-        buf.seek(0)
-        frame_buffers.append(buf)
     with tempfile.TemporaryDirectory() as tmpdir:
         frame_paths = []
-        for idx, buf in enumerate(frame_buffers):
-            frame_path = os.path.join(tmpdir, f"frame_{idx:03d}.webp")
-            with open(frame_path, "wb") as f:
-                f.write(buf.read())
+        for idx, img in enumerate(processed_images):
+            frame_path = os.path.join(tmpdir, f"frame_{idx:03d}.png")
+            img.save(frame_path, format="PNG")
             frame_paths.append(frame_path)
         gif_path = os.path.join(tmpdir, "output.gif")
-        # Use ImageMagick to create a high-quality GIF
-        delay = 17 if len(processed_images) == 12 else 8
+        # Use ImageMagick to create a high-quality GIF at 24fps
         convert_cmd = [
             "convert",
-            "-delay", str(delay),
+            "-delay", "8",  # 12fps = 100/12 = 8.33, so use 8 (ImageMagick uses 1/100s units)
             "-loop", "0",
             *frame_paths,
             "-layers", "OptimizeTransparency",
@@ -179,10 +176,12 @@ async def process_frames_to_gif(
             subprocess.run(convert_cmd, check=True)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"ImageMagick GIF encoding failed: {e}")
+        # Read GIF bytes
         with open(gif_path, "rb") as f:
             gif_bytes = f.read()
 
-    key = f"gifs/{userId}/{userGifRequestId}/final.gif"
+    # Upload to Supabase
+    key = f"gifs/{user_id}/{user_gif_request_id}/final.gif"
     try:
         res = supabase.storage.from_(SUPABASE_BUCKET).upload(
             key,

@@ -5,3 +5,4 @@ pillow
 requests
 supabase
 onnxruntime-gpu
+python-multipart

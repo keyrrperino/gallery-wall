@@ -60,17 +60,7 @@ export default function VideoSelfieCapture() {
   };
 
   const handleRecord = async () => {
-    const data = await captureFramesFromStream(stream, 2, 12) as {
-      frames: Blob[];
-      width: number;
-      height: number;
-    };
-
-    const {
-      frames,
-      width,
-      height
-    } = data;
+    const frames: Blob[] = await captureFramesFromStream(stream, 2, 12) as Blob[];
     // Upload frames as FormData (multipart)
     const formData = new FormData();
     frames.forEach((blob, i) => {
@@ -78,10 +68,8 @@ export default function VideoSelfieCapture() {
     });
     formData.append('userGifRequestId', '1');
     formData.append('userId', '1');
-    formData.append('targetWidth', `${width}`);
-    formData.append('targetHeight', `${height}`);
     try {
-      const response = await fetch('https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif', {
+      const response = await fetch('http://localhost:8000/process-frames-to-gif', {
         method: 'POST',
         body: formData,
       });
@@ -102,56 +90,137 @@ export default function VideoSelfieCapture() {
     });
   }
 
-  function captureFramesFromStream(stream, duration = 2, fps = 12) {
+  function captureFramesFromStream(stream, duration = 2, fps = 6) {
     return new Promise(async (resolve) => {
       const video = document.createElement("video");
       video.srcObject = stream;
       await video.play();
-
-      // Always use 672x672 (square)
-      const newWidth = 672;
-      const newHeight = 672;
+  
       const canvas = document.createElement("canvas");
-      canvas.width = newWidth;
-      canvas.height = newHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        resolve({ frames: [], width: newWidth, height: newHeight });
-        return;
-      }
-
-      const frames = [];
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx: any = canvas.getContext("2d");
+  
+      const frames: any = [];
       let count = 0;
       const totalFrames = duration * fps;
-
+  
       const interval = setInterval(async () => {
-        // Center crop the video to a 1:1 aspect ratio before resizing
-        const vW = video.videoWidth;
-        const vH = video.videoHeight;
-        let sx = 0, sy = 0, sWidth = vW, sHeight = vH;
-        if (vW > vH) {
-          // Landscape: crop left/right
-          sx = Math.floor((vW - vH) / 2);
-          sWidth = vH;
-        } else if (vH > vW) {
-          // Portrait: crop top/bottom
-          sy = Math.floor((vH - vW) / 2);
-          sHeight = vW;
-        }
-        ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, newWidth, newHeight);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const blob = await new Promise((res) =>
-          canvas.toBlob(res, "image/webp", 1)
+          canvas.toBlob(res, "image/webp", 1  )
         );
         if (blob) frames.push(blob);
         count++;
         if (count >= totalFrames) {
           clearInterval(interval);
           video.pause();
-          resolve({ frames, width: newWidth, height: newHeight });
+          resolve(frames);
         }
       }, 1000 / fps);
     });
   }
+
+  const uploadFrames = (frames: Blob[]) => {
+    const userId = "1";
+    const userGifRequestId = "1";
+    frames.forEach((blob, i) => {
+      const path = `frames/${
+        userId}/${userGifRequestId}/${i+1}.webp`;
+      const bucket = "gifs";
+      // Get signed upload URL
+      getSignedUploadUrlMutation.mutateAsync({
+        path,
+        bucket,
+      }).then((uploadUrl) => {
+        fetch(uploadUrl, {
+          method: "PUT",
+          body: blob,
+          headers: {
+            "Content-Type": "image/webp",
+          },
+        }).then((signedUrl) => {
+          const id = `${userId}${userGifRequestId}${i+1}`;
+          addFrameMutation.mutateAsync({
+            userGifRequestId: "1",
+            userId: "1",
+            frameNumber: `${i + 1}`,
+            imageUrl: signedUrl.url,
+            frameStatus: FrameStatusSchema.Enum.SUCCESS
+          }).then(() => {
+            setDoneFrames((oldFrame) => [...oldFrame, {
+              id,
+              userGifRequestId: userGifRequestId,
+              imageUrl: signedUrl.url,
+              frameStatus: FrameStatusSchema.Enum.SUCCESS,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }])
+          });
+        });
+      })
+    });
+  }
+
+  // Upload video to S3, then process to GIF via Firebase Function
+  const uploadVideoAndProcess = async (videoBlob: Blob) => {
+    setLoading(true);
+    setError(null);
+    setGifUrl(null);
+    try {
+      const path = `videos/${uuid()}.webm`;
+      const bucket = "gifs";
+      // Get signed upload URL
+      const uploadUrl = await getSignedUploadUrlMutation.mutateAsync({
+        path,
+        bucket,
+      });
+
+      // Upload the video
+      const response = await fetch(uploadUrl, {
+        method: "PUT",
+        body: videoBlob,
+        headers: {
+          "Content-Type": "video/webm",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload video");
+      }
+
+      // Get the signed URL for the uploaded video (valid for 1 day)
+      const { url } = await getSupabaseSignedUrlMutation.mutateAsync({
+        bucket,
+        path,
+        // expiresIn: 86400 // 1 day, optional if default
+      });
+
+      // Call Firebase function to process video to GIF
+
+      console.log(url);
+      console.log(`https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}`);
+
+      const firebaseUrl = `https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}&width=1080`;
+
+      setGifUrl(firebaseUrl);
+      // const gifResponse = await fetch(firebaseUrl);
+      // if (!gifResponse.ok) throw new Error("Failed to generate GIF");
+      // // Assume the function returns a JSON with { gifUrl }
+      // const gifData = await gifResponse.json();
+      // if (!gifData.gifUrl) throw new Error("GIF URL not found in response");
+      // setGifUrl(gifData.gifUrl);
+      setLoading(false);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err?.message || "Upload or processing failed.");
+      } else {
+        setError("Upload or processing failed.");
+      }
+      setLoading(false);
+    }
+  };
+
   // Start camera on mount
   React.useEffect(() => {
     let streamPartial: MediaStream;
@@ -198,7 +267,7 @@ export default function VideoSelfieCapture() {
         </video>
       )}
       {gifUrl && (
-        <img src={gifUrl} alt="Generated GIF" className="rounded-lg border w-[50%] h-[50%]" />
+        <img src={gifUrl} alt="Generated GIF" className="rounded-lg border w-full max-w-xs aspect-video" />
       )}
       <h1>{countInSecs} Frame Done: {doneFrames.length}</h1>
       <button

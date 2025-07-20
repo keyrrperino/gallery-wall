@@ -117,14 +117,15 @@ async def process_frames_to_gif(
             img = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
             # Remove background
             out_img = await asyncio.to_thread(remove, img, session=session)
-            # Center the 672x672 image on a 720x720 canvas
-            if out_img.width != 672 or out_img.height != 672:
-                out_img = out_img.resize((672, 672), Image.LANCZOS)
-            base_canvas = Image.new("RGBA", (720, 720), (0, 0, 0, 0))
-            offset = ((720 - 672) // 2, (720 - 672) // 2)
-            base_canvas.paste(out_img, offset, out_img)
-            # Overlay the frame (overlay_frame should be 720x720)
-            composited = Image.alpha_composite(base_canvas, overlay_frame)
+            # Resize out_img to match overlay_frame size if needed
+            if out_img.size != overlay_frame.size:
+                out_img = out_img.resize(overlay_frame.size, Image.LANCZOS)
+            # Overlay the frame
+            composited = Image.alpha_composite(out_img, overlay_frame)
+            # Resize to 1080p if needed
+            if composited.width != 1080:
+                h = int(composited.height * (1080 / composited.width))
+                composited = composited.resize((1080, h), Image.LANCZOS)
             # Remove transparency: paste on solid background
             background = Image.new("RGB", composited.size, (43, 144, 208))
             background.paste(composited, mask=composited.split()[-1])
