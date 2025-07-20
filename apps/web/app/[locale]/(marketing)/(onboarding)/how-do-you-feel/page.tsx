@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
-import Section from "@marketing/how-do-you-feel/components/Section";
+import MainSlider from "@ui/components/slider";
 
 export default function HowDoYouFeel() {
 
   return (
-    <>
-      <Section />
-    </>
+    <div className="absolute top-0 flex h-screen w-screen">
+      <MainSlider />
+    </div>
   );
 }

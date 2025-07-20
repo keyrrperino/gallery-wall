@@ -7,3 +7,9 @@ export type PlegeItemType = {
   onClick?: (value: string) => void;
   selected?: boolean;
 };
+
+export enum PledgeStyleEnum {
+  SUPPORT = "support",
+  FUTURE = "future",
+  CARE = "care",
+}

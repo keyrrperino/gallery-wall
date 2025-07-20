@@ -13,10 +13,10 @@ export function FeelItem({ displayText, selected, onClick }: FeelItemProps) {
     <Button
       variant={selected ? "default" : "secondary"}
       onClick={onClick}
-      className={`rounded-full px-6 py-2 text-base font-medium ${
+      className={`rounded-3xl p-16 text-[60px] font-text-regular tracking-[3px] ${
         selected
-          ? "bg-primary text-white"
-          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+          ? "bg-[#CEAA89] text-white"
+          : "bg-[#F7EBDF] text-gray-800 hover:bg-[#F7EBDF]"
       } transition`}
     >
       {displayText}

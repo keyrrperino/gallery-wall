@@ -7,7 +7,7 @@ interface MainSelfiePageProps {
 
 export default function MainSelfiePage({ onStart }: MainSelfiePageProps) {
   return (
-    <div className="flex flex-col items-start bg-white text-black h-full w-full p-32">
+    <div className="flex flex-col items-start bg-white text-blxack h-full w-full px-32">
       <h1 className="text-[130px] font-text-bold uppercase mb-6">
         TAKE A VIDEO SELFIE!
       </h1>

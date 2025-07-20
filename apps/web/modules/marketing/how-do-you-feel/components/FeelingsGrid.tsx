@@ -9,7 +9,7 @@ export function FeelingsGrid({
   onPick: (feel: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-2xl mx-auto mb-8">
+    <div className="flex flex-row flex-wrap gap-9 w-full mx-auto mb-8">
       {feelings.map((feel) => (
         <FeelItem
           key={feel}

@@ -1,9 +1,11 @@
 "use client";
 
-import { GeneratePhoto } from "@marketing/home/components/Welcome";
+import HomePage from "@marketing/home/components/Welcome";
 
 export default function Home() {
   return (
-    <GeneratePhoto />
+    <div className="absolute top-0 flex h-screen w-screen">
+      <HomePage />
+    </div>
   );
 }
