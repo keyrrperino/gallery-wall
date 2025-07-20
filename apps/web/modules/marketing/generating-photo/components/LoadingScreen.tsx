@@ -1,19 +1,20 @@
 "use client";
+
 import ExitButton from "@marketing/shared/components/ExitButton";
-import { Cross2Icon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoadingScreen() {
   const [dotCount, setDotCount] = useState(0);
-
-  // positions for each image
   const [positions, setPositions] = useState<
     { top?: string; bottom?: string; left?: string; right?: string }[]
   >([]);
+  const [finishedGenerating, setFinishedGenerating] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // cycle loading dots
+    // Cycle loading dots
     const interval = setInterval(() => {
       setDotCount((prev) => (prev + 1) % 4);
     }, 500);
@@ -21,14 +22,12 @@ export default function LoadingScreen() {
   }, []);
 
   useEffect(() => {
-    // random positions for three images
+    // Random positions for three images on mount
     const newPositions = Array.from({ length: 3 }).map(() => {
-      // random top OR bottom
       const useTop = Math.random() > 0.5;
-      const topOrBottomValue = Math.floor(Math.random() * 60) + 5; // 5% to 65%
-      // random left OR right
+      const topOrBottomValue = Math.floor(Math.random() * 60) + 5;
       const useLeft = Math.random() > 0.5;
-      const leftOrRightValue = Math.floor(Math.random() * 60) + 5; // 5% to 65%
+      const leftOrRightValue = Math.floor(Math.random() * 60) + 5;
 
       return {
         ...(useTop ? { top: `${topOrBottomValue}%` } : { bottom: `${topOrBottomValue}%` }),
@@ -36,16 +35,34 @@ export default function LoadingScreen() {
       };
     });
     setPositions(newPositions);
-  }, []); // run only on mount
+  }, []);
+
+  // Simulate image generation completion after 5 seconds
+  // This can be replaced with actual image generation logic
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFinishedGenerating(true);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (finishedGenerating) {
+      router.push("/save-pledge-photo");
+    }
+  }, [finishedGenerating, router]);
 
   const loadingText = `Generating your Unique Pledge Photo${".".repeat(dotCount)}`;
 
   return (
-    <div className="h-full w-full overflow-hidden bg-white flex flex-col items-center justify-between">
+    <div className="h-full w-full overflow-hidden bg-white flex flex-col items-center justify-between relative">
+      {/* TOP BAR */}
       <div className="top-0 flex w-full items-center justify-end h-80 px-16 font-text-bold text-black bg-transparent">
-            <ExitButton />
-        </div>
+        <ExitButton />
+      </div>
 
+      {/* Floating images */}
       {positions.length === 3 && (
         <>
           <motion.img
@@ -90,12 +107,10 @@ export default function LoadingScreen() {
         </>
       )}
 
-      {/* Loading text */}
       <div>
         <div className="text-black text-[130px] max-w-[60vw] font-text-bold z-10 leading-none text-center">
           {loadingText}
         </div>
-
         <p className="text-[50px] text-center mb-10 mx-[22vw] leading-tight">
           Hang tight!
         </p>
