@@ -9,6 +9,7 @@ import PickAFrame from "@marketing/what-is-your-pledge/components/Section";
 import MainSelfiePage from "@marketing/take-a-selfie/components/MainSelfiePage";
 import SelfieCameraMode from "@marketing/take-a-selfie/components/SelfieCameraMode";
 import { ProgressBar } from "@marketing/shared/components/ProgressBar";
+import ExitButton from "@marketing/shared/components/ExitButton";
 import { PledgeStyleEnum } from "@marketing/what-is-your-pledge/types";
 
 export default function MainSlider() {
@@ -30,10 +31,6 @@ export default function MainSlider() {
     } else {
       setSlide(slide - 1);
     }
-  };
-
-  const handleExit = () => {
-    router.push("/");
   };
 
   // CONTINUE FROM FEELINGS SECTION
@@ -77,13 +74,7 @@ export default function MainSlider() {
         <div className="flex-1 mx-4">
           <ProgressBar value={progress} />
         </div>
-        <button onClick={handleExit}>
-          <Cross2Icon
-            className="text-black hover:text-gray-600"
-            width={120}
-            height={120}
-          />
-        </button>
+        <ExitButton />
       </div>
 
       {/* SLIDER CONTENT */}

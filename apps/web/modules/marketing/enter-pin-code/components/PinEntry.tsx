@@ -1,5 +1,5 @@
 "use client";
-import { Cross2Icon } from "@radix-ui/react-icons";
+import ExitButton from "@marketing/shared/components/ExitButton";
 import { ChevronLeftIcon, DeleteIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -19,17 +19,15 @@ export default function PinEntry() {
   return (
     <div className="flex w-full h-full flex-col gap-12 items-center bg-white">
         <div className="flex w-full items-center justify-between h-80 px-16 font-text-bold text-black">
-            <button>
+            <button onClick={() => window.history.back()}>
               <ChevronLeftIcon
                 className="text-black hover:text-gray-600"
                 width={120}
                 height={120}
               />
             </button>
-            <h2 className="text-[110px]">ENTER PIN CODE</h2>
-            <button>
-                <Cross2Icon color="black" width={120} height={120} />
-            </button>
+            <h2 className="text-[130px]">ENTER PIN CODE</h2>
+            <ExitButton />
         </div>
 
         <p className="text-[50px] text-center mb-10 mx-[22vw] leading-tight">
@@ -40,7 +38,7 @@ export default function PinEntry() {
 
         {/* Left side - image */}
         <div className="flex flex-col items-center">
-          <div className="w-[33vw] h-[50vh] bg-gray-200 overflow-hidden rounded-md shadow-md">
+          <div className="w-[33vw] h-[33vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
             <img
               src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"
               alt="selfie preview"

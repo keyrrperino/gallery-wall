@@ -1,4 +1,5 @@
 "use client";
+import ExitButton from "@marketing/shared/components/ExitButton";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -42,9 +43,7 @@ export default function LoadingScreen() {
   return (
     <div className="h-full w-full overflow-hidden bg-white flex flex-col items-center justify-between">
       <div className="top-0 flex w-full items-center justify-end h-80 px-16 font-text-bold text-black bg-transparent">
-            <button>
-                <Cross2Icon color="black" width={120} height={120} />
-            </button>
+            <ExitButton />
         </div>
 
       {positions.length === 3 && (
