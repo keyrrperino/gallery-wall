@@ -14,7 +14,7 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const UserSessionScalarFieldEnumSchema = z.enum(['id','userId','createdAt','expiresAt']);
 
-export const FrameScalarFieldEnumSchema = z.enum(['id','userRequestId','imageUrl','frameStatus','createdAt','updatedAt']);
+export const FrameScalarFieldEnumSchema = z.enum(['id','userGifRequestId','imageUrl','imageUrlComposited','frameStatus','createdAt','updatedAt']);
 
 export const UserScalarFieldEnumSchema = z.enum(['id','email','name','userType','createdAt','updatedAt']);
 
@@ -66,8 +66,9 @@ export type UserSession = z.infer<typeof UserSessionSchema>
 export const FrameSchema = z.object({
   frameStatus: FrameStatusSchema,
   id: z.string(),
-  userRequestId: z.string(),
-  imageUrl: z.string(),
+  userGifRequestId: z.string(),
+  imageUrl: z.string().nullable(),
+  imageUrlComposited: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

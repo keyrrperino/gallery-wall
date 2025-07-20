@@ -52,13 +52,14 @@ enum GifStatus {
 }
 
 model Frame {
-  id            String         @id
-  userRequestId String
-  userRequest   UserGifRequest @relation(fields: [userRequestId], references: [id])
-  imageUrl      String
-  frameStatus   FrameStatus
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @default(now())
+  id                 String         @id
+  userGifRequestId   String
+  userGifRequest     UserGifRequest @relation(fields: [userGifRequestId], references: [id])
+  imageUrl           String?
+  imageUrlComposited String?
+  frameStatus        FrameStatus
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @default(now())
 }
 
 model User {

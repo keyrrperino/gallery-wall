@@ -10,6 +10,6 @@ export const supabaseSignedUrl = publicProcedure
     })
   )
   .mutation(async ({ input: { bucket, path } }) => {
-    const url = await getSupabaseSignedUrl(path, { bucket, expiresIn: 86400});
+    const url = await getSupabaseSignedUrl(path, { bucket, expiresIn: 631152000});
     return { url };
   });
