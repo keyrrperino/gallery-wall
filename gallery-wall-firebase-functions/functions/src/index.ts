@@ -19,9 +19,23 @@ import {removeBackground} from "@imgly/background-removal-node";
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
-import pLimit from "p-limit";
+import {CloudTasksClient, protos} from "@google-cloud/tasks";
+const {HttpMethod} = protos.google.cloud.tasks.v2;
 
 setGlobalOptions({maxInstances: 60});
+
+const tasksClient = new CloudTasksClient({
+  credentials: {
+    client_email: "665982940607-compute@developer.gserviceaccount.com",
+    // eslint-disable-next-line max-len
+    private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCz7L7nvRLxdyh3\nkOVMSSYgWmMf52Xwi4xZ5P+8xeBs1eV2VvMIJr7ZsVwt9d39dqjbDbMysQrA1mvI\nZPgMFa+gfHyO4PSEC3pt4W2gcgg/NP/OMBCp4zpU2i9zsbNz+yqRakQx1ehKqdVG\nStr4Q3v/UNe9VmI4r54/v46q9twquHHf8Kr9WBRAHLgSIXNekjMuYUd0WdaiwHkw\nQnc8TizLCn8gQuyhUKO6/iq0zUTeeVsjBqPbDM54gEJyeR5AOCQ6P0EUX0QuhUI3\nAP/yWAKmEIC0tT0+8jqY8vi56BpDwu/zerTWw45rXJzVL7DeD7Deiv8wzwNXfzPI\ndZxzMCOdAgMBAAECggEAToEmztA1mrvmIT1MfxuPkiA+DeaWGP2acIK1fvVLtdEi\nPJ81jUHyleOIF9mmUXhbtrBkluKekYM9JgPAIu23YqvOYT0QEyk68wSgI5h9tq52\nSs24B5hIlEta1v0bEqjtauNV+/ScVS+DCheRMS+ow77PUyKE2rztrFz1b+0kJVL2\nFik0wQ1tCxFpZuOrUyvuAicz7EKygW/0R9QLIRmd57J0kYuYsePflOnyUaJPsUDJ\nYlqQQxGpjA5MK6mBDV9ShkrmTZ+/JXNZsyALkFTUdcvUAtvohboc/lE2HiuuVxUv\nS9qc6oIhD6gIYyE1nS3z/2x5JwIzOufp5buk3gyUlQKBgQD1BOjKo4YY/mRHEQWx\nvnKbZ6A0HKR3uO6adIUKciN2OwlRIDZt4X4HXoF5WblH/IUZokMXWDHofapwjRG+\n26h4tv3g7rb4+M5eOKVdHKStQ9KIdKE/jl0MIKHqM0eyobUI/uTuHBgck1dndKvx\nhqCNns0AD2As9WqKvMUctedG6wKBgQC7/QMkJY2i6GxLlGe3pQ3US5mjfAhayPWn\n+yqTWzXeOEQJEhY7wKZzx+5/EFFvhlZ12QBU5FBcLwfGAeTYmCtv+zUorAki4q71\nDZIbR6VXq4aM4B2hKKiRAe8zZfXVxSuzuCD90o4MVQHHfb1VO08TqLv1jlII5JBT\nFfidqWotlwKBgBwqulBBSDMrW3/H9y2dxTMUUJhtCoMw4U0kQ/8Va/o1gzauS1OK\nbqCOPrgilmguIWb2/lt6qhIeEC/sJ7QXMGDgOINZLfOlNqQiQvBXUJ8Sguto7PiP\ndybjwXlY988TQ+qK0uqElEkErzGXegTEA0UEknCFU/sXI25bkRVh2/qNAoGAMTgq\nhWFLtzaRfCxsB3owp7/vhw1nhpWNNCEf4ZsE/JzQu2s/5P8o1bGoMR6No9yRcKOT\nYaaxn6E0sNQ4Hbmhzd0A6xg4AClH06Ns+LWGhfDD9siLGXHyyJywC04L0p+gNJrm\nEG77gCEVqSyz0MgJiUUpiT5tHiTx4L8k6+q6gRsCgYEA6KdOjcHtBV5a3mlkJe1y\n6YMWa0v77O1Ru05YFGUWUfQL/Hw5xGrbjrm5aUyvRObzB3+KWfxps0TFAd/7g5te\n4NTKQljjdfM+l367r6QkXRPhwDzm7JCFIuht5iIKptAljcklZnF/reo5Dac7Ezq9\nH1q3QJMs5Q9fHhi04Jr4nSI=\n-----END PRIVATE KEY-----\n",
+  },
+  projectId: "pub-coastal",
+});
+
+const PROJECT_NAME = "pub-coastal";
+const PROJECT_LOCATION = "asia-southeast1";
+const QUEUE_NAME = "removeframebackground";
 
 // ffmpeg.setFfmpegPath(ffmpegPath!);
 
@@ -44,6 +58,42 @@ const supabase = createClient(
 );
 
 const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || "gifs";
+
+
+const replaceFrameBackground = (
+  params: {
+    userId: string;
+    userGifRequestId: string;
+    frameNumber: number;
+    imageUrl: string;
+  }) => {
+  const {
+    userId,
+    userGifRequestId,
+    frameNumber,
+    imageUrl,
+  } = params;
+  const removeBackgroundUrl = "https://python-functions-665982940607.asia-southeast1.run.app/"+
+    `remove-image-background?userId=${
+      userId
+    }&userGifRequestId=${
+      userGifRequestId
+    }&frameNumber=${frameNumber}&imageUrl=${
+      imageUrl
+    }`;
+
+  const task = {
+    httpRequest: {
+      httpMethod: HttpMethod.POST,
+      url: removeBackgroundUrl,
+    },
+  };
+
+  const parent = tasksClient.queuePath(
+    PROJECT_NAME, PROJECT_LOCATION, QUEUE_NAME);
+
+  tasksClient.createTask({parent, task}).then();
+};
 
 /**
  * Uploads a GIF buffer to Supabase Storage and returns
@@ -255,6 +305,7 @@ export const convertRemoveBGAndUploadVideoUrlToGIF = onRequest({
         }
         // Composite the result over a solid color (white) background
         const outputBuffer = Buffer.from(await blob.arrayBuffer());
+
         const composited = await sharp(outputBuffer)
           .flatten({background: {r: 255, g: 255, b: 255}}) // white background
           .png()
@@ -368,14 +419,14 @@ export const extractFramesFromVideoUrl = onRequest(async (req, res) => {
           const webps = extractWebPs(leftover);
           let totalLength = 0;
 
-          webps.forEach((webp) => {
+          webps.forEach((buffer) => {
             count++;
             const key = `frames/${
               userId}/${userGifRequestId}/${count}.webp`;
             try {
               supabase.storage
                 .from(SUPABASE_BUCKET)
-                .upload(key, webp, {
+                .upload(key, buffer, {
                   contentType: "image/webp",
                   upsert: true,
                 });
@@ -383,28 +434,34 @@ export const extractFramesFromVideoUrl = onRequest(async (req, res) => {
               supabase.storage
                 .from(SUPABASE_BUCKET)
                 .createSignedUrl(key, 631152000).then((value) => {
+                  replaceFrameBackground({
+                    userId,
+                    userGifRequestId,
+                    frameNumber: count,
+                    imageUrl: value.data?.signedUrl || "",
+                  });
+
                   supabase
                     .from("Frame")
-                    .upsert([
+                    .upsert(
                       {
                         id: `${userId}${userGifRequestId}${count}`,
-                        userRequestId: userGifRequestId,
+                        userGifRequestId: userGifRequestId,
                         imageUrl: value?.data?.signedUrl,
                         frameStatus: "SUCCESS",
-                      },
-                    ]).then((value) => {
+                      }).then((value) => {
                       console.log(value);
                     });
                 }).catch(() => {
                   supabase
                     .from("Frame")
-                    .upsert([
+                    .upsert(
                       {
                         id: `${userId}${userGifRequestId}${count}`,
-                        userRequestId: userGifRequestId,
+                        userGifRequestId: userGifRequestId,
                         frameStatus: "FAILED",
                       },
-                    ]).then((value) => {
+                    ).then((value) => {
                       console.log(value);
                     });
                 });
@@ -412,8 +469,8 @@ export const extractFramesFromVideoUrl = onRequest(async (req, res) => {
               logger.error("Unexpected error in background frame save", err);
             }
 
-            frameBuffers.push(webp);
-            totalLength += webp.length;
+            frameBuffers.push(buffer);
+            totalLength += buffer.length;
           });
 
           leftover = leftover.slice(totalLength);
@@ -459,6 +516,110 @@ export const extractFramesFromVideoUrl = onRequest(async (req, res) => {
       res.status(500).json({
         error: err instanceof Error ? err.message : String(err),
       });
+    }
+  });
+});
+
+export const removeImageUrlBackground = onRequest({
+  timeoutSeconds: 540,
+  memory: "2GiB",
+}, async (req, res) => {
+  cors({origin: true})(req, res, async () => {
+    try {
+      const {imageUrl, userGifRequestId, userId, frameNumber} = req.query;
+      if (
+        typeof imageUrl !== "string" ||
+        typeof frameNumber !== "string" ||
+        typeof userGifRequestId !== "string" ||
+        typeof userId !== "string"
+      ) {
+        res.status(400).json({
+          error:
+            "Missing or invalid required parameters: "+
+            "videoUrl, width, userGifRequestId, userId",
+        });
+        return;
+      }
+      const frameId = `${userId}${userGifRequestId}${frameNumber}`;
+
+      removeBackground(imageUrl as string).then((blob) => {
+        blob.arrayBuffer()
+          .then((arrayBuffer) => {
+            const outputBuffer = Buffer.from(arrayBuffer);
+            sharp(outputBuffer)
+              .flatten({background: {r: 255, g: 255, b: 255}})
+              .png()
+              .toBuffer().then((compositedBuffer) => {
+                // update
+                const key = `frames/${
+                  userId}/${userGifRequestId}/${frameNumber}-composited.png`;
+                try {
+                  supabase.storage
+                    .from(SUPABASE_BUCKET)
+                    .upload(key, compositedBuffer, {
+                      contentType: "image/webp",
+                      upsert: true,
+                    }).then(() => {
+                      supabase.storage
+                        .from(SUPABASE_BUCKET)
+                        .createSignedUrl(key, 631152000).then((value) => {
+                          supabase
+                            .from("Frame")
+                            .update(
+                              {
+                                imageUrlComposited: value?.data?.signedUrl,
+                                frameStatus: "SUCCESS",
+                              }
+                            )
+                            .eq("id", frameId)
+                            .then((value) => {
+                              console.log(value);
+                              res.status(201).json({
+                                status: "SUCCEsS", message: value,
+                              });
+                            });
+                        }).catch((ex) => {
+                          supabase
+                            .from("Frame")
+                            .update(
+                              {
+                                frameStatus: "FAILED",
+                              })
+                            .eq("id", frameId).then((value) => {
+                              console.log(value);
+                            });
+
+                          console.error(ex);
+                          res.status(500).json({
+                            status: "ERROR", message: `${ex}`,
+                          });
+                        });
+                    })
+                    .catch((ex) => {
+                      console.error(ex);
+                      res.status(500).json({
+                        status: "ERROR", message: `${ex}`,
+                      });
+                    });
+                } catch (ex) {
+                  console.error(ex);
+                  res.status(500).json({status: "ERROR", message: `${ex}`});
+                }
+              }).catch((ex) => {
+                console.error(ex);
+                res.status(500).json({status: "ERROR", message: `${ex}`});
+              });
+          }).catch((ex) => {
+            console.error(ex);
+            res.status(500).json({status: "ERROR", message: `${ex}`});
+          });
+      }).catch((ex) => {
+        console.error(ex);
+        res.status(500).json({status: "ERROR", message: `${ex}`});
+      });
+    } catch (ex) {
+      console.error(ex);
+      res.status(500).json({status: "ERROR", message: `${ex}`});
     }
   });
 });

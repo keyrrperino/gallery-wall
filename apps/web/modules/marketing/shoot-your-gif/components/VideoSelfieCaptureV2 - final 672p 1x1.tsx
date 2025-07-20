@@ -1,0 +1,213 @@
+"use client";
+
+import * as React from "react";
+import { apiClient } from "@shared/lib/api-client";
+import { v4 as uuid } from "uuid";
+import { Frame, FrameStatusSchema } from "../../../../../../packages/database";
+
+export default function VideoSelfieCapture() {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [recording, setRecording] = React.useState(false);
+  const [stream, setStream] = React.useState<any>(null);
+  const [videoFrames, setVideoFrames] = React.useState<Blob[]>([]);
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const [gifUrl, setGifUrl] = React.useState<string | null>(null);
+  const [countInSecs, setCountInSecs] = React.useState(0);
+  const [doneFrames, setDoneFrames] = React.useState<Frame[]>([]);
+
+  const getSignedUploadUrlMutation = apiClient.uploads.signedUploadUrlGifs.useMutation();
+  const getSupabaseSignedUrlMutation = apiClient.uploads.supabaseSignedUrl.useMutation();
+  const addFrameMutation = apiClient.frames.addFrame.useMutation();
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setCountInSecs(countInSecs + 1), 1000);
+    return () => clearTimeout(timer);
+  }, [recording, countInSecs]);
+
+
+  // Record 3 seconds
+  const handleRecord2 = async () => {
+    setError(null);
+    setRecording(true);
+    setLoading(false);
+    setPreviewUrl(null);
+    const stream = videoRef.current?.srcObject as MediaStream;
+    if (!stream) {
+      setError("Camera not ready");
+      setRecording(false);
+      return;
+    }
+    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const chunks: BlobPart[] = [];
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        console.log(e.data);
+        chunks.push(e.data);
+      }
+    };
+    recorder.onstop = async () => {
+      const videoBlob = new Blob(chunks, { type: "video/webm" });
+      setPreviewUrl(URL.createObjectURL(videoBlob));
+      // await uploadVideoAndProcess(videoBlob);
+    };
+    recorder.start();
+    setTimeout(() => {
+      recorder.stop();
+      setRecording(false);
+    }, 2000);
+  };
+
+  const handleRecord = async () => {
+    const data = await captureFramesFromStream(stream, 2, 12) as {
+      frames: Blob[];
+      width: number;
+      height: number;
+    };
+
+    const {
+      frames,
+      width,
+      height
+    } = data;
+    // Upload frames as FormData (multipart)
+    const formData = new FormData();
+    frames.forEach((blob, i) => {
+      formData.append('images', blob, `frame${i}.webp`);
+    });
+    formData.append('userGifRequestId', '1');
+    formData.append('userId', '1');
+    formData.append('targetWidth', `${width}`);
+    formData.append('targetHeight', `${height}`);
+    try {
+      const response = await fetch('https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await response.json();
+      console.log(result);
+      setGifUrl(result.gifUrl)
+    } catch (err) {
+      setError('Failed to upload frames');
+    }
+  };
+
+  async function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function captureFramesFromStream(stream, duration = 2, fps = 12) {
+    return new Promise(async (resolve) => {
+      const video = document.createElement("video");
+      video.srcObject = stream;
+      await video.play();
+
+      // Always use 672x672 (square)
+      const newWidth = 672;
+      const newHeight = 672;
+      const canvas = document.createElement("canvas");
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve({ frames: [], width: newWidth, height: newHeight });
+        return;
+      }
+
+      const frames = [];
+      let count = 0;
+      const totalFrames = duration * fps;
+
+      const interval = setInterval(async () => {
+        // Center crop the video to a 1:1 aspect ratio before resizing
+        const vW = video.videoWidth;
+        const vH = video.videoHeight;
+        let sx = 0, sy = 0, sWidth = vW, sHeight = vH;
+        if (vW > vH) {
+          // Landscape: crop left/right
+          sx = Math.floor((vW - vH) / 2);
+          sWidth = vH;
+        } else if (vH > vW) {
+          // Portrait: crop top/bottom
+          sy = Math.floor((vH - vW) / 2);
+          sHeight = vW;
+        }
+        ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, newWidth, newHeight);
+        const blob = await new Promise((res) =>
+          canvas.toBlob(res, "image/webp", 1)
+        );
+        if (blob) frames.push(blob);
+        count++;
+        if (count >= totalFrames) {
+          clearInterval(interval);
+          video.pause();
+          resolve({ frames, width: newWidth, height: newHeight });
+        }
+      }, 1000 / fps);
+    });
+  }
+  // Start camera on mount
+  React.useEffect(() => {
+    let streamPartial: MediaStream;
+    void (async () => {
+      try {
+        streamPartial = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: false,
+        });
+        if (videoRef.current) {
+          videoRef.current.srcObject = streamPartial;
+        }
+        setStream(streamPartial);
+      } catch (e) {
+        setError("Unable to access camera. Please allow camera access.");
+      }
+    })();
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      }
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center gap-4 py-8">
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className="rounded-lg border w-full max-w-xs aspect-video bg-black"
+      />
+      {error && <div className="text-red-500">{error}</div>}
+      {previewUrl && (
+        <video
+          src={previewUrl}
+          controls
+          className="rounded-lg border w-full max-w-xs aspect-video"
+        >
+          <track kind="captions" />
+        </video>
+      )}
+      {gifUrl && (
+        <img src={gifUrl} alt="Generated GIF" className="rounded-lg border w-[50%] h-[50%]" />
+      )}
+      <h1>{countInSecs} Frame Done: {doneFrames.length}</h1>
+      <button
+        onClick={handleRecord}
+        disabled={recording || loading}
+        className="px-6 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+      >
+        {recording ? "Recording..." : loading ? "Processing..." : "Record 3s Selfie"}
+      </button>
+    </div>
+  );
+} 

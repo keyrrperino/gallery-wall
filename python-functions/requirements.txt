@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+rembg
+pillow
+requests
+supabase
+onnxruntime-gpu
+python-multipart
