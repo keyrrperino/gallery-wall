@@ -4,7 +4,6 @@ import ExitButton from "@marketing/shared/components/ExitButton";
 import { ChevronLeftIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import SimpleButton from "@marketing/home/components/Button";
 
 export default function ThankYouScreen() {
   const [seconds, setSeconds] = useState(30);
@@ -23,7 +22,7 @@ export default function ThankYouScreen() {
     <div className="flex w-full h-full flex-col gap-12 items-center bg-white">
         {/* TOP BAR */}
         <div className="flex w-full items-center justify-between h-80 px-16 font-text-bold text-black">
-            <button>
+            <button onClick={() => router.back()}>
             <ChevronLeftIcon
                 className="text-black hover:text-gray-600"
                 width={120}
