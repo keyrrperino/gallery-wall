@@ -5,9 +5,11 @@ import SimpleButton from "@marketing/home/components/Button";
 export default function PhotoPreview({
   onRetake,
   onUsePhoto,
+  gifUrl
 }: {
   onRetake: () => void;
   onUsePhoto: () => void;
+  gifUrl: string;
 }) {
   return (
     <div className="flex w-full h-full flex-col items-center bg-white relative">
@@ -18,7 +20,7 @@ export default function PhotoPreview({
       <div className="flex-grow flex items-center justify-center w-full -mt-24">
         <div className="w-[33vw] h-[33vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
           <img
-            src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"
+            src={gifUrl}
             alt="selfie preview"
             className="w-full h-full object-cover"
           />
@@ -28,7 +30,7 @@ export default function PhotoPreview({
       <div className="absolute bottom-16 flex flex-row gap-32">
         <SimpleButton
           onClick={onRetake}
-          className="text-[78px] font-text-bold bg-transparent uppercase py-16"
+          className="text-[78px] text-[#20409A] font-text-bold bg-transparent uppercase py-16"
         >
           Take Another Selfie
         </SimpleButton>

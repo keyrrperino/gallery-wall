@@ -3,9 +3,14 @@
 import ExitButton from "@marketing/shared/components/ExitButton";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useUser } from "@saas/auth/hooks/use-user";
 
 export default function LoadingScreen() {
+  const searchParams = useSearchParams();
+  const { gifUrl, isDoneGeneratingGif } = useUser();
+  const gif = searchParams.get("gif");
+  const userGifRequestId = searchParams.get("userGifRequestId");
   const [dotCount, setDotCount] = useState(0);
   const [positions, setPositions] = useState<
     { top?: string; bottom?: string; left?: string; right?: string }[]
@@ -48,10 +53,10 @@ export default function LoadingScreen() {
   }, []);
 
   useEffect(() => {
-    if (finishedGenerating) {
-      router.push("/save-pledge-photo");
+    if ( gifUrl&& isDoneGeneratingGif) {
+      router.push(`/save-pledge-photo?gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
     }
-  }, [finishedGenerating, router]);
+  }, [isDoneGeneratingGif, gifUrl, router]);
 
   const loadingText = `Generating your Unique Pledge Photo${".".repeat(dotCount)}`;
 

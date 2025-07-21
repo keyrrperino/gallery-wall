@@ -12,6 +12,7 @@ import { ProgressBar } from "@marketing/shared/components/ProgressBar";
 import ExitButton from "@marketing/shared/components/ExitButton";
 import { PledgeStyleEnum } from "@marketing/what-is-your-pledge/types";
 import { supabase } from "../../../lib/supabaseClient";
+import { RequestStatusSchema } from "../../../../../packages/database";
 
 export default function MainSlider() {
   // SLIDE STATE
@@ -56,7 +57,7 @@ export default function MainSlider() {
       .from('UserGifRequest')
       .insert([
         {
-          requestStatus: "PENDING",
+          requestStatus: RequestStatusSchema.enum.PENDING,
           userId: "1",
           createdAt: new Date().toISOString(), // optional if your DB has a default
         }
@@ -73,16 +74,16 @@ export default function MainSlider() {
       });
   }
 
-  const onGenerateGIF = (gifUrl: string) => {
+  const onGenerateGIF = (gifUrl: string, videoUrl: string) => {
     supabase
       .from("UserGifRequest")
       .update({
-        requestStatus: "SUCCESS",
+        requestStatus: RequestStatusSchema.Enum.PROCESSING,
         gifUrl
       })
       .eq("id", userGifRequestId)
-      .then((data) => {
-        router.push(`/enter-pin-code?gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
+      .then(() => {
+        router.push(`/enter-pin-code?videoUrl=${videoUrl}&gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
       });
   }
 
@@ -98,6 +99,7 @@ export default function MainSlider() {
     return <SelfieCameraMode
       onExit={() => setIsCameraMode(false)}
       onGenerateGIF={onGenerateGIF}
+      pledge={selectedPledge || "suppor"}
     />;
   }
 

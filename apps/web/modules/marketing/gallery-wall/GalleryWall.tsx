@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "../../../lib/supabaseClient";
+import { RequestStatusSchema } from "../../../../../packages/database";
 
 export const GalleryWall: React.FC = () => {
   const [images, setImages] = useState<{ id: string; gifUrl: string; isShowed: boolean }[]>([]);
@@ -20,6 +21,7 @@ export const GalleryWall: React.FC = () => {
       const { data, error } = await supabase
         .from("UserGifRequest")
         .select("id, gifUrl, isShowed")
+        .eq("requestStatus", RequestStatusSchema.Enum.SUCCESS)
         .not("gifUrl", "is", null)
         .order("createdAt", { ascending: false });
       if (!error && data) {
@@ -205,7 +207,7 @@ export const GalleryWall: React.FC = () => {
   return (
     <div className="cursor-none w-[100%]">
       <div className="h-[100%] w-full gap-4 p-8 flex items-center justify-center overflow-auto bg-black">
-        <div className="flex flex-wrap gap-4 w-full justify-center">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 w-full justify-center">
           {images.map((img, idx) => (
             <img
               key={img.id}
@@ -214,7 +216,7 @@ export const GalleryWall: React.FC = () => {
               onClick={() => openModal(img, idx)}
               alt={`Gallery image ${idx + 1}`}
               draggable={false}
-              className="cursor-none w-[200px] h-auto rounded-lg object-cover"
+              className="cursor-none w-[200px] h-auto object-cover"
               style={{
                 transition: "box-shadow 0.2s",
                 boxShadow:

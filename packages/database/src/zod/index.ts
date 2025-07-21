@@ -16,7 +16,7 @@ export const UserSessionScalarFieldEnumSchema = z.enum(['id','userId','createdAt
 
 export const UserScalarFieldEnumSchema = z.enum(['id','email','name','userType','createdAt','updatedAt']);
 
-export const UserGifRequestScalarFieldEnumSchema = z.enum(['id','userId','gifUrl','isShowed','requestStatus','createdAt','updatedAt']);
+export const UserGifRequestScalarFieldEnumSchema = z.enum(['id','userId','gifUrl','selfieVideoUrl','isShowed','requestStatus','createdAt','updatedAt']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -28,7 +28,7 @@ export const UserTypeSchema = z.enum(['PC','IPAD']);
 
 export type UserTypeType = `${z.infer<typeof UserTypeSchema>}`
 
-export const RequestStatusSchema = z.enum(['PENDING','EXTRACTING_FRAMES','DONE_EXTRACTING_FRAMES','FAILED','SUCCESS']);
+export const RequestStatusSchema = z.enum(['PENDING','STANDBY','PROCESSING','FAILED','SUCCESS']);
 
 export type RequestStatusType = `${z.infer<typeof RequestStatusSchema>}`
 
@@ -81,6 +81,7 @@ export const UserGifRequestSchema = z.object({
   id: z.string(),
   userId: z.string(),
   gifUrl: z.string().nullable(),
+  selfieVideoUrl: z.string().nullable(),
   isShowed: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

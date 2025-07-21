@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function SavingAnimationScreen({
   onComplete,
+  gifUrl
 }: {
   onComplete: () => void;
+  gifUrl: string;
 }) {
   const [countdown, setCountdown] = useState(3);
   const [fly, setFly] = useState(false);
@@ -59,7 +61,7 @@ export default function SavingAnimationScreen({
       >
         <div className="w-[33vw] h-[33vw] bg-gray-200 overflow-hidden rounded-md shadow-md -mt-24">
           <img
-            src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"
+            src={gifUrl}
             alt="saving selfie"
             className="w-full h-full object-cover"
           />
