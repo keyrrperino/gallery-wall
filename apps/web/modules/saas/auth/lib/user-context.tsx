@@ -132,7 +132,7 @@ export function UserContextProvider({
   const getGifUrl = async (formData: FormData): Promise<void> => {
     setIsDoneGeneratingGif(false);
     return new Promise((resolve, reject) => {
-      fetch("http://localhost:8000/process-frames-to-gif", {
+      fetch("https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif", {
         method: "POST",
         body: formData,
       }).then((response) => {
