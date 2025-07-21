@@ -26,9 +26,10 @@ type SelfieCameraModePropType = {
   onExit: () => void;
   onGenerateGIF: (gifUrl: string, videoUrl: string) => void;
   pledge: string;
+  userGifRequestId: string;
 }
 
-export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge }: SelfieCameraModePropType) {
+export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGifRequestId }: SelfieCameraModePropType) {
   const router = useRouter();
   const { user, getGifUrl } = useUser();
 
@@ -170,7 +171,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge }: Self
       frames.forEach((blob, i) => {
         formData.append("images", blob, `frame${i}.webp`);
       });
-      formData.append("userGifRequestId", "1");
+      formData.append("userGifRequestId", userGifRequestId);
       formData.append("userId", "1");
       formData.append("targetWidth", `${width}`);
       formData.append("targetHeight", `${height}`);

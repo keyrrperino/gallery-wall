@@ -96,6 +96,7 @@ export default function MainSlider() {
       onExit={() => setIsCameraMode(false)}
       onGenerateGIF={onGenerateGIF}
       pledge={selectedPledge ?? "support"}
+      userGifRequestId={userGifRequestId ?? ""}
     />;
   }
 
