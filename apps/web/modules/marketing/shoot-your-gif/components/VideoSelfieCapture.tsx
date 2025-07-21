@@ -153,7 +153,7 @@ export default function VideoSelfieCapture() {
       <button
         onClick={handleRecord}
         disabled={recording || loading}
-        className="px-6 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+        className="px-6 py-2 rounded text-white disabled:opacity-50"
       >
         {recording ? "Recording..." : loading ? "Processing..." : "Record 3s Selfie"}
       </button>

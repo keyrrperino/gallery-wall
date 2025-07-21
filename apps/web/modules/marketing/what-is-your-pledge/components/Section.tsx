@@ -30,7 +30,7 @@ export default function PickAFrame({
       <h1 className="text-[130px] font-text-bold uppercase mb-6 leading-tight">
         CHOOSE YOUR PLEDGE FRAME
       </h1>
-      <p className="mb-2 text-[50px] mb-20">Tap one to select.</p>
+      <p className="text-[50px] mb-20">Tap one to select.</p>
 
       <PledgeSlider
         pledges={PLEDGES}

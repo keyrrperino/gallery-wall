@@ -7,8 +7,7 @@ type SnapButtonProps = {
   };
 
   const SnapButton: React.FC<SnapButtonProps> = ({ 
-    onClick, 
-    size}) => {
+    onClick}) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isClicked, setIsClicked] = useState(false);
   
