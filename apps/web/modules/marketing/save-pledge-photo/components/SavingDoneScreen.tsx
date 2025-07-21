@@ -21,7 +21,7 @@ export default function SavingDoneScreen() {
       <h2 className="font-text-bold text-[130px] uppercase">
         Look up!
       </h2>
-      <p className="text-[50px] text-center mb-24 mx-[15vw] leading-tight">
+      <p className="text-[2vw] text-center mb-24 mx-[15vw] leading-tight">
         Your pledge has joined others on our Live Pledge Wall!
         You’re now part of a growing wave of support for Singapore’s coastal future.
       </p>

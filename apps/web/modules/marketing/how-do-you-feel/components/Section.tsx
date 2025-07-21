@@ -5,9 +5,7 @@ import { FeelingsGrid } from "./FeelingsGrid";
 import SimpleButton from "@marketing/home/components/Button";
 
 const FEELINGS = [
-  "Hopeful", "Safe", "Concerned", "Embracing", "Proud", "Responsible", "Empowered", "Grateful",
-  "Worried", "Inspired", "Determined", "Connected", "Protective", "Curious", "Motivated",
-  "Involved", "Anxious", "Passionate", "Informed", "Supportive", "Encouraged", "Engaged"
+  "Inspired", "Excited", "Supportive", "Assured", "Informed", "Concerned", "Unsure", "Unconvinced", "Skeptical"
 ];
 
 export default function HowDoYouFeelSection({
@@ -42,17 +40,29 @@ export default function HowDoYouFeelSection({
   };
 
   return (
-    <div className="flex flex-col items-start bg-white text-black h-full w-full px-32">
+    <div className="flex flex-col items-start bg-white text-black h-full w-full px-[5vw]">
       <div className="flex flex-col w-full">
-        <h1 className="text-[130px] font-text-bold uppercase mb-6 leading-tight">
-          HOW DO YOU FEEL ABOUT COASTAL<br />PROTECTION IN SINGAPORE NOW?
+        <h1
+        className="
+          text-4xl md:text-[4vw]
+          font-text-bold uppercase leading-[0.75]
+        "
+        >
+          HOW DO YOU FEEL ABOUT COASTAL PROTECTION IN SINGAPORE NOW?
         </h1>
-        <p className="text-[50px] mb-32">
+        <p className="text-base md:text-[2vw] mt-4 mb-[3vw] leading-[1]">
           Select up to 3 that apply.
         </p>
         <FeelingsGrid feelings={FEELINGS} selected={selected} onPick={handlePick} />
         <SimpleButton
-          className="absolute bottom-20 self-center mt-10 text-[75px] text-white py-16 px-80 rounded-full font-bold"
+        className="
+          absolute bottom-[clamp(40px,7.5vh,160px)] self-center mt-10
+          text-[clamp(2rem,3vw,4rem)]
+          text-white
+          py-[clamp(0.55rem,1.5vw,2rem)]
+          px-[clamp(2rem,10vw,12rem)]
+          rounded-full font-bold z-10
+        "
           disabled={selected.length < 3}
           onClick={handleContinue}
         >
