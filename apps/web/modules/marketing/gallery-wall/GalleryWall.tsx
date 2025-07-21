@@ -29,12 +29,18 @@ export const GalleryWall: React.FC = () => {
         // Only queue images not shown yet
         setQueueImages((q) => {
           const qIds = new Set(q.map(i => i.id));
-          const newImages = data.filter(img => img.isShowed === false && !qIds.has(img.id));
+          const newImages = data
+            .filter(img => img.isShowed === false && !qIds.has(
+              img.id)) as { id: string; gifUrl: string; isShowed: boolean }[];
           return [...q, ...newImages.reverse()];
         });
       }
     };
-    fetchImages();
+    fetchImages().then(() => {
+      console.log('success');
+    }).catch(() => {
+      console.log('error');
+    });
 
     const channel = supabase
       .channel("public:UserGifRequest")
@@ -49,7 +55,11 @@ export const GalleryWall: React.FC = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(channel).then(() => {
+        console.log('success');
+      }).catch(() => {
+        console.log('error');
+      });
     };
   }, []);
 
@@ -72,7 +82,7 @@ export const GalleryWall: React.FC = () => {
         ? idx
         : images.findIndex(i => i.id === img.id);
       const rect = imgRefs.current[imageIdx]?.getBoundingClientRect();
-      setOriginRect(rect || null);
+      setOriginRect(rect ?? null);
     }, 0);
   }, [images]);
 
@@ -93,26 +103,20 @@ export const GalleryWall: React.FC = () => {
     }
   }, [modalOpen, isClosing, isOpening]);
 
-  // ESC to close
-  useEffect(() => {
-    if (!modalOpen || isClosing || isOpening) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [modalOpen, isClosing, isOpening]);
-
   // On close, record modal image rect and trigger animation
   const handleClose = useCallback(() => {
-    if (!modalImgRef.current) return;
+    if (!modalImgRef.current) {
+      return;
+    }
     setModalRect(modalImgRef.current.getBoundingClientRect());
     setIsClosing(true);
   }, []);
 
   // After animation, remove modal and update isShowed in Supabase
   useEffect(() => {
-    if (!isClosing) return;
+    if (!isClosing) {
+      return;
+    }
     const timeout = setTimeout(async () => {
       setModalOpen(false);
       setIsClosing(false);
@@ -122,14 +126,23 @@ export const GalleryWall: React.FC = () => {
       setQueueImages((q) => {
         if (modalImage) {
           // Update isShowed in Supabase
-          supabase
-            .from("UserGifRequest")
-            .update({ isShowed: true })
-            .eq("id", modalImage.id)
-            .then((data) => {
-              console.log(data);
-            });
-            console.log(modalImage.id);
+          new Promise(async (resolve, reject) => {
+            try {
+              await supabase
+                .from("UserGifRequest")
+                .update({ isShowed: true })
+                .eq("id", modalImage.id)
+                resolve("success");
+            } catch (error) {
+              console.log(error);
+              reject("error");
+            }
+          }).then(() => {
+            console.log("success");
+          }).catch(() => {
+            console.log("error");
+          });
+
           return q.filter(img => img.id !== modalImage.id);
         }
         return q;
@@ -140,91 +153,30 @@ export const GalleryWall: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isClosing]);
 
-  // Calculate transform for opening animation
-  let openingStyle: React.CSSProperties = {};
-  if (isOpening && originRect && modalImgRef.current) {
-    const modalRect = modalImgRef.current.getBoundingClientRect();
-    const scaleX = originRect.width / modalRect.width;
-    const scaleY = originRect.height / modalRect.height;
-    const translateX =
-      originRect.left +
-      originRect.width / 2 -
-      (modalRect.left + modalRect.width / 2);
-    const translateY =
-      originRect.top +
-      originRect.height / 2 -
-      (modalRect.top + modalRect.height / 2);
-
-    openingStyle = {
-      transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
-      opacity: 0.5,
-      transition: "none",
-      willChange: "transform, opacity",
-      pointerEvents: "none",
-    };
-  }
-
-  // Calculate transform for closing animation
-  let closingStyle: React.CSSProperties = {};
-  if (isClosing && originRect && modalRect) {
-    const scaleX = originRect.width / modalRect.width;
-    const scaleY = originRect.height / modalRect.height;
-    const translateX =
-      originRect.left +
-      originRect.width / 2 -
-      (modalRect.left + modalRect.width / 2);
-    const translateY =
-      originRect.top +
-      originRect.height / 2 -
-      (modalRect.top + modalRect.height / 2);
-
-    closingStyle = {
-      transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
-      opacity: 0,
-      transition:
-        "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
-      willChange: "transform, opacity",
-      pointerEvents: "none",
-    };
-  }
-
-  // Overlay fade out/in
-  let overlayStyle: React.CSSProperties = {};
-  if (isClosing) {
-    overlayStyle = {
-      background: "rgba(0,0,0,0)",
-      transition: "background 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
-      pointerEvents: "none",
-    };
-  } else if (isOpening) {
-    overlayStyle = {
-      background: "rgba(0,0,0,0.2)",
-      transition: "background 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
-      pointerEvents: "none",
-    };
-  }
-
   return (
     <div className="cursor-none w-[100%]">
       <div className="h-[100%] w-full gap-4 p-8 flex items-center justify-center overflow-auto bg-black">
         <div className="flex flex-wrap gap-x-4 gap-y-2 w-full justify-center">
           {images.map((img, idx) => (
-            <img
-              key={img.id}
-              ref={(el: HTMLImageElement | null) => { imgRefs.current[idx] = el; }}
-              src={img.gifUrl}
-              onClick={() => openModal(img, idx)}
-              alt={`Gallery image ${idx + 1}`}
-              draggable={false}
-              className="cursor-none w-[200px] h-auto object-cover"
-              style={{
-                transition: "box-shadow 0.2s",
-                boxShadow:
-                  modalImage && modalImage.gifUrl === img.gifUrl && modalOpen && !isClosing && !isOpening
-                    ? "0 0 0 4px #fff"
-                    : undefined,
-              }}
-            />
+            <button key={`button-${img.id}`} onClick={() => {
+              openModal(img, idx);
+            }}>
+              <img
+                key={img.id}
+                ref={(el: HTMLImageElement | null) => { imgRefs.current[idx] = el; }}
+                src={img.gifUrl}
+                draggable={false}
+                alt="Gallery"
+                className="cursor-none w-[200px] h-auto object-cover"
+                style={{
+                  transition: "box-shadow 0.2s",
+                  boxShadow:
+                    modalImage && modalImage.gifUrl === img.gifUrl && modalOpen && !isClosing && !isOpening
+                      ? "0 0 0 4px #fff"
+                      : undefined,
+                }}
+              />
+            </button>
           ))}
         </div>
       </div>
@@ -234,7 +186,6 @@ export const GalleryWall: React.FC = () => {
           style={isClosing ? { background: "rgba(0,0,0,0)", transition: "background 0.5s cubic-bezier(0.22, 1, 0.36, 1)", pointerEvents: "none" }
             : isOpening ? { background: "rgba(0,0,0,0.2)", transition: "background 0.5s cubic-bezier(0.22, 1, 0.36, 1)", pointerEvents: "none" }
             : {}}
-          onClick={isClosing || isOpening ? undefined : handleClose}
         >
           <img
             ref={modalImgRef}
@@ -297,7 +248,6 @@ export const GalleryWall: React.FC = () => {
                     opacity: 1,
                   }
             }
-            onClick={e => e.stopPropagation()}
           />
         </div>
       )}

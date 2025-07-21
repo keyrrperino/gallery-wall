@@ -1,6 +1,5 @@
 "use client";
 
-import { PhotoWithFrameState } from "@marketing/home/components/PhotoWithFrame";
 import { apiClient } from "@shared/lib/api-client";
 import { clearCache } from "@shared/lib/cache";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,7 +18,7 @@ type UserContext = {
   logout: () => Promise<void>;
   loaded: boolean;
   gifUrl: string | null;
-  getGifUrl: (data: FormData) => void;
+  getGifUrl: (data: FormData) => Promise<void>;
   error: string | null;
   isDoneGeneratingGif: boolean;
   setIsDoneGeneratingGif: (value: boolean) => void;
@@ -46,7 +45,9 @@ export const userContext = createContext<UserContext>({
     return;
   },
   getGifUrl: () => {
-    return;
+    return new Promise(() => () => {
+      return null;
+    });
   }
 });
 
@@ -128,7 +129,7 @@ export function UserContextProvider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const getGifUrl = async (formData: FormData) => {
+  const getGifUrl = async (formData: FormData): Promise<void> => {
     setIsDoneGeneratingGif(false);
     return new Promise((resolve, reject) => {
       fetch("http://localhost:8000/process-frames-to-gif", {
@@ -144,13 +145,13 @@ export function UserContextProvider({
           // const newImageUrl = result?.gifUrl ? result.gifUrl as string : null;
           setGifUrl(result.gifUrl);
           setIsDoneGeneratingGif(true);
-          resolve(result);
-        }).catch((error) => {
-          reject(error);
+          resolve();
+        }).catch(() => {
+          reject("Failed to upload frames");
           setError("Failed to upload frames");
         });
-      }).catch((error) => {
-        reject(error);
+      }).catch(() => {
+        reject("Failed to upload frames");
       });
     });
   }

@@ -4,14 +4,12 @@ import * as adminProcedures from "../modules/admin/procedures";
 import * as aiProcedures from "../modules/ai/procedures";
 import * as authProcedures from "../modules/auth/procedures";
 import * as emailProcedures from "../modules/emails/procedures";
-import * as framesProcedures from "../modules/frames/procedures";
 import * as uploadsProcedures from "../modules/uploads/procedures";
 import { router } from "./base";
 
 export const apiRouter = router({
   auth: router(authProcedures),
   ai: router(aiProcedures),
-  frames: router(framesProcedures),
   emails: router(emailProcedures),
   admin: router(adminProcedures),
   uploads: router(uploadsProcedures)

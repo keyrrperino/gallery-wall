@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
@@ -52,9 +52,9 @@ export default function MainSlider() {
     }
   };
 
-  const handleTakeASelfie = () => {
-    supabase
-      .from('UserGifRequest')
+  const handleTakeASelfie = async () => {
+    const data = await supabase
+      .from("UserGifRequest")
       .insert([
         {
           requestStatus: RequestStatusSchema.enum.PENDING,
@@ -62,29 +62,25 @@ export default function MainSlider() {
           createdAt: new Date().toISOString(), // optional if your DB has a default
         }
       ])
-      .select("id")
-      .then((data) => {
-        const userGifRequests = data.data ?? [];
+      .select("id");
+
+      const userGifRequests = data.data ?? [];
         if (data.status === 201 && userGifRequests?.length > 0) {
-          setUserGifRequestId(userGifRequests[0].id);
+          setUserGifRequestId(userGifRequests[0].id as string);
           setIsCameraMode(true);
-        } else {
-          
         }
-      });
   }
 
-  const onGenerateGIF = (gifUrl: string, videoUrl: string) => {
-    supabase
+  const onGenerateGIF = async (gifUrl: string, videoUrl: string) => {
+    await supabase
       .from("UserGifRequest")
       .update({
         requestStatus: RequestStatusSchema.Enum.PROCESSING,
         gifUrl
       })
-      .eq("id", userGifRequestId)
-      .then(() => {
-        router.push(`/enter-pin-code?videoUrl=${videoUrl}&gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
-      });
+      .eq("id", userGifRequestId);
+
+      router.push(`/enter-pin-code?videoUrl=${videoUrl}&gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
   }
 
   // When we reach slide 3, log both (only once on transition)
@@ -99,7 +95,7 @@ export default function MainSlider() {
     return <SelfieCameraMode
       onExit={() => setIsCameraMode(false)}
       onGenerateGIF={onGenerateGIF}
-      pledge={selectedPledge || "suppor"}
+      pledge={selectedPledge ?? "support"}
     />;
   }
 

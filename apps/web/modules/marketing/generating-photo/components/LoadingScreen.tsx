@@ -9,13 +9,11 @@ import { useUser } from "@saas/auth/hooks/use-user";
 export default function LoadingScreen() {
   const searchParams = useSearchParams();
   const { gifUrl, isDoneGeneratingGif } = useUser();
-  const gif = searchParams.get("gif");
   const userGifRequestId = searchParams.get("userGifRequestId");
   const [dotCount, setDotCount] = useState(0);
   const [positions, setPositions] = useState<
     { top?: string; bottom?: string; left?: string; right?: string }[]
   >([]);
-  const [finishedGenerating, setFinishedGenerating] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -40,16 +38,6 @@ export default function LoadingScreen() {
       };
     });
     setPositions(newPositions);
-  }, []);
-
-  // Simulate image generation completion after 5 seconds
-  // This can be replaced with actual image generation logic
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setFinishedGenerating(true);
-    }, 5000);
-
-    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {

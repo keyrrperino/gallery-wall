@@ -90,13 +90,15 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge }: Self
     setError(null);
     setRecording(true);
     setPreviewUrl(null);
-    const stream = webcamRef.current?.video?.srcObject as MediaStream;
+    const stream: MediaStream = webcamRef.current?.video?.srcObject as MediaStream;
     if (!stream) {
       setError("Camera not ready");
       setRecording(false);
       return;
     }
-    let options: any = undefined;
+    let options: MediaRecorderOptions = {
+      
+    };
     if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
       options = { mimeType: "video/webm;codecs=vp9" };
     } else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
@@ -106,7 +108,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge }: Self
     } else if (MediaRecorder.isTypeSupported("video/mp4")) {
       options = { mimeType: "video/mp4" };
     } else {
-      options = undefined; // Let the browser pick
+      options = {}; // Let the browser pick
     }
 
     const recorder = new MediaRecorder(stream, options);
@@ -147,6 +149,8 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge }: Self
         tx.oncomplete = () => resolve();
         tx.onerror = () => reject(tx.error);
       });
+    }).catch((error) => {
+      console.log(error);
     });
   }
 
@@ -172,7 +176,11 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge }: Self
       formData.append("targetHeight", `${height}`);
       formData.append("pledge", pledge);
 
-      getGifUrl(formData);
+      getGifUrl(formData).then(() => {
+        console.log("success");
+      }).catch(() => {
+        console.log("error");
+      });
 
       // setImageUrl("https://lbrxffrgccdojnugwkgn.supabase.co/storage/v1/object/sign/gifs/gifs/1/1/final.gif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYmJhOWU0Zi03YmE4LTQ0OWItOTBhOC03YmQwMGYwYjUwN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJnaWZzL2dpZnMvMS8xL2ZpbmFsLmdpZiIsImlhdCI6MTc1MzAwMTY0MCwiZXhwIjoyMzg0MTUzNjQwfQ.CLkuTAWMKjWxIXu8HuKSVztQNwse-TPI0XCAx97ZuXo");
 
@@ -272,7 +280,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge }: Self
     setIsCounting(false);
     
     if (previewUrl) {
-      onGenerateGIF(imageUrl || '', previewUrl);
+      onGenerateGIF(imageUrl ?? "", previewUrl);
     }
   };
 

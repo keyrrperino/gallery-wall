@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ExitButton from "@marketing/shared/components/ExitButton";
 import PhotoPreview from "./PhotoPreview";
 import SavingAnimationScreen from "./SavingAnimationScreen";
@@ -14,23 +14,21 @@ import { useUser } from "@saas/auth/hooks/use-user";
 export default function SaveImageFlow() {
   const { gifUrl } = useUser();
   const searchParams = useSearchParams();
-  const gif = searchParams.get("gif") || '';
   const userGifRequestId = searchParams.get("userGifRequestId");
   const [showConfirmRetake, setShowConfirmRetake] = useState(false);
   const [phase, setPhase] = useState<"preview" | "saving" | "done">("preview");
   const router = useRouter();
 
-  const onComplete = () => {
-    supabase
+  const onComplete = async () => {
+    await supabase
       .from("UserGifRequest")
       .update({
         gifUrl,
         requestStatus: RequestStatusSchema.Enum.SUCCESS
       })
-      .eq("id", userGifRequestId)
-      .then(() => {
-        setPhase("done");
-      });
+      .eq("id", userGifRequestId);
+
+    setPhase("done");
   }
 
   return (
@@ -43,10 +41,10 @@ export default function SaveImageFlow() {
       {/* CONTENT */}
       <div className="w-full h-full flex-col">
         {phase === "preview" && (
-          <PhotoPreview gifUrl={gifUrl || ''} onRetake={() => setShowConfirmRetake(true)} onUsePhoto={() => setPhase("saving")} />
+          <PhotoPreview gifUrl={gifUrl ?? ""} onRetake={() => setShowConfirmRetake(true)} onUsePhoto={() => setPhase("saving")} />
         )}
         {phase === "saving" && (
-          <SavingAnimationScreen gifUrl={gifUrl || ''} onComplete={() => onComplete()} />
+          <SavingAnimationScreen gifUrl={gifUrl ?? ""} onComplete={() => onComplete()} />
         )}
         {phase === "done" && <SavingDoneScreen />}
       </div>
