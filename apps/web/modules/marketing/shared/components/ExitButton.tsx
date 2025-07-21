@@ -21,7 +21,7 @@ export default function ExitButton() {
         className="p-2 hover:opacity-70 transition"
         aria-label="Exit"
       >
-        <Cross2Icon color="black" width={120} height={120} />
+        <Cross2Icon color="black" width={"3vw"} height={"3vw"} />
       </button>
 
       {open && (

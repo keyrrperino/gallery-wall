@@ -74,7 +74,7 @@ export default function PinEntry() {
       </div>
 
       {/* Description */}
-      <p className="text-[50px] text-center mb-10 mx-[22vw] leading-tight">
+      <p className="text-[2vw] text-center mb-10 mx-[22vw] leading-tight">
         Please wait while we make sure your selfie is safe to send to the
         gallery wall.
       </p>
