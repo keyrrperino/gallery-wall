@@ -3,13 +3,12 @@ import SimpleButton from "@marketing/home/components/Button";
 import { PledgeStyleEnum } from "../types";
 
 const PLEDGES: {
-  topText: string;
-  bottomText: string;
+  image: string;
   style: PledgeStyleEnum;
 }[] = [
-  { topText: "I'M A", bottomText: "COASTAL PROTECTOR", style: PledgeStyleEnum.SUPPORT },
-  { topText: "I SUPPORT", bottomText: "OUR COASTAL FUTURE", style: PledgeStyleEnum.FUTURE },
-  { topText: "I STAND", bottomText: "FOR STRONG COASTS", style: PledgeStyleEnum.CARE },
+  { image: "/images/frames/Poster 1.svg", style: PledgeStyleEnum.SUPPORT },
+  { image: "/images/frames/Poster 2.svg", style: PledgeStyleEnum.FUTURE },
+  { image: "/images/frames/Poster 3.svg", style: PledgeStyleEnum.CARE },
 ];
 
 export default function PickAFrame({
@@ -30,13 +29,11 @@ export default function PickAFrame({
       <h1 className="text-4xl md:text-[4vw] font-text-bold uppercase leading-[0.75]">
         CHOOSE YOUR PLEDGE FRAME
       </h1>
-      <p className="text-base md:text-[2vw] mt-4 mb-[3vw] leading-[1]">Tap one to select.</p>
+      <p className="text-base md:text-[2vw] mt-4 mb-[3vw] leading-[1]">
+        Tap one to select.
+      </p>
 
-      <PledgeSlider
-        pledges={PLEDGES}
-        selected={selected}
-        onPick={handlePick}
-      />
+      <PledgeSlider pledges={PLEDGES} selected={selected} onPick={handlePick} />
 
       <SimpleButton
         className="

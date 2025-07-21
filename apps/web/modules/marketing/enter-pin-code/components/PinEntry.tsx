@@ -61,25 +61,23 @@ export default function PinEntry() {
   return (
     <div className="flex w-full h-full flex-col gap-12 items-center bg-white">
       {/* Header */}
-      <div className="flex w-full items-center justify-between h-80 px-16 font-text-bold text-black">
+      <div className="flex w-full items-center justify-between h-80 px-[5vw] py-[3vh] font-text-bold text-black">
         <button onClick={() => window.history.back()}>
           <ChevronLeftIcon
-            className="text-black hover:text-gray-600"
-            width={120}
-            height={120}
+            className="text-black hover:text-gray-600 w-8 h-8 md:w-[3vw] md:h-[3vw]"
           />
         </button>
-        <h2 className="text-[130px]">ENTER PIN CODE</h2>
+        <h1 className="text-4xl md:text-[4vw] font-text-bold uppercase leading-[0.75]">ENTER PIN CODE</h1>
         <ExitButton />
       </div>
 
       {/* Description */}
-      <p className="text-[2vw] text-center mb-10 mx-[22vw] leading-tight">
+      <p className="text-base md:text-[2vw] leading-[1] text-center">
         Please wait while we make sure your selfie is safe to send to the
         gallery wall.
       </p>
 
-      <div className="flex flex-row gap-48 mt-20">
+      <div className="flex flex-col md:flex-row gap-[3vw] mt-[3vw]">
         {/* Left side - image */}
         <div className="flex flex-col items-center">
           <div className="w-[33vw] h-[33vw] bg-gray-200 overflow-hidden rounded-md shadow-md">

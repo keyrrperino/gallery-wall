@@ -66,9 +66,7 @@ export default function MainSlider() {
       <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8">
         <button onClick={handleBack}>
           <ChevronLeftIcon
-            className="text-black hover:text-gray-600"
-            width={"3vw"}
-            height={"3vw"}
+            className="text-black hover:text-gray-600 w-8 h-8 md:w-[3vw] md:h-[3vw]"
           />
         </button>
         <div className="flex-1 mx-4">
