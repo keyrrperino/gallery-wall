@@ -1,4 +1,3 @@
-import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { PledgeCard } from "./PledgeCard";
 import { PledgeStyleEnum } from "../types";
@@ -16,15 +15,14 @@ export function PledgeSlider({
   return (
     <div className="w-full flex flex-row h-[40vh] items-center gap-5">
       {pledges.map((pledge, i) => (
-        <div
+        <button
           key={i}
+          type="button"
           onClick={() => onPick(pledge.style)}
-          className={`flex-1 h-full p-7 rounded-xl cursor-pointer transition-colors duration-300 ${
-            selected === pledge.style ? "bg-blue/50" : "bg-transparent"
-          }`}
+          className={`flex-1 h-full p-7 rounded-xl ${selected === pledge.style ? "bg-blue/50" : "bg-transparent"} cursor-pointer transition-colors duration-300`}
         >
           <PledgeCard {...pledge} active={selected === pledge.style} />
-        </div>
+        </button>
       ))}
     </div>
   );

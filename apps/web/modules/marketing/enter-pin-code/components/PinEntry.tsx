@@ -2,10 +2,12 @@
 import ExitButton from "@marketing/shared/components/ExitButton";
 import { ChevronLeftIcon, DeleteIcon } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 
 export default function PinEntry() {
+  const searchParams = useSearchParams();
+  const gif = searchParams.get("gif");
   const [pin, setPin] = useState<string>("");
   const [isError, setIsError] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
@@ -15,7 +17,9 @@ export default function PinEntry() {
   const samplePin = 1234; // ✅ your sample PIN
 
   const handlePress = (digit: string) => {
-    if (isLocked || isSuccess) return;
+    if (isLocked || isSuccess) {
+      return;
+    }
     if (pin.length < 4) {
       const newPin = pin + digit;
       setPin(newPin);
@@ -31,7 +35,9 @@ export default function PinEntry() {
   };
 
   const handleBackspace = () => {
-    if (isLocked || isSuccess) return;
+    if (isLocked || isSuccess) {
+      return;
+    }
     setPin(pin.slice(0, -1));
   };
 
@@ -77,11 +83,12 @@ export default function PinEntry() {
         {/* Left side - image */}
         <div className="flex flex-col items-center">
           <div className="w-[33vw] h-[33vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
-            <img
-              src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"
-              alt="selfie preview"
-              className="w-full h-full object-cover"
-            />
+            {gif && 
+              <img
+                src={gif}
+                alt="selfie preview"
+                className="w-full h-full object-cover"
+              />}
           </div>
           <div className="font-bold w-full bg-[#F7EBDF] text-[66px] text-center uppercase font-text-bold p-8">
             My Video Selfie

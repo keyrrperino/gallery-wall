@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeftIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import HowDoYouFeelSection from "@marketing/how-do-you-feel/components/Section";
 import PickAFrame from "@marketing/what-is-your-pledge/components/Section";

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { FeelingsGrid } from "./FeelingsGrid";
 import SimpleButton from "@marketing/home/components/Button";
 
@@ -19,9 +18,8 @@ export default function HowDoYouFeelSection({
   initialSelected?: string[];
 }) {
   const [selected, setSelected] = useState<string[]>(initialSelected);
-  const [flash, setFlash] = useState(false);
+  const [, setFlash] = useState(false);
   const flashTimeout = useRef<NodeJS.Timeout | null>(null);
-  const router = useRouter();
 
   const handlePick = (feel: string) => {
     if (selected.includes(feel)) {
@@ -49,7 +47,7 @@ export default function HowDoYouFeelSection({
         <h1 className="text-[130px] font-text-bold uppercase mb-6 leading-tight">
           HOW DO YOU FEEL ABOUT COASTAL<br />PROTECTION IN SINGAPORE NOW?
         </h1>
-        <p className="mb-2 text-[50px] mb-32">
+        <p className="text-[50px] mb-32">
           Select up to 3 that apply.
         </p>
         <FeelingsGrid feelings={FEELINGS} selected={selected} onPick={handlePick} />

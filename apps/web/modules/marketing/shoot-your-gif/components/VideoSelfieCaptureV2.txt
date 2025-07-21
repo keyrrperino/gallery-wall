@@ -96,7 +96,13 @@ export default function VideoSelfieCapture() {
   async function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result.split(',')[1]);
+        } else {
+          reject(new Error("Unexpected result type"));
+        }
+      };
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
@@ -120,7 +126,7 @@ export default function VideoSelfieCapture() {
         return;
       }
 
-      const frames = [];
+      const frames: Blob[] = [];
       let count = 0;
       const totalFrames = duration * fps;
 
@@ -139,10 +145,12 @@ export default function VideoSelfieCapture() {
           sHeight = vW;
         }
         ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, newWidth, newHeight);
-        const blob = await new Promise((res) =>
+        const blob = await new Promise<Blob | null>((res) =>
           canvas.toBlob(res, "image/webp", 1)
         );
-        if (blob) frames.push(blob);
+        if (blob) {
+          frames.push(blob);
+        }
         count++;
         if (count >= totalFrames) {
           clearInterval(interval);
@@ -204,7 +212,7 @@ export default function VideoSelfieCapture() {
       <button
         onClick={handleRecord}
         disabled={recording || loading}
-        className="px-6 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+        className="px-6 py-2 rounded text-white disabled:opacity-50"
       >
         {recording ? "Recording..." : loading ? "Processing..." : "Record 3s Selfie"}
       </button>

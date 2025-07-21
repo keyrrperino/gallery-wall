@@ -3,23 +3,21 @@
 import * as React from "react";
 import { apiClient } from "@shared/lib/api-client";
 import { v4 as uuid } from "uuid";
-import { Frame, FrameStatusSchema } from "../../../../../../packages/database";
+import { Frame } from "../../../../../../packages/database";
 
 export default function VideoSelfieCapture() {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const [recording, setRecording] = React.useState(false);
   const [stream, setStream] = React.useState<any>(null);
-  const [videoFrames, setVideoFrames] = React.useState<Blob[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [gifUrl, setGifUrl] = React.useState<string | null>(null);
   const [countInSecs, setCountInSecs] = React.useState(0);
-  const [doneFrames, setDoneFrames] = React.useState<Frame[]>([]);
+  const [doneFrames] = React.useState<Frame[]>([]);
 
   const getSignedUploadUrlMutation = apiClient.uploads.signedUploadUrlGifs.useMutation();
   const getSupabaseSignedUrlMutation = apiClient.uploads.supabaseSignedUrl.useMutation();
-  const addFrameMutation = apiClient.frames.addFrame.useMutation();
 
   React.useEffect(() => {
     const timer = setTimeout(() => setCountInSecs(countInSecs + 1), 1000);
@@ -84,81 +82,68 @@ export default function VideoSelfieCapture() {
   async function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result.split(',')[1]);
+        } else {
+          reject(new Error("Unexpected result type"));
+        }
+      };
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
   }
 
-  function captureFramesFromStream(stream, duration = 2, fps = 6) {
+  function captureFramesFromStream(stream, duration = 2, fps = 12) {
     return new Promise(async (resolve) => {
       const video = document.createElement("video");
       video.srcObject = stream;
       await video.play();
-  
+
+      // Always use 672x672 (square)
+      const newWidth = 672;
+      const newHeight = 672;
       const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx: any = canvas.getContext("2d");
-  
-      const frames: any = [];
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve({ frames: [], width: newWidth, height: newHeight });
+        return;
+      }
+
+      const frames: Blob[] = [];
       let count = 0;
       const totalFrames = duration * fps;
-  
+
       const interval = setInterval(async () => {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const blob = await new Promise((res) =>
-          canvas.toBlob(res, "image/webp", 1  )
+        // Center crop the video to a 1:1 aspect ratio before resizing
+        const vW = video.videoWidth;
+        const vH = video.videoHeight;
+        let sx = 0, sy = 0, sWidth = vW, sHeight = vH;
+        if (vW > vH) {
+          // Landscape: crop left/right
+          sx = Math.floor((vW - vH) / 2);
+          sWidth = vH;
+        } else if (vH > vW) {
+          // Portrait: crop top/bottom
+          sy = Math.floor((vH - vW) / 2);
+          sHeight = vW;
+        }
+        ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, newWidth, newHeight);
+        const blob = await new Promise<Blob | null>((res) =>
+          canvas.toBlob(res, "image/webp", 1)
         );
-        if (blob) frames.push(blob);
+        if (blob) {
+          frames.push(blob);
+        }
         count++;
         if (count >= totalFrames) {
           clearInterval(interval);
           video.pause();
-          resolve(frames);
+          resolve({ frames, width: newWidth, height: newHeight });
         }
       }, 1000 / fps);
-    });
-  }
-
-  const uploadFrames = (frames: Blob[]) => {
-    const userId = "1";
-    const userGifRequestId = "1";
-    frames.forEach((blob, i) => {
-      const path = `frames/${
-        userId}/${userGifRequestId}/${i+1}.webp`;
-      const bucket = "gifs";
-      // Get signed upload URL
-      getSignedUploadUrlMutation.mutateAsync({
-        path,
-        bucket,
-      }).then((uploadUrl) => {
-        fetch(uploadUrl, {
-          method: "PUT",
-          body: blob,
-          headers: {
-            "Content-Type": "image/webp",
-          },
-        }).then((signedUrl) => {
-          const id = `${userId}${userGifRequestId}${i+1}`;
-          addFrameMutation.mutateAsync({
-            userGifRequestId: "1",
-            userId: "1",
-            frameNumber: `${i + 1}`,
-            imageUrl: signedUrl.url,
-            frameStatus: FrameStatusSchema.Enum.SUCCESS
-          }).then(() => {
-            setDoneFrames((oldFrame) => [...oldFrame, {
-              id,
-              userGifRequestId: userGifRequestId,
-              imageUrl: signedUrl.url,
-              frameStatus: FrameStatusSchema.Enum.SUCCESS,
-              createdAt: new Date(),
-              updatedAt: new Date()
-            }])
-          });
-        });
-      })
     });
   }
 
@@ -273,7 +258,7 @@ export default function VideoSelfieCapture() {
       <button
         onClick={handleRecord}
         disabled={recording || loading}
-        className="px-6 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+        className="px-6 py-2 rounded text-white disabled:opacity-50"
       >
         {recording ? "Recording..." : loading ? "Processing..." : "Record 3s Selfie"}
       </button>

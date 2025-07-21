@@ -12,7 +12,7 @@ export default function PhotoPreview({
   return (
     <div className="flex w-full h-full flex-col items-center bg-white relative">
       <h2 className="absolute top-16 font-text-bold text-[130px] uppercase">
-        Here's your unique pledge photo!
+        Here&apos;s your unique pledge photo!
       </h2>
 
       <div className="flex-grow flex items-center justify-center w-full -mt-24">
@@ -28,7 +28,7 @@ export default function PhotoPreview({
       <div className="absolute bottom-16 flex flex-row gap-32">
         <SimpleButton
           onClick={onRetake}
-          className="text-[78px] font-text-bold bg-transparent text-main uppercase py-16"
+          className="text-[78px] font-text-bold bg-transparent uppercase py-16"
         >
           Take Another Selfie
         </SimpleButton>
