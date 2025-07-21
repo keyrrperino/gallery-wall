@@ -308,11 +308,11 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
 
       {/* HEADER */}
       <div className="relative top-0 flex w-full items-center justify-between py-4 font-text-bold text-white">
-        <div className="flex w-full items-center justify-between h-80 px-16">
+        <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8">
           <div></div>
-          <h2 className="text-[110px]">TAKE YOUR VIDEO SELFIE!</h2>
+          <h1 className="text-4xl md:text-[4vw] text-center font-text-bold uppercase leading-[0.75]">TAKE YOUR VIDEO SELFIE!</h1>
           <button onClick={onExit}>
-            <Cross2Icon color="white" width={120} height={120} />
+            <Cross2Icon className="w-8 h-8 md:w-[3vw] md:h-[3vw] text-white"/>
           </button>
         </div>
       </div>
@@ -321,7 +321,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
       <div className="flex size-full flex-col items-center justify-start">
         {!videoTaken ? (
           <div className="flex size-full items-center justify-center">
-            <div className="relative w-1/2 flex size-full max-w-full items-center justify-center border-[20px] border-white">
+            <div className="relative aspect-square w-[90vw] md:w-auto md:h-full border-[20px] border-white flex items-center justify-center">
               {isCounting && (
                 <CountdownTimer
                   key={isCountingKey}
@@ -334,22 +334,19 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
                 audio={false}
                 mirrored={true}
                 videoConstraints={videoConstraints}
-                className={`absolute size-full object-cover ${imageUrl ? "hidden" : ""}`}
+                className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? "hidden" : ""}`}
               />
             </div>
           </div>
         ) : (
-          <div className="flex h-[90%] w-screen flex-col items-center justify-center">
-            <h1 className="font-button-base py-10 text-6xl uppercase text-white">
-              Are these good to go?
-            </h1>
-            <div className="mt-4 grid h-full w-[900px] grid-cols-2 justify-center gap-4">
-              <div className="relative col-span-2 row-span-2">
+          <div className="flex size-full items-center justify-center">
+            <div className="relative aspect-square w-[90vw] md:w-auto md:h-full border-[20px] border-white justify-center gap-4">
+              
                 {previewUrl && 
                   <video
                     src={previewUrl}
                     ref={previewVideoRef}
-                    className="size-full border-4 border-white object-cover"
+                    className="size-full absolute inset-0 h-full w-full object-cover"
                     autoPlay
                     loop
                     muted
@@ -357,7 +354,6 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
                   >
                     <track kind="captions" />
                   </video>}
-              </div>
             </div>
           </div>
         )}
@@ -366,20 +362,20 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
       {/* BOTTOM BUTTONS */}
       <div className="flex h-1/3 w-full items-center justify-center bg-black/75">
         {!isCounting && !videoTaken ? (
-          <SnapButton onClick={capture} size="w-48" />
+          <SnapButton onClick={capture} size="w-[2vh]" />
         ) : (
           <div className="flex w-full">
             {videoTaken && (
-              <div className="flex flex-row w-full items-center justify-around gap-4 pb-16">
+              <div className="flex flex-row w-full items-center justify-around gap-4 py-8">
                 <div></div>
                 <button
-                  className="font-text-bold text-white text-[80px]"
+                  className="font-text-bold text-white text-2xl md:text-[clamp(2rem,3vw,4rem)]"
                   onClick={retake}
                 >
                   RETAKE
                 </button>
                 <button
-                  className="font-text-bold text-white text-[80px]"
+                  className="font-text-bold text-white text-2xl md:text-[clamp(2rem,3vw,4rem)]"
                   onClick={() => {generateFace();}}
                 >
                   USE THIS SELFIE {">"}
