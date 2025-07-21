@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExitButton from "@marketing/shared/components/ExitButton";
 import PhotoPreview from "./PhotoPreview";
 import SavingAnimationScreen from "./SavingAnimationScreen";
