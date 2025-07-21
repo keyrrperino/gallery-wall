@@ -14,6 +14,7 @@ import Processing from "@marketing/home/components/Modal-content/Processing";
 import Modal from "@marketing/home/components/Popups/Modal";
 import { v4 } from "uuid";
 import { CountdownTimer } from "@marketing/home/components/CountdownTimer";
+import { supabase } from "../../../../lib/supabaseClient";
 
 enum COUNTDOWN_TIMER_STATE {
   STARTED = "STARTED",
@@ -24,9 +25,10 @@ enum COUNTDOWN_TIMER_STATE {
 
 type SelfieCameraModePropType = {
   onExit: () => void;
+  onGenerateGIF: (gifUrl: string) => void;
 }
 
-export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
+export default function SelfieCameraMode({ onExit, onGenerateGIF }: SelfieCameraModePropType) {
   const router = useRouter();
   const { user } = useUser();
 
@@ -135,24 +137,26 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
       formData.append("targetWidth", `${width}`);
       formData.append("targetHeight", `${height}`);
 
-      fetch("https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif", {
-        method: "POST",
-        body: formData,
-      }).then((response) => {
-        response.json().then((result: {
-          status: string;
-          gifUrl: string;
-          success: string;
-        }) => {
-          console.log(result);
-          // const newImageUrl = result?.gifUrl ? result.gifUrl as string : null;
-          setImageUrl(result.gifUrl);
-        }).catch(() => {
-          setError("Failed to upload frames");
-        });
-      }).catch(() => {
-        setError("Failed to upload frames");
-      });
+      setImageUrl("https://lbrxffrgccdojnugwkgn.supabase.co/storage/v1/object/sign/gifs/gifs/1/1/final.gif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYmJhOWU0Zi03YmE4LTQ0OWItOTBhOC03YmQwMGYwYjUwN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJnaWZzL2dpZnMvMS8xL2ZpbmFsLmdpZiIsImlhdCI6MTc1MzAwMTY0MCwiZXhwIjoyMzg0MTUzNjQwfQ.CLkuTAWMKjWxIXu8HuKSVztQNwse-TPI0XCAx97ZuXo");
+
+      // fetch("https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif", {
+      //   method: "POST",
+      //   body: formData,
+      // }).then((response) => {
+      //   response.json().then((result: {
+      //     status: string;
+      //     gifUrl: string;
+      //     success: string;
+      //   }) => {
+      //     console.log(result);
+      //     // const newImageUrl = result?.gifUrl ? result.gifUrl as string : null;
+      //     setImageUrl(result.gifUrl);
+      //   }).catch(() => {
+      //     setError("Failed to upload frames");
+      //   });
+      // }).catch(() => {
+      //   setError("Failed to upload frames");
+      // });
     }).catch(() => {
       setError("Failed to upload frames");
     });
@@ -233,7 +237,7 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
 
   useEffect(() => {
     if (isProcessing && imageUrl) {
-      router.push(`/enter-pin-code?gif=${imageUrl}`);
+      onGenerateGIF(imageUrl);
     }
   }, [imageUrl, isProcessing]);
 

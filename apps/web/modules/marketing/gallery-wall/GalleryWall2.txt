@@ -1,0 +1,153 @@
+import React, { useState, useCallback, useEffect, useRef } from "react";
+
+interface GalleryWallProps {
+  images: string[];
+}
+
+export const GalleryWall: React.FC<GalleryWallProps> = ({ images }) => {
+  const [modalImage, setModalImage] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [originRect, setOriginRect] = useState<DOMRect | null>(null);
+  const [modalRect, setModalRect] = useState<DOMRect | null>(null);
+
+  const imgRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const modalImgRef = useRef<HTMLImageElement | null>(null);
+
+  // Open modal and record the thumbnail's bounding rect
+  const openModal = useCallback((img: string, idx: number) => {
+    setModalImage(img);
+    setModalOpen(true);
+    setIsClosing(false);
+    setTimeout(() => {
+      const rect = imgRefs.current[idx]?.getBoundingClientRect();
+      setOriginRect(rect || null);
+    }, 0); // Wait for DOM update
+  }, []);
+
+  // Auto-close after 6 seconds
+  useEffect(() => {
+    if (modalOpen && !isClosing) {
+      const t = setTimeout(() => handleClose(), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [modalOpen, isClosing]);
+
+  // ESC to close
+  useEffect(() => {
+    if (!modalOpen || isClosing) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [modalOpen, isClosing]);
+
+  // On close, record modal image rect and trigger animation
+  const handleClose = useCallback(() => {
+    if (!modalImgRef.current) return;
+    setModalRect(modalImgRef.current.getBoundingClientRect());
+    setIsClosing(true);
+  }, []);
+
+  // After animation, remove modal
+  useEffect(() => {
+    if (!isClosing) return;
+    const timeout = setTimeout(() => {
+      setModalOpen(false);
+      setModalImage(null);
+      setIsClosing(false);
+      setOriginRect(null);
+      setModalRect(null);
+    }, 600); // Match transition duration
+    return () => clearTimeout(timeout);
+  }, [isClosing]);
+
+  // Calculate transform for closing animation
+  let closingStyle: React.CSSProperties = {};
+  if (isClosing && originRect && modalRect) {
+    const scaleX = originRect.width / modalRect.width;
+    const scaleY = originRect.height / modalRect.height;
+    const translateX =
+      originRect.left +
+      originRect.width / 2 -
+      (modalRect.left + modalRect.width / 2);
+    const translateY =
+      originRect.top +
+      originRect.height / 2 -
+      (modalRect.top + modalRect.height / 2);
+
+    closingStyle = {
+      transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
+      opacity: 0,
+      transition:
+        "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
+      willChange: "transform, opacity",
+      pointerEvents: "none",
+    };
+  }
+
+  // Overlay fade out
+  let overlayStyle: React.CSSProperties = {};
+  if (isClosing) {
+    overlayStyle = {
+      background: "rgba(0,0,0,0)",
+      transition: "background 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+      pointerEvents: "none",
+    };
+  }
+
+  return (
+    <div>
+      <div className="h-screen w-full gap-4 p-8 items-baseline justify-center overflow-auto bg-black">
+        <div className="flex flex-wrap gap-4 w-full justify-center">
+          {images.map((img, idx) => (
+            <img
+              key={img}
+              ref={el => (imgRefs.current[idx] = el)}
+              src={img}
+              onClick={() => openModal(img, idx)}
+              alt={`Gallery image ${idx + 1}`}
+              draggable={false}
+              className="w-[720px] h-auto rounded-lg object-cover cursor-pointer"
+              style={{
+                transition: "box-shadow 0.2s",
+                boxShadow:
+                  modalImage === img && modalOpen && !isClosing
+                    ? "0 0 0 4px #fff"
+                    : undefined,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      {(modalOpen || isClosing) && modalImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 transition-colors"
+          style={overlayStyle}
+          onClick={isClosing ? undefined : handleClose}
+        >
+          <img
+            ref={modalImgRef}
+            src={modalImage}
+            alt="Modal"
+            className="max-w-[70%] max-h-[70%] w-[100%] rounded-lg shadow-2xl object-contain"
+            draggable={false}
+            style={
+              isClosing
+                ? closingStyle
+                : {
+                    transition:
+                      "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s",
+                    opacity: 1,
+                  }
+            }
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default GalleryWall; 

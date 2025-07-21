@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,6 +11,7 @@ import SelfieCameraMode from "@marketing/take-a-selfie/components/SelfieCameraMo
 import { ProgressBar } from "@marketing/shared/components/ProgressBar";
 import ExitButton from "@marketing/shared/components/ExitButton";
 import { PledgeStyleEnum } from "@marketing/what-is-your-pledge/types";
+import { supabase } from "../../../lib/supabaseClient";
 
 export default function MainSlider() {
   // SLIDE STATE
@@ -21,6 +22,7 @@ export default function MainSlider() {
   const [selectedFeelings, setSelectedFeelings] = useState<string[]>([]);
   const [selectedPledge, setSelectedPledge] = useState<PledgeStyleEnum | null>(null);
   const [isCameraMode, setIsCameraMode] = useState(false);
+  const [userGifRequestId, setUserGifRequestId] = useState<string | null>(null);
 
   const router = useRouter();
   const progress = (slide / totalSlides) * 100;
@@ -49,16 +51,55 @@ export default function MainSlider() {
     }
   };
 
+  const handleTakeASelfie = () => {
+    supabase
+      .from('UserGifRequest')
+      .insert([
+        {
+          requestStatus: "PENDING",
+          userId: "1",
+          createdAt: new Date().toISOString(), // optional if your DB has a default
+        }
+      ])
+      .select("id")
+      .then((data) => {
+        const userGifRequests = data.data ?? [];
+        if (data.status === 201 && userGifRequests?.length > 0) {
+          setUserGifRequestId(userGifRequests[0].id);
+          setIsCameraMode(true);
+        } else {
+          
+        }
+      });
+  }
+
+  const onGenerateGIF = (gifUrl: string) => {
+    supabase
+      .from("UserGifRequest")
+      .update({
+        requestStatus: "SUCCESS",
+        gifUrl
+      })
+      .eq("id", userGifRequestId)
+      .then((data) => {
+        router.push(`/enter-pin-code?gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
+      });
+  }
+
   // When we reach slide 3, log both (only once on transition)
   if (slide === 3) {
     console.log("✅ FINAL SELECTION");
     console.log("Selected Feelings:", selectedFeelings);
     console.log("Selected Pledge:", selectedPledge);
+    console.log("Selected userGifRequestId:", userGifRequestId);
   }
     
-    if (isCameraMode) {
-    return <SelfieCameraMode onExit={() => setIsCameraMode(false)} />;
-    }
+  if (isCameraMode) {
+    return <SelfieCameraMode
+      onExit={() => setIsCameraMode(false)}
+      onGenerateGIF={onGenerateGIF}
+    />;
+  }
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-white text-black">
@@ -122,7 +163,9 @@ export default function MainSlider() {
                 transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="absolute top-0 left-0 w-full h-full"
             >
-                <MainSelfiePage onStart={() => setIsCameraMode(true)} />
+                <MainSelfiePage
+                  onStart={() => handleTakeASelfie()}
+                />
             </motion.div>
             )}
         </AnimatePresence>
