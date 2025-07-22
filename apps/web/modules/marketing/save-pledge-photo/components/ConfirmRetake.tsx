@@ -23,15 +23,15 @@ export default function ConfirmRetakeModal({
             Taking another selfie will discard your current photo. Are you sure you want to retake?
         </p>
 
-        <div className="flex justify-center gap-8">
+        <div className="flex justify-center gap-[1.5vw]">
           <SimpleButton
-            className="bg-gray-200 mt-10 text-[75px] text-black py-16 px-40 rounded-full font-bold"
+            className="bg-gray-200 mt-10 text-[75px] text-black py-[3vh] px-[10vh] rounded-full font-bold"
             onClick={onCancel}
           >
             RETURN
           </SimpleButton>
           <SimpleButton
-            className="bg-primary mt-10 text-[75px] text-white py-16 px-40 rounded-full font-bold"
+            className="bg-primary mt-[2vh] text-[2vw] text-white py-[3vh] px-[10vh] rounded-full font-bold"
             onClick={onConfirm}
           >
             CONFIRM RETAKE
