@@ -27,7 +27,7 @@ export default function SavingDoneScreen() {
       </p>
 
         <SimpleButton
-          className="absolute bottom-20 self-center mt-10 text-[75px] text-white py-16 px-80 rounded-full font-bold"
+          className="absolute bottom-20 self-center mt-10 text-[4vw] text-white py-[2vh] px-[10vh] rounded-full font-bold"
           onClick={handleContinue}
         >
           CONTINUE
