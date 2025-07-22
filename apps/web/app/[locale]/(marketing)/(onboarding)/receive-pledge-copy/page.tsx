@@ -3,7 +3,7 @@
 
 import PledgeCopy from "@marketing/receive-pledge-copy/Section";
 
-export default function EnterPinCode() {
+export default function PledgeCopyPage() {
 
   return (
     <div className="absolute top-0 flex h-screen w-screen">

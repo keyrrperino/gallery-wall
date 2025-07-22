@@ -102,7 +102,7 @@ export default function PinEntry() {
       <div className="h-full flex flex-col md:flex-row items-center justify-center gap-9 md:gap-[3vw]">
         {/* Left side - image */}
         <div className="flex flex-col items-center">
-          <div className="relative aspect-square w-[50vw] md:w-auto md:h-[50vh] bg-gray-200 overflow-hidden shadow-md">
+          <div className="relative aspect-square w-[50vw] md:w-auto md:h-[50vh] bg-transparent overflow-hidden shadow-md">
             {gif && 
               <img
                 src={previewUrl ? previewUrl : gif}
