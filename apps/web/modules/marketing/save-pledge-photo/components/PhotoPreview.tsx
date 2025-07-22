@@ -13,16 +13,16 @@ export default function PhotoPreview({
 }) {
   return (
     <div className="flex w-full h-full flex-col items-center bg-white relative">
-      <h2 className="font-text-bold text-[5.5vw] uppercase">
+      <h1 className="text-4xl md:text-[4vw] text-center font-text-bold uppercase leading-[0.75]">
         Here&apos;s your unique pledge photo!
-      </h2>
+      </h1>
 
-      <div className="flex-grow flex items-center justify-center w-full -mt-[4vh]">
-        <div className="w-[30vw] h-[30vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
+      <div className="flex-grow flex items-center justify-center w-full">
+        <div className="relative aspect-square w-[50vw] md:w-auto md:h-[50vh] bg-gray-200 overflow-hidden shadow-md">
           <img
             src={gifUrl}
             alt="selfie preview"
-            className="w-[30vw] h-[30vw] object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
@@ -30,14 +30,24 @@ export default function PhotoPreview({
       <div className="flex flex-row gap-[5vw]">
         <SimpleButton
           onClick={onRetake}
-          className="text-[3vw] text-[#20409A] font-text-bold bg-transparent uppercase py-[3vh]"
+          className="bottom-[clamp(40px,7.5vh,160px)] mt-10
+          text-[clamp(2rem,3vw,4rem)]
+          hover:text-[#42639F] text-[#20409A] bg-transparent
+          py-[clamp(0.55rem,1.5vw,2rem)]
+          px-[2vw]
+          rounded-full font-text-bold z-10 mb-[3vh]"
         >
           Take Another Selfie
         </SimpleButton>
 
         <SimpleButton
           onClick={onUsePhoto}
-          className="text-[3vw] font-text-bold py-[3vh] px-[9vh] uppercase"
+          className="bottom-[clamp(40px,7.5vh,160px)] mt-10
+          text-[clamp(2rem,3vw,4rem)]
+          text-white
+          py-[clamp(0.55rem,1.5vw,2rem)]
+          px-[2vw] hover:bg-[#42639F]
+          rounded-full font-text-bold z-10 mb-[3vh]"
         >
           This looks good!
         </SimpleButton>

@@ -18,16 +18,23 @@ export default function SavingDoneScreen() {
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }} // fades in over 1s
     >
-      <h2 className="font-text-bold text-[130px] uppercase">
+      <h1 className="text-4xl md:text-[4vw] text-center font-text-bold uppercase leading-[0.75] -mt-[20vh]">
         Look up!
-      </h2>
-      <p className="text-[2vw] text-center mb-24 mx-[15vw] leading-tight">
+      </h1>
+      <p className="text-base text-center md:text-[2vw] mt-4 mb-[3vw] leading-[1] mx-9 md:mx-[10vw]">
         Your pledge has joined others on our Live Pledge Wall!
         You’re now part of a growing wave of support for Singapore’s coastal future.
       </p>
 
         <SimpleButton
-          className="absolute bottom-20 self-center mt-10 text-[75px] text-white py-16 px-80 rounded-full font-bold"
+          className="
+            absolute bottom-[clamp(40px,7.5vh,160px)] self-center mt-10
+            text-[clamp(2rem,3vw,4rem)]
+            text-white
+            py-[clamp(0.55rem,1.5vw,2rem)]
+            px-[clamp(2rem,10vw,12rem)]
+            rounded-full font-bold z-10
+          "
           onClick={handleContinue}
         >
           CONTINUE

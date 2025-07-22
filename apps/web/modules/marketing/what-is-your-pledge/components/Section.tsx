@@ -4,12 +4,8 @@ import { PledgeStyleEnum } from "../types";
 
 const PLEDGES: {
   image: string;
-  image: string;
   style: PledgeStyleEnum;
 }[] = [
-  { image: "/images/frames/Poster 1.svg", style: PledgeStyleEnum.SUPPORT },
-  { image: "/images/frames/Poster 2.svg", style: PledgeStyleEnum.FUTURE },
-  { image: "/images/frames/Poster 3.svg", style: PledgeStyleEnum.CARE },
   { image: "/images/frames/Poster 1.svg", style: PledgeStyleEnum.SUPPORT },
   { image: "/images/frames/Poster 2.svg", style: PledgeStyleEnum.FUTURE },
   { image: "/images/frames/Poster 3.svg", style: PledgeStyleEnum.CARE },
