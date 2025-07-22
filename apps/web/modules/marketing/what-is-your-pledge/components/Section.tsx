@@ -38,7 +38,7 @@ export default function PickAFrame({
       <SimpleButton
         className="
           absolute bottom-[clamp(40px,7.5vh,160px)] self-center mt-10
-          text-[clamp(1vw,2vw,3vw)]
+          text-[clamp(2rem,3vw,4rem)]
           text-white
           py-[clamp(0.55rem,1.5vw,2rem)]
           px-[clamp(2rem,10vw,12rem)]

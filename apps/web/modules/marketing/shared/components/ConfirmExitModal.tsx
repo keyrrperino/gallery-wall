@@ -17,22 +17,22 @@ export default function ConfirmExitModal({
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
-        className="bg-white rounded-2xl shadow-2xl p-24 w-[65%] text-center"
+        className="bg-white rounded-2xl shadow-2xl p-8 md:p-24 w-[65%] text-center"
       >
-        <h2 className="text-[110px] font-text-bold uppercase">Are you sure?</h2>
-        <p className="text-[2vw] text-center font-sans my-32 leading-tight">
+        <h1 className="text-4xl md:text-[4vw] font-text-bold uppercase leading-[0.75]">Are you sure?</h1>
+        <p className="text-base md:text-[2vw] mt-4 mb-[3vw] leading-[1] mt-[2vh]">
             Exiting now will lose your progress. Are you sure you want to exit?
         </p>
 
-        <div className="flex justify-center gap-8">
+        <div className="flex flex-col md:flex-row justify-center gap-2 md:gap-8">
           <SimpleButton
-            className="bg-gray-200 mt-10 text-[75px] text-black py-16 px-40 rounded-full font-bold"
+            className="hover:bg-gray-300 bg-gray-200 mt-10 text-2xl md:text-[3vw] p-5 md:p-[4vh] text-black rounded-full font-bold"
             onClick={onCancel}
           >
             CONTINUE
           </SimpleButton>
           <SimpleButton
-            className="bg-red-500 mt-10 text-[75px] text-white py-16 px-40 rounded-full font-bold"
+            className="hover:bg-red-600 bg-red-500 md:mt-10 text-2xl md:text-[3vw] p-5 md:p-[4vh] text-white rounded-full font-bold"
             onClick={onConfirm}
           >
             CONFIRM EXIT

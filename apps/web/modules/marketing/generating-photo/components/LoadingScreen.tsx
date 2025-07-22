@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@saas/auth/hooks/use-user";
+import StickerCarousel from "@marketing/shared/components/StickerCarousel";
 
 export default function LoadingScreen() {
   const searchParams = useSearchParams();
@@ -51,54 +52,9 @@ export default function LoadingScreen() {
   return (
     <div className="h-full w-full overflow-hidden bg-white flex flex-col items-center justify-between relative">
       {/* TOP BAR */}
-      <div className="top-0 flex w-full items-center justify-end h-80 px-16 font-text-bold text-black bg-transparent">
+      <div className="flex w-full items-center justify-end px-[5vw] py-[3vh] gap-8">
         <ExitButton />
       </div>
-
-      {/* Floating images */}
-      {positions.length === 3 && (
-        <>
-          <motion.img
-            src="/images/bg-image1.png"
-            alt="bg1"
-            className="absolute w-[25vw] h-[25vw] opacity-30"
-            style={positions[0]}
-            animate={{ x: [0, 50, 0], y: [0, -30, 0] }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              repeatType: "mirror",
-              ease: "easeInOut",
-            }}
-          />
-          <motion.img
-            src="/images/bg-image2.png"
-            alt="bg2"
-            className="absolute w-[25vw] h-[25vw] opacity-30"
-            style={positions[1]}
-            animate={{ x: [0, -60, 0], y: [0, 40, 0] }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              repeatType: "mirror",
-              ease: "easeInOut",
-            }}
-          />
-          <motion.img
-            src="/images/bg-image3.png"
-            alt="bg3"
-            className="absolute w-[25vw] h-[25vw] opacity-30"
-            style={positions[2]}
-            animate={{ x: [0, 30, 0], y: [0, -50, 0] }}
-            transition={{
-              duration: 12,
-              repeat: Infinity,
-              repeatType: "mirror",
-              ease: "easeInOut",
-            }}
-          />
-        </>
-      )}
 
       <div>
         <div className="text-black text-[5vw] max-w-[60vw] font-text-bold z-10 leading-none text-center">
@@ -108,6 +64,8 @@ export default function LoadingScreen() {
           Hang tight!
         </p>
       </div>
+
+      <StickerCarousel />
 
       <div></div>
     </div>

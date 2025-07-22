@@ -81,34 +81,34 @@ export default function PinEntry() {
   };
 
   return (
-    <div className="flex w-full h-full flex-col gap-[1vw] items-center bg-white">
+    <div className="flex w-full h-full flex-col md:gap-12 items-center bg-white">
       {/* Header */}
-      <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] font-text-bold text-black">
+      <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8">
         <button onClick={() => window.history.back()}>
           <ChevronLeftIcon
             className="text-black hover:text-gray-600 w-8 h-8 md:w-[3vw] md:h-[3vw]"
           />
         </button>
-        <h1 className="text-[4vw] font-text-bold uppercase leading-[0.75]">ENTER PIN CODE</h1>
+        <h1 className="text-4xl md:text-[4vw] text-center font-text-bold uppercase leading-[0.75]">ENTER PIN CODE</h1>
         <ExitButton />
       </div>
 
       {/* Description */}
-      <p className="text-[2vw] leading-[1] text-center">
+      <p className="text-base md:text-[2vw] leading-[1] text-center px-9">
         Please wait while we make sure your selfie is safe to send to the
         gallery wall.
       </p>
 
-      <div className="flex flex-col md:flex-row gap-[3vw] mt-[3vw]">
+      <div className="h-full flex flex-col md:flex-row items-center justify-center gap-9 md:gap-[3vw]">
         {/* Left side - image */}
         <div className="flex flex-col items-center">
-          <div className="w-[30vw] h-[30vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
-            {/* {previewUrl && 
+          <div className="relative aspect-square w-[50vw] md:w-auto md:h-[50vh] bg-transparent overflow-hidden shadow-md">
+            {gif && 
               <img
-                src={previewUrl}
+                src={previewUrl ? previewUrl : gif}
                 alt="selfie preview"
                 className="w-full h-full object-cover"
-              />} */}
+              />}
             {previewUrl && 
               <video
               src={previewUrl}
@@ -121,13 +121,13 @@ export default function PinEntry() {
               <track kind="captions" />
             </video>}
           </div>
-          <div className="font-bold w-[30vw] bg-[#F7EBDF] text-[3vw] text-center uppercase font-text-bold p-[1vw]">
+          <div className="font-bold w-full bg-[#F7EBDF] text-base md:text-[2vw] leading-[1] text-center uppercase font-text-bold p-4 md:p-8">
             My Video Selfie
           </div>
         </div>
 
         {/* Right side - PIN pad */}
-        <div className="flex flex-col items-center gap-16">
+        <div className="flex flex-col items-center gap-[2vw]">
           {/* Dots */}
           <motion.div
             animate={
@@ -152,20 +152,20 @@ export default function PinEntry() {
               return (
                 <div
                   key={i}
-                  className={`w-[1.5vw] h-[1.5vw] rounded-full transition-colors duration-300 ${dotColor}`}
+                  className={`w-3 h-3 md:w-[2vw] md:h-[2vw] rounded-full transition-colors duration-300 ${dotColor}`}
                 ></div>
               );
             })}
           </motion.div>
 
           {/* Numpad grid */}
-          <div className="grid grid-cols-3 gap-[3vw]">
+          <div className="grid grid-cols-3 gap-[2vw] items-center">
             {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit, i) => (
               <button
                 key={i}
                 onClick={() => handlePress(digit)}
                 disabled={isLocked || isSuccess}
-                className="w-[6vw] h-[6vw] rounded-full bg-gray-100 text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+                className="h-12 w-12 md:h-[10vh] md:w-[10vh] rounded-full bg-gray-100 text-base md:text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
               >
                 {digit}
               </button>
@@ -174,16 +174,16 @@ export default function PinEntry() {
             <button
               onClick={() => handlePress("0")}
               disabled={isLocked || isSuccess}
-              className="w-[6vw] h-[6vw] rounded-full bg-gray-100 text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+              className="h-12 w-12 md:h-[10vh] md:w-[10vh] rounded-full bg-gray-100 text-base md:text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
             >
               0
             </button>
             <button
               onClick={handleBackspace}
               disabled={isLocked || isSuccess}
-              className="flex w-[6vw] h-[6vw] rounded-full items-center justify-center bg-gray-100 hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+              className="flex h-12 w-12 md:h-[10vh] md:w-[10vh] items-center justify-center rounded-full bg-gray-100 text-base md:text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
             >
-              <DeleteIcon className="text-black" width={60} height={60} />
+              <DeleteIcon className="text-black hover:text-gray-600 w-5 h-5 md:w-[2vw] md:h-[2vw]" />
             </button>
           </div>
         </div>

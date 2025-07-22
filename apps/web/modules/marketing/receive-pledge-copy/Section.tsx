@@ -36,27 +36,27 @@ export default function PledgeCopy() {
   };
 
   return (
-    <div className="flex w-full h-full flex-col gap-12 items-center bg-white">
+    <div className="flex w-full h-full flex-col gap-[3vh] items-center bg-white">
       {/* TOP BAR */}
-      <div className="flex w-full items-center justify-between h-80 px-16 font-text-bold text-black">
-        <button>
-          <ChevronLeftIcon className="text-white" width={120} height={120} />
-        </button>
-        <h2 className="text-[130px] uppercase">Want a copy of your pledge?</h2>
+      <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8 font-text-bold text-black">
+        <div className="hidden md:block"></div>
+        <h1 className="text-4xl md:text-[4vw] text-center font-text-bold uppercase leading-[0.75]">Want a copy of your pledge?</h1>
         <ExitButton />
       </div>
 
       {/* INTRO TEXT */}
-      <p className="text-[2vw] text-center mb-48 mx-[15vw] leading-tight">
+      <p className="text-base text-center md:text-[2vw] mt-4 mb-[3vw] leading-[1] mx-9 md:mx-[10vw]">
         Your pledge has joined others on our Live Pledge Wall!<br />
         You’re now part of a growing wave of support for Singapore’s coastal
         future.
       </p>
 
       {/* SEND TO EMAIL SECTION */}
-      <div className="flex flex-row w-full items-center justify-between mb-10 px-[15vw]">
-        <h2 className="text-[80px] font-text-bold uppercase">SEND TO MY EMAIL</h2>
-        <div className="flex flex-row gap-10 items-center">
+      <div className="flex flex-col md:flex-row w-full items-center justify-between px-[15vw]">
+        <h1 className="text-2xl md:text-[3vw] text-left font-text-bold uppercase leading-[0.75]">
+          SEND TO MY EMAIL
+        </h1>
+        <div className="flex flex-row gap-[2vw] items-center mt-4 md:mt-0 w-full md:w-auto">
           {/* EMAIL INPUT */}
           <input
             type="email"
@@ -64,7 +64,7 @@ export default function PledgeCopy() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter email address"
-            className={`border rounded-[32px] px-10 py-14 text-[2vw] w-[30vw] transition-colors ${
+            className={`border py-[1.5vw] px-4 md:py-[3vw] md:px-[3vw] rounded-lg md:rounded-[32px] text-base md:text-[2vw] w-full md:w-[30vw] transition-colors ${
               isInvalid && email !== "" ? "border-red-500" : "border-gray-400"
             } ${inputDisabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
           />
@@ -77,7 +77,7 @@ export default function PledgeCopy() {
             <SimpleButton
               onClick={handleSendEmail}
               disabled={isInvalid}
-              className={`text-[75px] py-8 px-16 rounded-[32px] font-bold transition-colors ${
+              className={`text-2xl md:text-[3vw] py-[1.5vw] px-4 md:py-[3vw] md:px-[3vw] rounded-lg md:rounded-[32px] font-bold transition-colors ${
                 isInvalid
                   ? "bg-red-500 text-white cursor-not-allowed"
                   : "bg-primary text-white hover:bg-primary"
@@ -90,15 +90,15 @@ export default function PledgeCopy() {
       </div>
 
       <div className="w-full px-[15vw]">
-        <hr className="w-full border-black mb-10" />
+        <hr className="w-full border-black" />
       </div>
 
       {/* DOWNLOAD MY PLEDGE SECTION */}
-      <div className="flex flex-row w-full items-start gap-24 px-[15vw]">
-        <h2 className="text-[80px] font-text-bold uppercase">
+      <div className="flex flex-col md:flex-row w-full items-center md:items-start gap-[2vw] px-[15vw]">
+        <h1 className="text-2xl md:text-[3vw] font-text-bold uppercase leading-[0.75]">
           DOWNLOAD MY PLEDGE
-        </h2>
-        <div className="w-[600px] h-[600px] overflow-hidden rounded-md shadow-md">
+        </h1>
+        <div className="relative aspect-square h-[35vw] md:w-auto md:h-[35vh] bg-gray-200 shadow-md">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
             alt="qr code"

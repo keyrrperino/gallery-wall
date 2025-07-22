@@ -32,7 +32,7 @@ export default function SaveImageFlow() {
   }
 
   return (
-    <div className="flex w-full h-full flex-col gap-[1vw] items-center bg-white pb-20">
+    <div className="flex w-full h-full flex-col gap-[1vw] items-center bg-white">
       {/* TOP BAR */}
       <div className="flex w-full items-center justify-end h-[12vh] px-[4vw] font-text-bold text-black">
         <ExitButton />

@@ -18,10 +18,10 @@ export default function SavingDoneScreen() {
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }} // fades in over 1s
     >
-      <h2 className="font-text-bold text-[130px] uppercase">
+      <h1 className="text-4xl md:text-[4vw] text-center font-text-bold uppercase leading-[0.75] -mt-[20vh]">
         Look up!
-      </h2>
-      <p className="text-[2vw] text-center mb-24 mx-[15vw] leading-tight">
+      </h1>
+      <p className="text-base text-center md:text-[2vw] mt-4 mb-[3vw] leading-[1] mx-9 md:mx-[10vw]">
         Your pledge has joined others on our Live Pledge Wall!
         You’re now part of a growing wave of support for Singapore’s coastal future.
       </p>
