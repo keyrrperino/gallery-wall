@@ -59,9 +59,9 @@ export default function PinEntry() {
   };
 
   return (
-    <div className="flex w-full h-full flex-col gap-12 items-center bg-white">
+    <div className="flex w-full h-full flex-col md:gap-12 items-center bg-white">
       {/* Header */}
-      <div className="flex w-full items-center justify-between h-80 px-[5vw] py-[3vh] font-text-bold text-black">
+      <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8">
         <button onClick={() => window.history.back()}>
           <ChevronLeftIcon
             className="text-black hover:text-gray-600 w-8 h-8 md:w-[3vw] md:h-[3vw]"
@@ -77,10 +77,10 @@ export default function PinEntry() {
         gallery wall.
       </p>
 
-      <div className="flex flex-col md:flex-row gap-[3vw] mt-[3vw]">
+      <div className="flex flex-col md:flex-row gap-[3vw]">
         {/* Left side - image */}
         <div className="flex flex-col items-center">
-          <div className="w-[33vw] h-[33vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
+          <div className="relative aspect-square w-[40vw] md:w-auto md:h-full bg-gray-200 overflow-hidden shadow-md">
             {gif && 
               <img
                 src={gif}
@@ -88,13 +88,13 @@ export default function PinEntry() {
                 className="w-full h-full object-cover"
               />}
           </div>
-          <div className="font-bold w-full bg-[#F7EBDF] text-[66px] text-center uppercase font-text-bold p-8">
+          <div className="font-bold w-full bg-[#F7EBDF] text-base md:text-[2vw] leading-[1] text-center uppercase font-text-bold p-8">
             My Video Selfie
           </div>
         </div>
 
         {/* Right side - PIN pad */}
-        <div className="flex flex-col items-center gap-16">
+        <div className="flex flex-col items-center gap-[2vw]">
           {/* Dots */}
           <motion.div
             animate={
@@ -119,7 +119,7 @@ export default function PinEntry() {
               return (
                 <div
                   key={i}
-                  className={`w-[2vw] h-[2vw] rounded-full transition-colors duration-300 ${dotColor}`}
+                  className={`w-2 h-2 md:w-[2vw] md:h-[2vw] rounded-full transition-colors duration-300 ${dotColor}`}
                 ></div>
               );
             })}
