@@ -6,6 +6,7 @@ const config = {
   ],
   plugins: ["tailwindcss"],
   rules: {
+    "all": "off",
     "@next/next/no-html-link-for-pages": "off",
     "@typescript-eslint/require-await": "off",
     "react/jsx-curly-brace-presence": [

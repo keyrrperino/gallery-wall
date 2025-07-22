@@ -1,0 +1,73 @@
+import React, { useState, useCallback, useEffect } from "react";
+
+interface GalleryWallProps {
+  images: string[];
+}
+
+export const GalleryWall: React.FC<GalleryWallProps> = ({ images }) => {
+  const [modalImage, setModalImage] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(true);
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const openModal = useCallback((img: string) => {
+    setModalImage(img);
+    setModalOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (modalOpen) {
+      // Auto-close after 6 seconds
+      const t = setTimeout(() => {
+        setModalOpen(false);
+        setModalImage(null);
+      }, 6000);
+      setTimer(t);
+      return () => clearTimeout(t);
+    } else if (timer) {
+      clearTimeout(timer);
+    }
+  }, [modalOpen]);
+
+  // Optional: close modal on ESC
+  useEffect(() => {
+    if (!modalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setModalOpen(false);
+        setModalImage(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [modalOpen]);
+
+  return (
+    <div>
+      <div className="h-screen w-full gap-4 p-8 items-baseline justify-center overflow-auto bg-black">
+        <div className="flex flex-wrap gap-4 w-full justify-center">
+          {images.map((img, idx) => (
+            <img
+              src={img}
+              onClick={() => openModal(img)}
+              alt={`Gallery image ${idx + 1}`}
+              draggable={false}
+              className="w-[720px] h-auto rounded-lg object-cover cursor-pointer"
+            />
+          ))}
+        </div>
+      </div>
+      {modalOpen && modalImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 transition-colors">
+          <img
+            src={modalImage}
+            alt="Modal"
+            className="max-w-[70%] max-h-[70%] w-[100%] rounded-lg shadow-2xl object-contain"
+            draggable={false}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default GalleryWall; 

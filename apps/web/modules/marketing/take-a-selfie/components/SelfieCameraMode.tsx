@@ -10,10 +10,10 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import { useUser } from "@saas/auth/hooks/use-user";
 import SimpleButton from "@marketing/home/components/Button";
 import SnapButton from "@marketing/home/components/SnapButton";
-import Processing from "@marketing/home/components/Modal-content/Processing";
 import Modal from "@marketing/home/components/Popups/Modal";
 import { v4 } from "uuid";
 import { CountdownTimer } from "@marketing/home/components/CountdownTimer";
+import { KEY, openDB, STORE_NAME } from "../../../../lib/indexDB";
 
 enum COUNTDOWN_TIMER_STATE {
   STARTED = "STARTED",
@@ -24,11 +24,14 @@ enum COUNTDOWN_TIMER_STATE {
 
 type SelfieCameraModePropType = {
   onExit: () => void;
+  onGenerateGIF: (gifUrl: string, videoUrl: string) => void;
+  pledge: string;
+  userGifRequestId: string;
 }
 
-export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
+export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGifRequestId }: SelfieCameraModePropType) {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, getGifUrl } = useUser();
 
   const webcamRef = useRef<Webcam | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -39,7 +42,6 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
   const [isCounting, setIsCounting] = useState<boolean>(false);
   const [isCountingKey, setIsCountingKey] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [, setTimer] = useState<number>(60);
   const [, setError] = useState<string | null>(null);
   const [countdownState, setCountdownState] = useState<COUNTDOWN_TIMER_STATE>(
@@ -89,13 +91,28 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
     setError(null);
     setRecording(true);
     setPreviewUrl(null);
-    const stream = webcamRef.current?.video?.srcObject as MediaStream;
+    const stream: MediaStream = webcamRef.current?.video?.srcObject as MediaStream;
     if (!stream) {
       setError("Camera not ready");
       setRecording(false);
       return;
     }
-    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+    let options: MediaRecorderOptions = {
+      
+    };
+    if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
+      options = { mimeType: "video/webm;codecs=vp9" };
+    } else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
+      options = { mimeType: "video/webm;codecs=vp8" };
+    } else if (MediaRecorder.isTypeSupported("video/webm")) {
+      options = { mimeType: "video/webm" };
+    } else if (MediaRecorder.isTypeSupported("video/mp4")) {
+      options = { mimeType: "video/mp4" };
+    } else {
+      options = {}; // Let the browser pick
+    }
+
+    const recorder = new MediaRecorder(stream, options);
     const chunks: BlobPart[] = [];
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) {
@@ -103,9 +120,20 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
         chunks.push(e.data);
       }
     };
+
     recorder.onstop = () => {
       const videoBlob = new Blob(chunks, { type: "video/webm" });
       setPreviewUrl(URL.createObjectURL(videoBlob));
+
+      saveBlobToIndexedDB(videoBlob);
+
+      // // Save to localStorage as Data URL
+      // const reader = new FileReader();
+      // reader.onload = function () {
+      //   // Save the Data URL string to localStorage
+      //   localStorage.setItem("videoPreviewBlob", reader.result as string);
+      // };
+      // reader.readAsDataURL(videoBlob);
     };
     recorder.start();
     setTimeout(() => {
@@ -113,6 +141,19 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
       setRecording(false);
     }, 2000);
   };
+
+  function saveBlobToIndexedDB(blob: Blob) {
+    openDB().then((db) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      tx.objectStore(STORE_NAME).put(blob, KEY);
+      return new Promise<void>((resolve, reject) => {
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
 
   const createGIF = () => {
     captureFramesFromStream(getStream(), 2, 12).then((data: {
@@ -130,29 +171,39 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
       frames.forEach((blob, i) => {
         formData.append("images", blob, `frame${i}.webp`);
       });
-      formData.append("userGifRequestId", "1");
+      formData.append("userGifRequestId", userGifRequestId);
       formData.append("userId", "1");
       formData.append("targetWidth", `${width}`);
       formData.append("targetHeight", `${height}`);
+      formData.append("pledge", pledge);
 
-      fetch("https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif", {
-        method: "POST",
-        body: formData,
-      }).then((response) => {
-        response.json().then((result: {
-          status: string;
-          gifUrl: string;
-          success: string;
-        }) => {
-          console.log(result);
-          // const newImageUrl = result?.gifUrl ? result.gifUrl as string : null;
-          setImageUrl(result.gifUrl);
-        }).catch(() => {
-          setError("Failed to upload frames");
-        });
+      getGifUrl(formData).then(() => {
+        console.log("success");
       }).catch(() => {
-        setError("Failed to upload frames");
+        console.log("error");
       });
+
+      // setImageUrl("https://lbrxffrgccdojnugwkgn.supabase.co/storage/v1/object/sign/gifs/gifs/1/1/final.gif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYmJhOWU0Zi03YmE4LTQ0OWItOTBhOC03YmQwMGYwYjUwN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJnaWZzL2dpZnMvMS8xL2ZpbmFsLmdpZiIsImlhdCI6MTc1MzAwMTY0MCwiZXhwIjoyMzg0MTUzNjQwfQ.CLkuTAWMKjWxIXu8HuKSVztQNwse-TPI0XCAx97ZuXo");
+
+      // fetch("https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif", {
+      // fetch("http://localhost:8000/process-frames-to-gif", {
+      //   method: "POST",
+      //   body: formData,
+      // }).then((response) => {
+      //   response.json().then((result: {
+      //     status: string;
+      //     gifUrl: string;
+      //     success: string;
+      //   }) => {
+      //     console.log(result);
+      //     // const newImageUrl = result?.gifUrl ? result.gifUrl as string : null;
+      //     setImageUrl(result.gifUrl);
+      //   }).catch(() => {
+      //     setError("Failed to upload frames");
+      //   });
+      // }).catch(() => {
+      //   setError("Failed to upload frames");
+      // });
     }).catch(() => {
       setError("Failed to upload frames");
     });
@@ -227,20 +278,16 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
 
   const generateFace = () => {
     setCountdownState(COUNTDOWN_TIMER_STATE.PAUSE);
-    setIsProcessing(true);
     setIsCounting(false);
-  };
-
-  useEffect(() => {
-    if (isProcessing && imageUrl) {
-      router.push(`/enter-pin-code?gif=${imageUrl}`);
+    
+    if (previewUrl) {
+      onGenerateGIF(imageUrl ?? "", previewUrl);
     }
-  }, [imageUrl, isProcessing]);
+  };
 
   const onCloseError = () => {
     setImageUrl(null);
     setVideoTaken(false);
-    setIsProcessing(false);
     setHasError(false);
     setTimer(60);
     setCountdownState(COUNTDOWN_TIMER_STATE.STARTED);
@@ -250,17 +297,13 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
 
   return (
     <div className="bg-black h-full w-full flex flex-col items-center justify-end">
-      {hasError ? (
+      {hasError && (
         <Modal isOpen>
           <div className="text-center text-4xl font-bold text-white">
             <p>Oops! something went wrong.</p>
             <SimpleButton onClick={onCloseError}>Close</SimpleButton>
           </div>
         </Modal>
-      ) : (
-        isProcessing && (
-          <Processing />
-        )
       )}
 
       {/* HEADER */}
@@ -302,7 +345,6 @@ export default function SelfieCameraMode({ onExit }: SelfieCameraModePropType) {
                 {previewUrl && 
                   <video
                     src={previewUrl}
-                    controls
                     ref={previewVideoRef}
                     className="size-full absolute inset-0 h-full w-full object-cover"
                     autoPlay

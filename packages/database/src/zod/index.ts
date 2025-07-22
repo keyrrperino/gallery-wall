@@ -14,11 +14,9 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const UserSessionScalarFieldEnumSchema = z.enum(['id','userId','createdAt','expiresAt']);
 
-export const FrameScalarFieldEnumSchema = z.enum(['id','userGifRequestId','imageUrl','imageUrlComposited','frameStatus','createdAt','updatedAt']);
-
 export const UserScalarFieldEnumSchema = z.enum(['id','email','name','userType','createdAt','updatedAt']);
 
-export const UserGifRequestScalarFieldEnumSchema = z.enum(['id','userId','gifUrl','requestStatus','createdAt','updatedAt']);
+export const UserGifRequestScalarFieldEnumSchema = z.enum(['id','userId','gifUrl','selfieVideoUrl','isShowed','requestStatus','createdAt','updatedAt']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -30,7 +28,7 @@ export const UserTypeSchema = z.enum(['PC','IPAD']);
 
 export type UserTypeType = `${z.infer<typeof UserTypeSchema>}`
 
-export const RequestStatusSchema = z.enum(['PENDING','EXTRACTING_FRAMES','DONE_EXTRACTING_FRAMES','FAILED','SUCCESS']);
+export const RequestStatusSchema = z.enum(['PENDING','STANDBY','PROCESSING','FAILED','SUCCESS']);
 
 export type RequestStatusType = `${z.infer<typeof RequestStatusSchema>}`
 
@@ -60,22 +58,6 @@ export const UserSessionSchema = z.object({
 export type UserSession = z.infer<typeof UserSessionSchema>
 
 /////////////////////////////////////////
-// FRAME SCHEMA
-/////////////////////////////////////////
-
-export const FrameSchema = z.object({
-  frameStatus: FrameStatusSchema,
-  id: z.string(),
-  userGifRequestId: z.string(),
-  imageUrl: z.string().nullable(),
-  imageUrlComposited: z.string().nullable(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-})
-
-export type Frame = z.infer<typeof FrameSchema>
-
-/////////////////////////////////////////
 // USER SCHEMA
 /////////////////////////////////////////
 
@@ -99,6 +81,8 @@ export const UserGifRequestSchema = z.object({
   id: z.string(),
   userId: z.string(),
   gifUrl: z.string().nullable(),
+  selfieVideoUrl: z.string().nullable(),
+  isShowed: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

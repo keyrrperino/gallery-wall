@@ -4,6 +4,8 @@ alias pip=pip3.11
 
 source ~/myenv/bin/activate
 
+uvicorn main:app --host 0.0.0.0 --port 8000
+
 brew install python@3.11
 
 export CLOUDSDK_PYTHON=$(which python3.11)

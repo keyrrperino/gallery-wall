@@ -14,6 +14,7 @@ from tempfile import TemporaryDirectory
 from PIL import ImageSequence
 import subprocess
 from fastapi.middleware.cors import CORSMiddleware
+import random
 
 app = FastAPI()
 
@@ -38,6 +39,30 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Path to your transparent PNG frame (should be 1080p, RGBA)
 FRAME_OVERLAY_PATH = os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frame_overlay.png"))
+
+FRAME_MAP = {
+    "care": {
+        "color": (43, 144, 208),
+        "frames": [
+            os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"blue-{shape}.png"))
+            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
+        ]
+    },
+    "future": {
+        "color": (114, 143, 61),
+        "frames": [
+            os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"green-{shape}.png"))
+            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
+        ]
+    },
+    "support": {
+        "color": (247, 235, 223),
+        "frames": [
+            os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"dry-orange-{shape}.png"))
+            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
+        ]
+    },
+}
 
 @app.post("/remove-image-background")
 async def remove_image_background(request: Request):
@@ -98,16 +123,17 @@ async def remove_image_background(request: Request):
 async def process_frames_to_gif(
     userGifRequestId: str = Form(...),
     userId: str = Form(...),
-    images: List[UploadFile] = File(...)
+    images: List[UploadFile] = File(...),
+    pledge: str = Form(...),
 ):
-    if not images or not userGifRequestId or not userId:
-        raise HTTPException(status_code=400, detail="Missing required parameters.")
-    if len(images) != 12 and len(images) != 24:
-        raise HTTPException(status_code=400, detail="Exactly 12 or 24 images required.")
-
-    # Load the overlay frame (should be 1080p, RGBA, transparent)
+    if pledge not in FRAME_MAP:
+        raise HTTPException(status_code=400, detail=f"Invalid pledge: {pledge}")
+    color = FRAME_MAP[pledge]["color"]
+    frame_choices = FRAME_MAP[pledge]["frames"]
+    # Pick a random overlay frame for this request
+    overlay_frame_path = random.choice(frame_choices)
     try:
-        overlay_frame = Image.open(FRAME_OVERLAY_PATH).convert("RGBA")
+        overlay_frame = Image.open(overlay_frame_path).convert("RGBA")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to load overlay frame: {e}")
 
@@ -126,7 +152,7 @@ async def process_frames_to_gif(
             # Overlay the frame (overlay_frame should be 720x720)
             composited = Image.alpha_composite(base_canvas, overlay_frame)
             # Remove transparency: paste on solid background
-            background = Image.new("RGB", composited.size, (43, 144, 208))
+            background = Image.new("RGB", composited.size, color)
             background.paste(composited, mask=composited.split()[-1])
             return background
         except Exception as e:

@@ -1,6 +1,5 @@
 "use client";
 
-import { PhotoWithFrameState } from "@marketing/home/components/PhotoWithFrame";
 import { apiClient } from "@shared/lib/api-client";
 import { clearCache } from "@shared/lib/cache";
 import { useQueryClient } from "@tanstack/react-query";
@@ -11,10 +10,6 @@ import type { PropsWithChildren } from "react";
 import { createContext, useEffect, useState } from "react";
 
 type User = ApiOutput["auth"]["user"];
-type ImageUrlWithFrameDataType = {
-  imageUrlWithFrame: string;
-  imageUrlWithFrameState: PhotoWithFrameState
-}
 
 type UserContext = {
   user: User;
@@ -22,8 +17,11 @@ type UserContext = {
   updateUser: (info: Partial<User>) => void;
   logout: () => Promise<void>;
   loaded: boolean;
-  imageUrlWithFrameData: ImageUrlWithFrameDataType,
-  setImageUrlWithFrame: (data: ImageUrlWithFrameDataType) => void;
+  gifUrl: string | null;
+  getGifUrl: (data: FormData) => Promise<void>;
+  error: string | null;
+  isDoneGeneratingGif: boolean;
+  setIsDoneGeneratingGif: (value: boolean) => void;
 };
 
 const authBroadcastChannel = new BroadcastChannel("auth");
@@ -40,12 +38,16 @@ export const userContext = createContext<UserContext>({
   },
   logout: () => Promise.resolve(),
   loaded: false,
-  imageUrlWithFrameData: {
-    imageUrlWithFrame: "",
-    imageUrlWithFrameState: PhotoWithFrameState.IS_LOADING
-  },
-  setImageUrlWithFrame: () => {
+  gifUrl: null,
+  isDoneGeneratingGif: false,
+  error: null,
+  setIsDoneGeneratingGif: () => {
     return;
+  },
+  getGifUrl: () => {
+    return new Promise(() => () => {
+      return null;
+    });
   }
 });
 
@@ -58,10 +60,9 @@ export function UserContextProvider({
   const router = useRouter();
   const [loaded, setLoaded] = useState(!!initialUser);
   const [user, setUser] = useState<User>(initialUser);
-  const [imageUrlWithFrameData, setImageUrlWithFrameData] = useState({
-    imageUrlWithFrame: "",
-    imageUrlWithFrameState: PhotoWithFrameState.IS_LOADING
-  });
+  const [gifUrl, setGifUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isDoneGeneratingGif, setIsDoneGeneratingGif] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
   const userQuery = apiClient.auth.user.useQuery(undefined, {
@@ -74,10 +75,6 @@ export function UserContextProvider({
   const reloadUser = async () => {
     await userQuery.refetch();
   };
-
-  const setImageUrlWithFrame = (data: ImageUrlWithFrameDataType) => {
-    setImageUrlWithFrameData(data)
-  }
 
   const logout = async () => {
     await logoutMutation.mutateAsync();
@@ -132,6 +129,33 @@ export function UserContextProvider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  const getGifUrl = async (formData: FormData): Promise<void> => {
+    setIsDoneGeneratingGif(false);
+    return new Promise((resolve, reject) => {
+      fetch("https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif", {
+        method: "POST",
+        body: formData,
+      }).then((response) => {
+        response.json().then((result: {
+          status: string;
+          gifUrl: string;
+          success: string;
+        }) => {
+          console.log(result);
+          // const newImageUrl = result?.gifUrl ? result.gifUrl as string : null;
+          setGifUrl(result.gifUrl);
+          setIsDoneGeneratingGif(true);
+          resolve();
+        }).catch(() => {
+          reject("Failed to upload frames");
+          setError("Failed to upload frames");
+        });
+      }).catch(() => {
+        reject("Failed to upload frames");
+      });
+    });
+  }
+
   const updateUser = (info: Partial<User>) => {
     if (user) {
       setUser({
@@ -149,8 +173,11 @@ export function UserContextProvider({
         logout,
         loaded,
         updateUser,
-        imageUrlWithFrameData,
-        setImageUrlWithFrame
+        gifUrl,
+        getGifUrl,
+        error,
+        isDoneGeneratingGif,
+        setIsDoneGeneratingGif
       }}
     >
       {children}

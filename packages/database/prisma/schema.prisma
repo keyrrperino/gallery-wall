@@ -33,8 +33,8 @@ enum UserType {
 
 enum RequestStatus {
   PENDING
-  EXTRACTING_FRAMES
-  DONE_EXTRACTING_FRAMES
+  STANDBY
+  PROCESSING
   FAILED
   SUCCESS
 }
@@ -51,17 +51,6 @@ enum GifStatus {
   SUCCESS
 }
 
-model Frame {
-  id                 String         @id
-  userGifRequestId   String
-  userGifRequest     UserGifRequest @relation(fields: [userGifRequestId], references: [id])
-  imageUrl           String?
-  imageUrlComposited String?
-  frameStatus        FrameStatus
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @default(now())
-}
-
 model User {
   id        String           @id @default(cuid())
   email     String?
@@ -74,14 +63,15 @@ model User {
 }
 
 model UserGifRequest {
-  id            String        @id
-  userId        String
-  user          User          @relation(fields: [userId], references: [id])
-  gifUrl        String?
-  requestStatus RequestStatus
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now())
-  Frames        Frame[]
+  id             String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  gifUrl         String?
+  selfieVideoUrl String?
+  isShowed       Boolean       @default(false)
+  requestStatus  RequestStatus
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
 
   @@index([userId])
 }

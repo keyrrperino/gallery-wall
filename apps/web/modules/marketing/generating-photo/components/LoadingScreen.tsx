@@ -3,14 +3,17 @@
 import ExitButton from "@marketing/shared/components/ExitButton";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useUser } from "@saas/auth/hooks/use-user";
 
 export default function LoadingScreen() {
+  const searchParams = useSearchParams();
+  const { gifUrl, isDoneGeneratingGif } = useUser();
+  const userGifRequestId = searchParams.get("userGifRequestId");
   const [dotCount, setDotCount] = useState(0);
   const [positions, setPositions] = useState<
     { top?: string; bottom?: string; left?: string; right?: string }[]
   >([]);
-  const [finishedGenerating, setFinishedGenerating] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -37,21 +40,11 @@ export default function LoadingScreen() {
     setPositions(newPositions);
   }, []);
 
-  // Simulate image generation completion after 5 seconds
-  // This can be replaced with actual image generation logic
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setFinishedGenerating(true);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (finishedGenerating) {
-      router.push("/save-pledge-photo");
+    if ( gifUrl&& isDoneGeneratingGif) {
+      router.push(`/save-pledge-photo?gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
     }
-  }, [finishedGenerating, router]);
+  }, [isDoneGeneratingGif, gifUrl, router]);
 
   const loadingText = `Generating your Unique Pledge Photo${".".repeat(dotCount)}`;
 

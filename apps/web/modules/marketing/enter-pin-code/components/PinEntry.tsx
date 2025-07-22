@@ -1,13 +1,17 @@
 "use client";
 import ExitButton from "@marketing/shared/components/ExitButton";
 import { ChevronLeftIcon, DeleteIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { KEY, openDB, STORE_NAME } from "../../../../lib/indexDB";
 
 export default function PinEntry() {
   const searchParams = useSearchParams();
   const gif = searchParams.get("gif");
+  const userGifRequestId = searchParams.get("userGifRequestId");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const [pin, setPin] = useState<string>("");
   const [isError, setIsError] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
@@ -15,6 +19,24 @@ export default function PinEntry() {
   const router = useRouter();
 
   const samplePin = 1234; // ✅ your sample PIN
+
+  async function getBlobFromIndexedDB(): Promise<Blob | null> {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const request = tx.objectStore(STORE_NAME).get(KEY);
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result ?? null);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  useEffect(() => {
+    getBlobFromIndexedDB().then(blob => {
+      if (blob) {
+        setPreviewUrl(URL.createObjectURL(blob));
+      }
+    }).catch(console.error);
+  }, []);
 
   const handlePress = (digit: string) => {
     if (isLocked || isSuccess) {
@@ -54,7 +76,7 @@ export default function PinEntry() {
   const triggerSuccess = () => {
     setIsSuccess(true);
     setTimeout(() => {
-      router.push("/generating-photo");
+      router.push(`/generating-photo?gif=${gif}&userGifRequestId=${userGifRequestId}`);
     }, 800);
   };
 
@@ -83,10 +105,21 @@ export default function PinEntry() {
           <div className="relative aspect-square w-[40vw] md:w-auto md:h-full bg-gray-200 overflow-hidden shadow-md">
             {gif && 
               <img
-                src={gif}
+                src={previewUrl ? previewUrl : gif}
                 alt="selfie preview"
                 className="w-full h-full object-cover"
               />}
+            {previewUrl && 
+              <video
+              src={previewUrl}
+              className="size-full border-4 border-white object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+            >
+              <track kind="captions" />
+            </video>}
           </div>
           <div className="font-bold w-full bg-[#F7EBDF] text-base md:text-[2vw] leading-[1] text-center uppercase font-text-bold p-8">
             My Video Selfie

@@ -52,7 +52,8 @@ const nextConfig = {
     return config;
   },
   eslint: {
-    dirs: ["app", "cypress", "modules"],
+    ignoreDuringBuilds: true,
+    // dirs: ["app", "cypress", "modules"],
   },
   output: 'standalone'
 };

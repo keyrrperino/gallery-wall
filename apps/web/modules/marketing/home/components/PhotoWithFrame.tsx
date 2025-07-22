@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@saas/auth/hooks/use-user";
 import { useEffect } from "react";
 
 export enum PhotoWithFrameState {
@@ -15,7 +14,6 @@ type PhotoWithFrameTypes = {
 }
 
 export function PhotoWithFrame(props: PhotoWithFrameTypes) {
-  const { setImageUrlWithFrame } = useUser();
 
   const { imageUrl, onGenerateFrame, onStateChange } = props;
 
@@ -37,10 +35,6 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
 
   useEffect(() => {
     onStateChange && onStateChange(PhotoWithFrameState.IS_LOADING);
-    setImageUrlWithFrame({
-      imageUrlWithFrame: "",
-      imageUrlWithFrameState: PhotoWithFrameState.IS_LOADING
-    })
 
     const imgEle1 = new Image();
     const imgEle2 = new Image();
@@ -75,10 +69,6 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
             const imageUrlBase64FromCanvas = resEle.toDataURL("image/png");
             onGenerateFrame(imageUrlBase64FromCanvas);
             onStateChange && onStateChange(PhotoWithFrameState.LOADED);
-            setImageUrlWithFrame({
-              imageUrlWithFrame: imageUrlBase64FromCanvas,
-              imageUrlWithFrameState: PhotoWithFrameState.LOADED
-            })
           }
         }
       };

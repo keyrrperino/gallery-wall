@@ -1,5 +1,4 @@
 import { UserContextProvider } from "@saas/auth/lib/user-context";
-import { Footer } from "@saas/shared/components/Footer";
 import type { PropsWithChildren } from "react";
 
 export const dynamic = "force-dynamic";
@@ -11,9 +10,10 @@ export default async function Layout({ children }: PropsWithChildren) {
     <UserContextProvider
       initialUser={null}
     >
-      <div className="min-h-screen bg-muted">
-        <main className="bg-muted">{children}</main>
-        <Footer />
+      <div className="bg-muted">
+        <main className="h-screen w-full items-baseline justify-center overflow-auto bg-black">
+          {children}
+        </main>
       </div>
     </UserContextProvider>
   );
