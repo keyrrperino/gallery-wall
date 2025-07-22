@@ -101,7 +101,7 @@ export default function LoadingScreen() {
       )}
 
       <div>
-        <div className="text-black text-[130px] max-w-[60vw] font-text-bold z-10 leading-none text-center">
+        <div className="text-black text-[5vw] max-w-[60vw] font-text-bold z-10 leading-none text-center">
           {loadingText}
         </div>
         <p className="text-[2vw] text-center mb-10 mx-[22vw] leading-tight">
