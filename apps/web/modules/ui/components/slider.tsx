@@ -103,12 +103,10 @@ export default function MainSlider() {
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-white text-black">
       {/* TOP BAR */}
-      <div className="flex items-center justify-between px-32 py-16 gap-8">
+      <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8">
         <button onClick={handleBack}>
           <ChevronLeftIcon
-            className="text-black hover:text-gray-600"
-            width={120}
-            height={120}
+            className="text-black hover:text-gray-600 w-8 h-8 md:w-[3vw] md:h-[3vw]"
           />
         </button>
         <div className="flex-1 mx-4">

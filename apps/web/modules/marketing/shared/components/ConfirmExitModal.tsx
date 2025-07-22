@@ -20,7 +20,7 @@ export default function ConfirmExitModal({
         className="bg-white rounded-2xl shadow-2xl p-24 w-[65%] text-center"
       >
         <h2 className="text-[110px] font-text-bold uppercase">Are you sure?</h2>
-        <p className="text-[50px] text-center font-sans my-32 leading-tight">
+        <p className="text-[2vw] text-center font-sans my-32 leading-tight">
             Exiting now will lose your progress. Are you sure you want to exit?
         </p>
 

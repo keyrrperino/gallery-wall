@@ -19,19 +19,19 @@ export default function ConfirmRetakeModal({
         className="bg-white rounded-2xl shadow-2xl p-24 w-[65%] text-center"
       >
         <h2 className="text-[110px] font-text-bold uppercase">Are you sure?</h2>
-        <p className="text-[50px] text-center font-sans my-32 leading-tight">
+        <p className="text-[2vw] text-center font-sans my-32 leading-tight">
             Taking another selfie will discard your current photo. Are you sure you want to retake?
         </p>
 
-        <div className="flex justify-center gap-8">
+        <div className="flex justify-center gap-[1.5vw]">
           <SimpleButton
-            className="bg-gray-200 mt-10 text-[75px] text-black py-16 px-40 rounded-full font-bold"
+            className="bg-gray-200 mt-10 text-[75px] text-black py-[3vh] px-[10vh] rounded-full font-bold"
             onClick={onCancel}
           >
             RETURN
           </SimpleButton>
           <SimpleButton
-            className="bg-primary mt-10 text-[75px] text-white py-16 px-40 rounded-full font-bold"
+            className="bg-primary mt-[2vh] text-[2vw] text-white py-[3vh] px-[10vh] rounded-full font-bold"
             onClick={onConfirm}
           >
             CONFIRM RETAKE

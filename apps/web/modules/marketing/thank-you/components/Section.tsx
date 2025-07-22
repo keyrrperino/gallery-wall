@@ -34,7 +34,7 @@ export default function ThankYouScreen() {
         </div>
 
         {/* INTRO TEXT */}
-        <p className="text-[50px] text-center mb-24 mx-[15vw] leading-tight">
+        <p className="text-[2vw] text-center mb-24 mx-[15vw] leading-tight">
             Keep an eye on your inbox! Your pledge will be landing there soon.<br />Thanks for joining us on this adventure!
         </p>
 
@@ -48,7 +48,7 @@ export default function ThankYouScreen() {
 
 
         <div className="flex flex-col items-center justify-center bg-white text-black gap-6 leading-none mt-28">
-            <p className="text-[50px] font-sans text-center text-black/75">
+            <p className="text-[2vw] font-sans text-center text-black/75">
                 Returning to homepage in {seconds} second{seconds !== 1 ? "s" : ""}...
             </p>
             <button

@@ -47,7 +47,7 @@ export default function PledgeCopy() {
       </div>
 
       {/* INTRO TEXT */}
-      <p className="text-[50px] text-center mb-48 mx-[15vw] leading-tight">
+      <p className="text-[2vw] text-center mb-48 mx-[15vw] leading-tight">
         Your pledge has joined others on our Live Pledge Wall!<br />
         You’re now part of a growing wave of support for Singapore’s coastal
         future.
@@ -64,7 +64,7 @@ export default function PledgeCopy() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter email address"
-            className={`border rounded-[32px] px-10 py-14 text-[50px] w-[30vw] transition-colors ${
+            className={`border rounded-[32px] px-10 py-14 text-[2vw] w-[30vw] transition-colors ${
               isInvalid && email !== "" ? "border-red-500" : "border-gray-400"
             } ${inputDisabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
           />

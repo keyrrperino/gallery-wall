@@ -25,7 +25,7 @@ type SnapButtonProps = {
     };
     return (
         <button
-            className={`h-32 w-32 font-button-base flex items-center justify-center outline-none transition-all duration-300 
+            className={`h-[10vh] w-[10vh] font-button-base flex items-center justify-center outline-none transition-all duration-300 
               focus:outline-none bg-red-500 hover:bg-red-600 active:bg-red-700 rounded-full border-4 border-white
               ${isHovered ? " -translate-y-1 scale-90" : ""}
               ${isClicked ? " pointer-events-none opacity-0" : " opacity-100"}`}
