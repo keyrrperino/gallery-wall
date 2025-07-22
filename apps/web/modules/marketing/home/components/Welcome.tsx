@@ -1,8 +1,8 @@
 import React from "react";
 import SimpleButton from "@marketing/home/components/Button";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import StickerCarousel from "@marketing/shared/components/StickerCarousel";
 
 export default function HomePage() {
   const router = useRouter();
@@ -14,42 +14,36 @@ export default function HomePage() {
       transition={{ duration: 1 }}
       className="relative flex flex-col items-center justify-center bg-[#f7f0e8] text-black min-h-screen w-full overflow-hidden"
     >
-      {/* Top images */}
-      <div
-        className="
-          absolute top-0 self-center m-[clamp(8px,1vw,32px)]
-          w-[30vh] h-[30vh]
-        "
-      >
-        <Image
-          src="/images/bg-image1.png"
-          alt="top-left"
-          fill
-          className="object-contain"
-        />
+      
+
+      <div className="absolute top-0 h-[50vh] w-full pointer-events-none">
+        <StickerCarousel />
       </div>
 
       {/* Main content */}
-      <h1
-        className="
-          text-4xl md:text-[7.7vw]
-          font-text-bold uppercase text-center leading-[0.75]
-        "
-      >
-        WELCOME TO THE<br />PUB PLEDGE WALL!
-      </h1>
-      <p
-        className="
-          text-base md:text-[2vw] mt-4
-          text-center mx-[clamp(16px,22vw,600px)]
-           leading-[1]
-        "
-      >
-        Join us in taking a stand for coastal protection in Singapore! <br />
-        In just a few quick steps, you’ll create your own personalized pledge
-        photo to share with the world and be part of a live pledge wall
-        growing with every submission.
-      </p>
+      <div className="absolute md:bottom-0 left-0 w-full h-full md:h-[80vh] flex flex-col items-center justify-center pointer-events-none" >
+        
+        <h1
+          className="
+            text-4xl md:text-[4.5vw]
+            font-text-bold uppercase text-center leading-[0.75]
+          "
+        >
+          WELCOME TO THE<br />PUB PLEDGE WALL!
+        </h1>
+        <p
+          className="
+            text-base md:text-[1.5vw] mt-4
+            text-center mx-[clamp(16px,22vw,600px)]
+            leading-[1]
+          "
+        >
+          Join us in taking a stand for coastal protection in Singapore! <br />
+          In just a few quick steps, you’ll create your own personalized pledge
+          photo to share with the world and be part of a live pledge wall
+          growing with every submission.
+        </p>
+      </div>
 
       <SimpleButton
         className="
@@ -64,34 +58,6 @@ export default function HomePage() {
       >
         BEGIN
       </SimpleButton>
-
-      {/* Bottom images */}
-      <div
-        className="
-          absolute bottom-0 left-0
-          w-[30vh] h-[30vh]
-        "
-      >
-        <Image
-          src="/images/bg-image2.png"
-          alt="bottom-left"
-          fill
-          className="object-contain"
-        />
-      </div>
-      <div
-        className="
-          absolute bottom-0 right-0
-          w-[30vh] h-[30vh]
-        "
-      >
-        <Image
-          src="/images/bg-image3.png"
-          alt="bottom-right"
-          fill
-          className="object-contain"
-        />
-      </div>
     </motion.div>
   );
 }
