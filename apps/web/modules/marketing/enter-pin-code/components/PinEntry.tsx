@@ -119,20 +119,20 @@ export default function PinEntry() {
               return (
                 <div
                   key={i}
-                  className={`w-10 h-10 rounded-full transition-colors duration-300 ${dotColor}`}
+                  className={`w-[2vw] h-[2vw] rounded-full transition-colors duration-300 ${dotColor}`}
                 ></div>
               );
             })}
           </motion.div>
 
           {/* Numpad grid */}
-          <div className="grid grid-cols-3 gap-20">
+          <div className="grid grid-cols-3 gap-[2vw]">
             {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit, i) => (
               <button
                 key={i}
                 onClick={() => handlePress(digit)}
                 disabled={isLocked || isSuccess}
-                className="w-40 h-40 rounded-full bg-gray-100 text-[60px] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+                className="h-[10vh] w-[10vh] rounded-full bg-gray-100 text-base md:text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
               >
                 {digit}
               </button>
@@ -141,16 +141,16 @@ export default function PinEntry() {
             <button
               onClick={() => handlePress("0")}
               disabled={isLocked || isSuccess}
-              className="w-40 h-40 rounded-full bg-gray-100 text-[60px] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+              className="h-[10vh] w-[10vh] rounded-full bg-gray-100 text-base md:text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
             >
               0
             </button>
             <button
               onClick={handleBackspace}
               disabled={isLocked || isSuccess}
-              className="flex w-40 h-40 rounded-full items-center justify-center bg-gray-100 hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+              className="flex h-[10vh] w-[10vh] items-center justify-center rounded-full bg-gray-100 text-base md:text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
             >
-              <DeleteIcon className="text-black" width={60} height={60} />
+              <DeleteIcon className="text-black hover:text-gray-600 w-8 h-8 md:w-[2vw] md:h-[2vw]" />
             </button>
           </div>
         </div>

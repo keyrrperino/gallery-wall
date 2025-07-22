@@ -42,12 +42,7 @@ export default function HowDoYouFeelSection({
   return (
     <div className="flex flex-col items-start bg-white text-black h-full w-full px-[5vw]">
       <div className="flex flex-col w-full">
-        <h1
-        className="
-          text-4xl md:text-[4vw]
-          font-text-bold uppercase leading-[0.75]
-        "
-        >
+        <h1 className="text-4xl md:text-[4vw] font-text-bold uppercase leading-[0.75]">
           HOW DO YOU FEEL ABOUT COASTAL PROTECTION IN SINGAPORE NOW?
         </h1>
         <p className="text-base md:text-[2vw] mt-4 mb-[3vw] leading-[1]">
@@ -55,14 +50,14 @@ export default function HowDoYouFeelSection({
         </p>
         <FeelingsGrid feelings={FEELINGS} selected={selected} onPick={handlePick} />
         <SimpleButton
-        className="
-          absolute bottom-[clamp(40px,7.5vh,160px)] self-center mt-10
-          text-[clamp(2rem,3vw,4rem)]
-          text-white
-          py-[clamp(0.55rem,1.5vw,2rem)]
-          px-[clamp(2rem,10vw,12rem)]
-          rounded-full font-bold z-10
-        "
+          className="
+            absolute bottom-[clamp(40px,7.5vh,160px)] self-center mt-10
+            text-[clamp(2rem,3vw,4rem)]
+            text-white
+            py-[clamp(0.55rem,1.5vw,2rem)]
+            px-[clamp(2rem,10vw,12rem)]
+            rounded-full font-bold z-10
+          "
           disabled={selected.length < 3}
           onClick={handleContinue}
         >
