@@ -36,7 +36,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
   const webcamRef = useRef<Webcam | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
 
-  const [, setRecording] = useState(false);
+  const [isRecording, setRecording] = useState(false);
   const [, setStream] = useState<MediaStream | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isCounting, setIsCounting] = useState<boolean>(false);
@@ -73,8 +73,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
 
   const capture = () => {
     setIsCountingKey(v4());
-    handleRecord();
-    createGIF();
+    setVideoTaken(false);
     setIsCounting(true);
     setImageUrl(null);
   };
@@ -124,8 +123,11 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
     recorder.onstop = () => {
       const videoBlob = new Blob(chunks, { type: "video/webm" });
       setPreviewUrl(URL.createObjectURL(videoBlob));
+      setRecording(false);
+      setVideoTaken(true);
 
       saveBlobToIndexedDB(videoBlob);
+
 
       // // Save to localStorage as Data URL
       // const reader = new FileReader();
@@ -138,7 +140,6 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
     recorder.start();
     setTimeout(() => {
       recorder.stop();
-      setRecording(false);
     }, 2000);
   };
 
@@ -182,28 +183,6 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
       }).catch(() => {
         console.log("error");
       });
-
-      // setImageUrl("https://lbrxffrgccdojnugwkgn.supabase.co/storage/v1/object/sign/gifs/gifs/1/1/final.gif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYmJhOWU0Zi03YmE4LTQ0OWItOTBhOC03YmQwMGYwYjUwN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJnaWZzL2dpZnMvMS8xL2ZpbmFsLmdpZiIsImlhdCI6MTc1MzAwMTY0MCwiZXhwIjoyMzg0MTUzNjQwfQ.CLkuTAWMKjWxIXu8HuKSVztQNwse-TPI0XCAx97ZuXo");
-
-      // fetch("https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif", {
-      // fetch("http://localhost:8000/process-frames-to-gif", {
-      //   method: "POST",
-      //   body: formData,
-      // }).then((response) => {
-      //   response.json().then((result: {
-      //     status: string;
-      //     gifUrl: string;
-      //     success: string;
-      //   }) => {
-      //     console.log(result);
-      //     // const newImageUrl = result?.gifUrl ? result.gifUrl as string : null;
-      //     setImageUrl(result.gifUrl);
-      //   }).catch(() => {
-      //     setError("Failed to upload frames");
-      //   });
-      // }).catch(() => {
-      //   setError("Failed to upload frames");
-      // });
     }).catch(() => {
       setError("Failed to upload frames");
     });
@@ -267,7 +246,9 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
 
   const handleCountdownEnd = async () => {
     setIsCounting(false);
-    setVideoTaken(true);
+
+    handleRecord();
+    createGIF();
   };
 
   const retake = () => {
@@ -319,23 +300,28 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
 
       {/* CAMERA AREA */}
       <div className="flex size-full flex-col items-center justify-start">
-        {!videoTaken ? (
+        {!previewUrl ? (
           <div className="flex size-full items-center justify-center">
             <div className="relative aspect-square w-[90vw] md:w-auto md:h-full border-[20px] border-white flex items-center justify-center">
+              <div className="absolute inset-0 h-full w-full">
+                {isCounting && (
+                  <div className="absolute inset-0 h-full w-full bg-black/80 z-10 pointer-events-none" />
+                )}
+                <Webcam
+                  ref={webcamRef}
+                  audio={false}
+                  mirrored={true}
+                  videoConstraints={videoConstraints}
+                  className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? "hidden" : ""}`}
+                />
+              </div>
               {isCounting && (
                 <CountdownTimer
                   key={isCountingKey}
-                  initialCount={2}
+                  initialCount={3}
                   onEnd={handleCountdownEnd}
                 />
               )}
-              <Webcam
-                ref={webcamRef}
-                audio={false}
-                mirrored={true}
-                videoConstraints={videoConstraints}
-                className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? "hidden" : ""}`}
-              />
             </div>
           </div>
         ) : (
@@ -361,11 +347,11 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
 
       {/* BOTTOM BUTTONS */}
       <div className="flex h-1/3 w-full items-center justify-center bg-black/75">
-        {!isCounting && !videoTaken ? (
+        {!isCounting && !videoTaken && !isRecording ? (
           <SnapButton onClick={capture} size="w-[2vh]" />
         ) : (
           <div className="flex w-full">
-            {videoTaken && (
+            {previewUrl && videoTaken && (
               <div className="flex flex-row w-full items-center justify-around gap-4 py-8">
                 <div></div>
                 <button
