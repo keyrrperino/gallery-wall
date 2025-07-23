@@ -163,7 +163,7 @@ export default function PinEntry() {
                 key={i}
                 onClick={() => handlePress(digit)}
                 disabled={isLocked || isSuccess}
-                className="w-[50px] h-[50px] rounded-full bg-gray-100 text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+                className="w-[50px] h-[50px] rounded-full bg-gray-100 text-[15px] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
               >
                 {digit}
               </button>
@@ -172,7 +172,7 @@ export default function PinEntry() {
             <button
               onClick={() => handlePress("0")}
               disabled={isLocked || isSuccess}
-              className="w-[50px] h-[50px] rounded-full bg-gray-100 text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+              className="w-[50px] h-[50px] rounded-full bg-gray-100 text-[15px] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
             >
               0
             </button>
