@@ -13,14 +13,14 @@ export function PledgeSlider({
 }) {
   return (
     <div
-      className="w-full max-h-[1/3] grid grid-cols-2 md:grid-cols-3 gap-[3vw]"
+      className="w-full max-h-[1/3] grid grid-cols-2 md:grid-cols-3 gap-[2vw] pb-[80px]"
     >
       {pledges.map((pledge, i) => (
         <button
           key={i}
           type="button"
           onClick={() => onPick(pledge.style)}
-          className={`relative aspect-square overflow-hidden transition-all duration-300
+          className={`relative aspect-square w-full md:w-[27vw] md:h-[27vw] overflow-hidden transition-all duration-300
             ${selected === pledge.style ? "ring-4 md:ring-[1vw] ring-blue-500" : ""}
           `}
         >

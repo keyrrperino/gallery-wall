@@ -15,6 +15,8 @@ export default function SaveImageFlow() {
   const { gifUrl } = useUser();
   const searchParams = useSearchParams();
   const userGifRequestId = searchParams.get("userGifRequestId");
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}&` : '?';
   const [showConfirmRetake, setShowConfirmRetake] = useState(false);
   const [phase, setPhase] = useState<"preview" | "saving" | "done">("preview");
   const router = useRouter();
@@ -53,7 +55,7 @@ export default function SaveImageFlow() {
         <ConfirmRetake
           onCancel={() => setShowConfirmRetake(false)}
           onConfirm={() => {
-            router.push(`/pledge-a-photo?userGifRequestId=${userGifRequestId}`);
+            router.push(`/pledge-a-photo${additionUrl}userGifRequestId=${userGifRequestId}`);
           }}
         />
       )}

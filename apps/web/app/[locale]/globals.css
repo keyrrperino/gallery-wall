@@ -85,16 +85,11 @@ pre.shiki {
   font-family: "Novecento CondBold";
   src: url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.eot");
   src:
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.eot?#iefix")
-      format("embedded-opentype"),
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.woff")
-      format("woff"),
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.woff2")
-      format("woff2"),
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.ttf")
-      format("truetype"),
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.svg#Novecento CondBold")
-      format("svg");
+    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.eot?#iefix") format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.woff") format("woff"),
+    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.woff2") format("woff2"),
+    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.ttf") format("truetype"),
+    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.svg#Novecento CondBold") format("svg");
   font-weight: normal;
   font-style: normal;
   font-display: swap;

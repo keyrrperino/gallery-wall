@@ -12,17 +12,17 @@ export default function PhotoPreview({
   gifUrl: string;
 }) {
   return (
-    <div className="flex w-full h-full flex-col items-center bg-white relative">
-      <h2 className="font-text-bold text-[5.5vw] uppercase">
+    <div className="flex w-full h-full flex-col items-center bg-white gap-3 relative mr-3 ml-3">
+      <h2 className="font-text-bold text-[5.5vh] md:text-[4vw] uppercase mr-3 ml-3">
         Here&apos;s your unique pledge photo!
       </h2>
 
       <div className="flex-grow flex items-center justify-center w-full -mt-[4vh]">
-        <div className="w-[30vw] h-[30vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
+        <div className="w-[35vh] md:w-[25vw] lg:w-[35vw] h-[35vh] md:h-[25vw] lg:h-[35vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
           <img
             src={gifUrl}
             alt="selfie preview"
-            className="w-[30vw] h-[30vw] object-cover"
+            className="w-[35vh] md:w-[25vw] lg:w-[35vw] h-[35vh] md:h-[25vw] lg:h-[35vw] object-cover"
           />
         </div>
       </div>
@@ -37,7 +37,7 @@ export default function PhotoPreview({
 
         <SimpleButton
           onClick={onUsePhoto}
-          className="text-[3vw] font-text-bold py-[3vh] px-[9vh] uppercase"
+          className="text-[3vw] font-text-bold py-[2vh] md:py-[3vh] px-[7vh] md:px-[9vh] uppercase"
         >
           This looks good!
         </SimpleButton>

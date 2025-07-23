@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import ConfirmExitModal from "./ConfirmExitModal";
 
 export default function ExitButton() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '';
 
   const handleConfirm = () => {
     setOpen(false);
-    router.push("/");
+    router.push("/" + additionUrl);
   };
 
   return (

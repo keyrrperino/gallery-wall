@@ -3,15 +3,19 @@
 import ExitButton from "@marketing/shared/components/ExitButton";
 import { ChevronLeftIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ThankYouScreen() {
   const [seconds, setSeconds] = useState(30);
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '';
+
   useEffect(() => {
     if (seconds <= 0) {
-      router.push("/");
+      router.push("/" + additionUrl);
       return;
     }
     const timer = setTimeout(() => setSeconds((prev) => prev - 1), 1000);
@@ -52,7 +56,7 @@ export default function ThankYouScreen() {
                 Returning to homepage in {seconds} second{seconds !== 1 ? "s" : ""}...
             </p>
             <button
-                onClick={() => router.push("/")}
+                onClick={() => router.push("/" + additionUrl)}
                 className="text-[#20409A] text-[75px] rounded-full font-text-bold"
             >
                 RETURN TO HOMEPAGE NOW

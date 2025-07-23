@@ -10,6 +10,8 @@ export default function LoadingScreen() {
   const searchParams = useSearchParams();
   const { gifUrl, isDoneGeneratingGif } = useUser();
   const userGifRequestId = searchParams.get("userGifRequestId");
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}&` : '?';
   const [dotCount, setDotCount] = useState(0);
   const [positions, setPositions] = useState<
     { top?: string; bottom?: string; left?: string; right?: string }[]
@@ -41,8 +43,8 @@ export default function LoadingScreen() {
   }, []);
 
   useEffect(() => {
-    if ( gifUrl&& isDoneGeneratingGif) {
-      router.push(`/save-pledge-photo?gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
+    if ( gifUrl && isDoneGeneratingGif) {
+      router.push(`/save-pledge-photo${additionUrl}gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
     }
   }, [isDoneGeneratingGif, gifUrl, router]);
 

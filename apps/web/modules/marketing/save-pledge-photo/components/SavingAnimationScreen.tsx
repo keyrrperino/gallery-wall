@@ -42,7 +42,7 @@ export default function SavingAnimationScreen({
             transition={{ duration: 0.3 }}
             className="absolute inset-0 flex items-center justify-center z-50"
           >
-            <div className="text-[400px] font-text-bold text-white -mt-24">
+            <div className="text-[20vh] md:text-[25vw] font-text-bold text-white -mt-24">
               {countdown}
             </div>
           </motion.div>
@@ -55,11 +55,11 @@ export default function SavingAnimationScreen({
         initial={{ y: "-50%", x: "-50%" }}
         animate={
           fly
-            ? { y: "-500%", transition: { duration: 1, ease: "easeInOut" } }
+            ? { y: "-2000%", transition: { duration: 1, ease: "easeInOut" } }
             : {}
         }
       >
-        <div className="w-[33vw] h-[33vw] bg-gray-200 overflow-hidden rounded-md shadow-md -mt-24">
+        <div className="w-[35vh] md:w-[25vw] md:w-[35vw] h-[35vh] md:h-[25vw] lg:h-[35vw] bg-gray-200 overflow-hidden rounded-md shadow-md -mt-24">
           <img
             src={gifUrl}
             alt="saving selfie"

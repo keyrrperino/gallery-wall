@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import HowDoYouFeelSection from "@marketing/how-do-you-feel/components/Section";
@@ -16,6 +16,9 @@ import { RequestStatusSchema } from "../../../../../packages/database";
 
 export default function MainSlider() {
   // SLIDE STATE
+  const searchParams = useSearchParams();
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '?';
   const [slide, setSlide] = useState(1);
   const totalSlides = 3;
 
@@ -30,7 +33,7 @@ export default function MainSlider() {
 
   const handleBack = () => {
     if (slide === 1) {
-      router.push("/");
+      router.push("/" + additionUrl);
     } else {
       setSlide(slide - 1);
     }
@@ -80,7 +83,7 @@ export default function MainSlider() {
       })
       .eq("id", userGifRequestId);
 
-      router.push(`/enter-pin-code?videoUrl=${videoUrl}&gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
+      router.push(`/enter-pin-code${additionUrl}&videoUrl=${videoUrl}&gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
   }
 
   // When we reach slide 3, log both (only once on transition)
@@ -100,8 +103,27 @@ export default function MainSlider() {
     />;
   }
 
+
+  const slides = {
+    1: <>
+        <h1 className="
+          text-[3vh] md:text-[4vh]
+          font-text-bold uppercase
+        ">
+          HOW DO YOU FEEL ABOUT COASTAL PROTECTION IN SINGAPORE NOW?
+        </h1>
+        <p className="text-[2vh] md:text-[4vh] mt-[2vh] mb-[3vh] leading-[1]">
+        Select up to 3 that apply.
+        </p>
+      </>,
+    2: <>
+
+    </>,
+    3: null
+  }
+
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-white text-black">
+    <div className="relative h-screen w-screen bg-white text-black">
       {/* TOP BAR */}
       <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8">
         <button onClick={handleBack}>
@@ -114,9 +136,12 @@ export default function MainSlider() {
         </div>
         <ExitButton />
       </div>
+      <div className="px-[5vw]">
+        {slides[slide]}
+      </div>
 
       {/* SLIDER CONTENT */}
-      <div className="relative h-[85%] w-full">
+      <div className="relative h-[75vh] w-full overflow-y-scroll overflow-x-hidden lg:overflow-hidden">
         <AnimatePresence mode="wait">
           {slide === 1 && (
             <motion.div
@@ -141,7 +166,7 @@ export default function MainSlider() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute top-0 left-0 w-full h-full"
+              className="absolute top-5 left-0 w-full h-full"
             >
               <PickAFrame
                 onContinue={handlePledgeContinue}

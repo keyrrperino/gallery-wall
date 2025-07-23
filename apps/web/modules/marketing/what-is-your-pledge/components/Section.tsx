@@ -1,6 +1,7 @@
 import { PledgeSlider } from "./PledgeSlider";
 import SimpleButton from "@marketing/home/components/Button";
 import { PledgeStyleEnum } from "../types";
+import clsx from "clsx";
 
 const PLEDGES: {
   image: string;
@@ -26,24 +27,31 @@ export default function PickAFrame({
 
   return (
     <div className="flex flex-col items-start bg-white text-black h-full w-full px-[5vw]">
-      <h1 className="text-4xl md:text-[4vw] font-text-bold uppercase leading-[0.75]">
+      <h1 className="
+        text-[3vh] md:text-[4vh]
+        font-text-bold uppercase
+      ">
         CHOOSE YOUR PLEDGE FRAME
       </h1>
-      <p className="text-base md:text-[2vw] mt-4 mb-[3vw] leading-[1]">
+      <p className="text-[3vh] mt-[2vh] mb-[3vh] leading-[1]">
         Tap one to select.
       </p>
-
       <PledgeSlider pledges={PLEDGES} selected={selected} onPick={handlePick} />
 
       <SimpleButton
-        className="
-          absolute bottom-[clamp(40px,7.5vh,160px)] self-center mt-10
-          text-[clamp(1vw,2vw,3vw)]
-          text-white
-          py-[clamp(0.55rem,1.5vw,2rem)]
-          px-[clamp(2rem,10vw,12rem)]
-          rounded-full font-bold z-10
-        "
+        className={clsx(
+          "fixed",
+          "mt-5",
+          "bottom-[3vh]",
+          "self-center",
+          "text-white",
+          "rounded-full font-bold",
+          "pt-[2vh] md:pt-[3vh]",
+          "pb-[2vh] md:pb-[3vh]",
+          "pr-[11vw]",
+          "pl-[11vw]",
+          "text-[3vh]"
+        )}
         disabled={selected === null}
         onClick={() => onContinue(selected)}
       >

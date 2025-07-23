@@ -11,6 +11,10 @@ import { createContext, useEffect, useState } from "react";
 
 type User = ApiOutput["auth"]["user"];
 
+const removeBackgroundRoute = "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif";
+// const NoRemoveBackgroundRoute = "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif-no-remove-background";
+const NoRemoveBackgroundRoute = "http://localhost:8000/process-frames-to-gif-no-remove-background";
+
 type UserContext = {
   user: User;
   reloadUser: () => Promise<void>;
@@ -18,7 +22,7 @@ type UserContext = {
   logout: () => Promise<void>;
   loaded: boolean;
   gifUrl: string | null;
-  getGifUrl: (data: FormData) => Promise<void>;
+  getGifUrl: (data: FormData, noRemoveBackground?: boolean) => Promise<void>;
   error: string | null;
   isDoneGeneratingGif: boolean;
   setIsDoneGeneratingGif: (value: boolean) => void;
@@ -129,10 +133,10 @@ export function UserContextProvider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const getGifUrl = async (formData: FormData): Promise<void> => {
+  const getGifUrl = async (formData: FormData, noRemoveBackground?: boolean): Promise<void> => {
     setIsDoneGeneratingGif(false);
     return new Promise((resolve, reject) => {
-      fetch("https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif", {
+      fetch(noRemoveBackground ? NoRemoveBackgroundRoute : removeBackgroundRoute, {
         method: "POST",
         body: formData,
       }).then((response) => {

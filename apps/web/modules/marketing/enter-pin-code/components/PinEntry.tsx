@@ -10,6 +10,8 @@ export default function PinEntry() {
   const searchParams = useSearchParams();
   const gif = searchParams.get("gif");
   const userGifRequestId = searchParams.get("userGifRequestId");
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}&` : '?';
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [pin, setPin] = useState<string>("");
@@ -76,7 +78,7 @@ export default function PinEntry() {
   const triggerSuccess = () => {
     setIsSuccess(true);
     setTimeout(() => {
-      router.push(`/generating-photo?gif=${gif}&userGifRequestId=${userGifRequestId}`);
+      router.push(`/generating-photo${additionUrl}gif=${gif}&userGifRequestId=${userGifRequestId}`);
     }, 800);
   };
 
@@ -84,31 +86,27 @@ export default function PinEntry() {
     <div className="flex w-full h-full flex-col gap-[1vw] items-center bg-white">
       {/* Header */}
       <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] font-text-bold text-black">
-        <button onClick={() => window.history.back()}>
+        <button onClick={() => {
+          router.push(`/pledge-a-photo${additionUrl}gif=${gif}&userGifRequestId=${userGifRequestId}`);
+        }}>
           <ChevronLeftIcon
             className="text-black hover:text-gray-600 w-8 h-8 md:w-[3vw] md:h-[3vw]"
           />
         </button>
-        <h1 className="text-[4vw] font-text-bold uppercase leading-[0.75]">ENTER PIN CODE</h1>
+        <h1 className="text-[4vh] font-text-bold uppercase leading-[0.75]">ENTER PIN CODE</h1>
         <ExitButton />
       </div>
 
       {/* Description */}
-      <p className="text-[2vw] leading-[1] text-center">
+      <p className="text-[3vh] leading-[1] text-center">
         Please wait while we make sure your selfie is safe to send to the
         gallery wall.
       </p>
 
-      <div className="flex flex-col md:flex-row gap-[3vw] mt-[3vw]">
+      <div className="flex flex-col md:flex-row gap-[3vw] mt-[3vh]">
         {/* Left side - image */}
         <div className="flex flex-col items-center">
-          <div className="w-[30vw] h-[30vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
-            {/* {previewUrl && 
-              <img
-                src={previewUrl}
-                alt="selfie preview"
-                className="w-full h-full object-cover"
-              />} */}
+          <div className="w-[30vh] h-[30vh] bg-gray-200 overflow-hidden rounded-md shadow-md">
             {previewUrl && 
               <video
               src={previewUrl}
@@ -121,20 +119,20 @@ export default function PinEntry() {
               <track kind="captions" />
             </video>}
           </div>
-          <div className="font-bold w-[30vw] bg-[#F7EBDF] text-[3vw] text-center uppercase font-text-bold p-[1vw]">
+          <div className="font-bold w-[30vh] bg-[#F7EBDF] text-[3vh] text-center uppercase font-text-bold p-[1vw]">
             My Video Selfie
           </div>
         </div>
 
         {/* Right side - PIN pad */}
-        <div className="flex flex-col items-center gap-16">
+        <div className="flex flex-col items-center gap-[15px]">
           {/* Dots */}
           <motion.div
             animate={
               isError ? { x: [-10, 10, -10, 10, 0] } : {} // shake only on error
             }
             transition={{ duration: 0.4 }}
-            className="flex flex-row w-full gap-7 items-center justify-around"
+            className="flex flex-row gap-[25px] items-center justify-around"
           >
             {[0, 1, 2, 3].map((i) => {
               let dotColor = "bg-gray-300";
@@ -152,20 +150,20 @@ export default function PinEntry() {
               return (
                 <div
                   key={i}
-                  className={`w-[1.5vw] h-[1.5vw] rounded-full transition-colors duration-300 ${dotColor}`}
+                  className={`w-[18px] h-[18px] rounded-full transition-colors duration-300 ${dotColor}`}
                 ></div>
               );
             })}
           </motion.div>
 
           {/* Numpad grid */}
-          <div className="grid grid-cols-3 gap-[3vw]">
+          <div className="grid grid-cols-3 gap-[5px]">
             {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit, i) => (
               <button
                 key={i}
                 onClick={() => handlePress(digit)}
                 disabled={isLocked || isSuccess}
-                className="w-[6vw] h-[6vw] rounded-full bg-gray-100 text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+                className="w-[50px] h-[50px] rounded-full bg-gray-100 text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
               >
                 {digit}
               </button>
@@ -174,16 +172,16 @@ export default function PinEntry() {
             <button
               onClick={() => handlePress("0")}
               disabled={isLocked || isSuccess}
-              className="w-[6vw] h-[6vw] rounded-full bg-gray-100 text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+              className="w-[50px] h-[50px] rounded-full bg-gray-100 text-[2vw] font-semibold hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
             >
               0
             </button>
             <button
               onClick={handleBackspace}
               disabled={isLocked || isSuccess}
-              className="flex w-[6vw] h-[6vw] rounded-full items-center justify-center bg-gray-100 hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
+              className="flex w-[50px] h-[50px] rounded-full items-center justify-center bg-gray-100 hover:bg-gray-200 active:bg-gray-300 disabled:opacity-50"
             >
-              <DeleteIcon className="text-black" width={60} height={60} />
+              <DeleteIcon className="text-black" />
             </button>
           </div>
         </div>

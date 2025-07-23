@@ -5,7 +5,7 @@ import { ChevronLeftIcon } from "lucide-react";
 import { useState } from "react";
 import SimpleButton from "@marketing/home/components/Button";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -15,6 +15,9 @@ export default function PledgeCopy() {
   const [email, setEmail] = useState("");
   const [shake, setShake] = useState(false);
   const [inputDisabled, setInputDisabled] = useState(false);
+  const searchParams = useSearchParams();
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '?';
 
   const valid = isValidEmail(email);
   const isInvalid = email.trim() === "" || !valid;
@@ -32,7 +35,7 @@ export default function PledgeCopy() {
     }
 
     console.log("📧 Sending pledge to:", email);
-    router.push("/thank-you");
+    router.push("/thank-you" + additionUrl);
   };
 
   return (

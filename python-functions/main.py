@@ -226,3 +226,105 @@ async def process_frames_to_gif(
         "key": key
     })
 
+@app.post("/process-frames-to-gif-no-remove-background")
+async def process_frames_to_gif_no_background_remove(
+    userGifRequestId: str = Form(...),
+    userId: str = Form(...),
+    images: List[UploadFile] = File(...),
+    pledge: str = Form(...),
+):
+    if pledge not in FRAME_MAP:
+        raise HTTPException(status_code=400, detail=f"Invalid pledge: {pledge}")
+    frame_choices = FRAME_MAP[pledge]["frames"]
+    # Pick a random overlay frame for this request
+    overlay_frame_path = random.choice(frame_choices)
+    try:
+        overlay_frame = Image.open(overlay_frame_path).convert("RGBA")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load overlay frame: {e}")
+
+    async def process_single_image(idx, upload_file):
+        try:
+            img_bytes = await upload_file.read()
+            img = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
+            # Center the 672x672 image on a 720x720 canvas
+            if img.width != 672 or img.height != 672:
+                img = img.resize((672, 672), Image.LANCZOS)
+            base_canvas = Image.new("RGBA", (720, 720), (0, 0, 0, 0))
+            offset = ((720 - 672) // 2, (720 - 672) // 2)
+            base_canvas.paste(img, offset, img)
+            # Overlay the frame (overlay_frame should be 720x720)
+            composited = Image.alpha_composite(base_canvas, overlay_frame)
+            # Do NOT add a background color, keep as RGBA
+            return composited
+        except Exception as e:
+            raise Exception(f"Frame {idx+1} failed: {e}")
+
+    # Process all images in parallel
+    try:
+        processed_images = await asyncio.gather(*[
+            process_single_image(idx, upload_file) for idx, upload_file in enumerate(images)
+        ])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image processing failed: {e}")
+
+    # Save as GIF (12 or 24 frames)
+    if len(processed_images) not in (12, 24):
+        raise HTTPException(status_code=500, detail=f"Expected 12 or 24 processed images, got {len(processed_images)}")
+    base_size = processed_images[0].size
+    for idx, img in enumerate(processed_images):
+        if not isinstance(img, Image.Image):
+            raise HTTPException(status_code=500, detail=f"Frame {idx+1} is not a valid image: {type(img)}")
+        if img.size != base_size:
+            raise HTTPException(status_code=500, detail=f"Frame {idx+1} size {img.size} does not match first frame size {base_size}")
+
+    import tempfile, os
+    frame_buffers = []
+    for idx, img in enumerate(processed_images):
+        buf = io.BytesIO()
+        img.save(buf, format="WEBP")
+        buf.seek(0)
+        frame_buffers.append(buf)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        frame_paths = []
+        for idx, buf in enumerate(frame_buffers):
+            frame_path = os.path.join(tmpdir, f"frame_{idx:03d}.webp")
+            with open(frame_path, "wb") as f:
+                f.write(buf.read())
+            frame_paths.append(frame_path)
+        gif_path = os.path.join(tmpdir, "output.gif")
+        # Use ImageMagick to create a high-quality GIF
+        delay = 17 if len(processed_images) == 12 else 8
+        convert_cmd = [
+            "convert",
+            "-delay", str(delay),
+            "-loop", "0",
+            *frame_paths,
+            "-layers", "OptimizeTransparency",
+            gif_path
+        ]
+        try:
+            subprocess.run(convert_cmd, check=True)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"ImageMagick GIF encoding failed: {e}")
+        with open(gif_path, "rb") as f:
+            gif_bytes = f.read()
+
+    key = f"gifs/{userId}/{userGifRequestId}/final.gif"
+    try:
+        res = supabase.storage.from_(SUPABASE_BUCKET).upload(
+            key,
+            gif_bytes,
+            file_options={"content-type": "image/gif", "upsert": "true"}
+        )
+        signed = supabase.storage.from_(SUPABASE_BUCKET).create_signed_url(key, 631152000)
+        signed_url = signed.get("signedURL") or signed.get("signed_url") or signed.get("url")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Supabase upload failed: {e}")
+
+    return JSONResponse({
+        "status": "SUCCESS",
+        "gifUrl": signed_url,
+        "key": key
+    })
+

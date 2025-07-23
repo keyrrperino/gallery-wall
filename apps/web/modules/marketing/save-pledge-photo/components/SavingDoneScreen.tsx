@@ -1,14 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import SimpleButton from "@marketing/home/components/Button";
+import clsx from "clsx";
 
 export default function SavingDoneScreen() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '?';
 
   const handleContinue = () => {
-    router.push("/receive-pledge-copy");
+    // router.push("/receive-pledge-copy" + additionUrl);
+    router.push("/" + additionUrl);
   };
 
   return (
@@ -18,7 +23,7 @@ export default function SavingDoneScreen() {
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }} // fades in over 1s
     >
-      <h2 className="font-text-bold text-[130px] uppercase">
+      <h2 className="font-text-bold text-[100px] md:text-[130px] uppercase">
         Look up!
       </h2>
       <p className="text-[2vw] text-center mb-24 mx-[15vw] leading-tight">
@@ -27,7 +32,19 @@ export default function SavingDoneScreen() {
       </p>
 
         <SimpleButton
-          className="absolute bottom-20 self-center mt-10 text-[4vw] text-white py-[2vh] px-[10vh] rounded-full font-bold"
+          className={clsx(
+            "fixed",
+            "mt-5",
+            "bottom-[3vh]",
+            "self-center",
+            "text-white",
+            "rounded-full font-bold",
+            "pt-[2vh] md:pt-[3vh]",
+            "pb-[2vh] md:pb-[3vh]",
+            "pr-[11vw]",
+            "pl-[11vw]",
+            "text-[3vh]"
+          )}
           onClick={handleContinue}
         >
           CONTINUE

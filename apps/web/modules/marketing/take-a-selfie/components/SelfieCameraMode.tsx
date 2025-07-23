@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Webcam from "react-webcam";
 import { Cross2Icon } from "@radix-ui/react-icons";
 
@@ -32,6 +32,9 @@ type SelfieCameraModePropType = {
 export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGifRequestId }: SelfieCameraModePropType) {
   const router = useRouter();
   const { user, getGifUrl } = useUser();
+  const searchParams = useSearchParams();
+  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '';
 
   const webcamRef = useRef<Webcam | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -67,7 +70,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
 
   useEffect(() => {
     if (user !== null && !user?.name) {
-      router.push("/");
+      router.push("/" + additionUrl);
     }
   }, [user]);
 
@@ -178,7 +181,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
       formData.append("targetHeight", `${height}`);
       formData.append("pledge", pledge);
 
-      getGifUrl(formData).then(() => {
+      getGifUrl(formData, noRemoveBackground ? true : false).then(() => {
         console.log("success");
       }).catch(() => {
         console.log("error");
@@ -277,7 +280,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
   const videoConstraints = { facingMode: "user" };
 
   return (
-    <div className="bg-black h-full w-full flex flex-col items-center justify-end">
+    <div className="bg-black h-full w-full flex flex-col items-center">
       {hasError && (
         <Modal isOpen>
           <div className="text-center text-4xl font-bold text-white">
@@ -288,10 +291,10 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
       )}
 
       {/* HEADER */}
-      <div className="relative top-0 flex w-full items-center justify-between py-4 font-text-bold text-white">
-        <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8">
+      <div className="relative top-0 flex w-full items-center justify-between py-[1vh] font-text-bold text-white">
+        <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-[1vh]">
           <div></div>
-          <h1 className="text-4xl md:text-[4vw] text-center font-text-bold uppercase leading-[0.75]">TAKE YOUR VIDEO SELFIE!</h1>
+          <h1 className="text-[3vh] md:text-[4vw] text-center font-text-bold uppercase leading-[1]">TAKE YOUR VIDEO SELFIE!</h1>
           <button onClick={onExit}>
             <Cross2Icon className="w-8 h-8 md:w-[3vw] md:h-[3vw] text-white"/>
           </button>
@@ -299,10 +302,10 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
       </div>
 
       {/* CAMERA AREA */}
-      <div className="flex size-full flex-col items-center justify-start">
+      <div className="flex flex-col items-center justify-start">
         {!previewUrl ? (
-          <div className="flex size-full items-center justify-center">
-            <div className="relative aspect-square w-[90vw] md:w-auto md:h-full border-[20px] border-white flex items-center justify-center">
+          <div className="flex size-full items-center justify-center w-screen">
+            <div className="relative aspect-square w-[40vh] lg:w-[40vw] h-auto lg:h-[40vw] border-[1.5vh] border-white flex items-center justify-center">
               <div className="absolute inset-0 h-full w-full">
                 {isCounting && (
                   <div className="absolute inset-0 h-full w-full bg-black/80 z-10 pointer-events-none" />
@@ -325,8 +328,8 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
             </div>
           </div>
         ) : (
-          <div className="flex size-full items-center justify-center">
-            <div className="relative aspect-square w-[90vw] md:w-auto md:h-full border-[20px] border-white justify-center gap-4">
+          <div className="flex size-full items-center justify-center w-screen">
+            <div className="relative aspect-square w-[40vh] lg:w-[40vw] h-auto lg:h-[40vw] border-[1.5vh] border-white flex items-center justify-center">
               
                 {previewUrl && 
                   <video
@@ -346,9 +349,9 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
       </div>
 
       {/* BOTTOM BUTTONS */}
-      <div className="flex h-1/3 w-full items-center justify-center bg-black/75">
+      <div className="flex w-full justify-center bg-black/75 mt-[3vh]">
         {!isCounting && !videoTaken && !isRecording ? (
-          <SnapButton onClick={capture} size="w-[2vh]" />
+          <SnapButton onClick={capture} size="w-[2vh] md:w-[1vh]" />
         ) : (
           <div className="flex w-full">
             {previewUrl && videoTaken && (

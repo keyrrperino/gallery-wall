@@ -1,4 +1,5 @@
 import SimpleButton from "@marketing/home/components/Button";
+import clsx from "clsx";
 import React from "react";
 
 type MainSelfiePagePropsType = {
@@ -23,15 +24,27 @@ export default function MainSelfiePage({ onStart }: MainSelfiePagePropsType) {
       <div className="bg-[#f7f0e8] text-base md:text-[2vw] p-4 md:p-10 rounded mt-6 text-[#555] leading-[1]">
         Don&apos;t worry, your video is only used to generate the GIF and is not saved or shared. Only the final GIF will appear on the pledge wall and be sent to you.
       </div>
+
+      <div className="">
+      <button className="text-4xl w-full md:text-[4vw] h-[50px] font-text-bold uppercase leading-[0.75]">
+          &nbsp;
+        </button>
+      </div>
+
       <SimpleButton
-          className="
-            absolute bottom-[clamp(40px,7.5vh,160px)] self-center mt-10
-            text-[clamp(2rem,3vw,4rem)]
-            text-white
-            py-[clamp(0.55rem,1.5vw,2rem)]
-            px-[clamp(2rem,10vw,12rem)]
-            rounded-full font-bold z-10
-          "
+        className={clsx(
+          "fixed",
+          "mt-5",
+          "bottom-[3vh]",
+          "self-center",
+          "text-white",
+          "rounded-full font-bold",
+          "pt-[2vh] md:pt-[3vh]",
+          "pb-[2vh] md:pb-[3vh]",
+          "pr-[11vw]",
+          "pl-[11vw]",
+          "text-[3vh]"
+        )}
           onClick={onStart}
       >
         TAKE A SELFIE
