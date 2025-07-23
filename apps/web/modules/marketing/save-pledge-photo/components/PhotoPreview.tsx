@@ -12,8 +12,8 @@ export default function PhotoPreview({
   gifUrl: string;
 }) {
   return (
-    <div className="flex w-full h-full flex-col items-center bg-white gap-3 relative mr-3 ml-3">
-      <h2 className="font-text-bold text-[5.5vh] md:text-[4vw] uppercase mr-3 ml-3">
+    <div className="flex w-full h-full flex-col items-center bg-white gap-2 relative mr-3 ml-3">
+      <h2 className="font-text-bold text-[5vh] md:text-[4vw] uppercase mr-3 ml-3">
         Here&apos;s your unique pledge photo!
       </h2>
 
@@ -27,7 +27,7 @@ export default function PhotoPreview({
         </div>
       </div>
 
-      <div className="flex flex-row gap-[5vw]">
+      <div className="flex flex-row pb-[20px] gap-[5vw]">
         <SimpleButton
           onClick={onRetake}
           className="text-[3vw] text-[#20409A] font-text-bold bg-transparent uppercase py-[3vh]"

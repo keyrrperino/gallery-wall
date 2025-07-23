@@ -98,12 +98,12 @@ export default function PinEntry() {
       </div>
 
       {/* Description */}
-      <p className="text-[3vh] leading-[1] text-center">
+      <p className="text-[2.5vh] leading-[1] text-center">
         Please wait while we make sure your selfie is safe to send to the
         gallery wall.
       </p>
 
-      <div className="flex flex-col md:flex-row gap-[3vw] mt-[3vh]">
+      <div className="flex flex-col sm:flex-row md:flex-row gap-[3vw] mt-[3vh]">
         {/* Left side - image */}
         <div className="flex flex-col items-center">
           <div className="w-[30vh] h-[30vh] bg-gray-200 overflow-hidden rounded-md shadow-md">

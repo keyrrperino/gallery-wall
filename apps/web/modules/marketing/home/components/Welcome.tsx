@@ -121,7 +121,7 @@ export default function HomePage() {
 
       <SimpleButton
         className={clsx(
-          "md:absolute",
+          "lg:absolute",
           "bottom-[5vh] md:bottom-[3vh]",
           "self-center",
           "text-white",

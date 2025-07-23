@@ -53,7 +53,7 @@ export default function LoadingScreen() {
   return (
     <div className="h-full w-full overflow-hidden bg-white flex flex-col items-center justify-between relative">
       {/* TOP BAR */}
-      <div className="top-0 flex w-full items-center justify-end h-80 px-16 font-text-bold text-black bg-transparent">
+      <div className="top-0 flex w-full items-center justify-end mt-3 px-16 font-text-bold text-black bg-transparent">
         <ExitButton />
       </div>
 

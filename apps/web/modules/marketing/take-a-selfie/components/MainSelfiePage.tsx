@@ -35,7 +35,7 @@ export default function MainSelfiePage({ onStart }: MainSelfiePagePropsType) {
         className={clsx(
           "fixed",
           "mt-5",
-          "bottom-[3vh]",
+          "bottom-[5vh]",
           "self-center",
           "text-white",
           "rounded-full font-bold",
