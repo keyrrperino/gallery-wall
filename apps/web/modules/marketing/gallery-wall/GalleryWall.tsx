@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { RequestStatusSchema } from "../../../../../packages/database";
+import { getBase64VersionDate } from "utils";
 
 export const GalleryWall: React.FC = () => {
   const [images, setImages] = useState<{ id: string; gifUrl: string; isShowed: boolean }[]>([]);
@@ -164,7 +165,7 @@ export const GalleryWall: React.FC = () => {
               <img
                 key={img.id}
                 ref={(el: HTMLImageElement | null) => { imgRefs.current[idx] = el; }}
-                src={img.gifUrl}
+                src={`${img.gifUrl}&v=${getBase64VersionDate()}`}
                 draggable={false}
                 alt="Gallery"
                 className="cursor-none w-[200px] h-auto object-cover"

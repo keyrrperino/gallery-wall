@@ -82,3 +82,8 @@ export const convertImageUrlToBase64 = async (imageUrl: string) => {
     return null;
   }
 }
+
+export function getBase64VersionDate() {
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  return btoa(date);
+}
