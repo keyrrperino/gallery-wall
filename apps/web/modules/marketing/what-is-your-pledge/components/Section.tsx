@@ -7,9 +7,9 @@ const PLEDGES: {
   image: string;
   style: PledgeStyleEnum;
 }[] = [
-  { image: "/images/frames/Poster 1.svg", style: PledgeStyleEnum.SUPPORT },
-  { image: "/images/frames/Poster 2.svg", style: PledgeStyleEnum.FUTURE },
-  { image: "/images/frames/Poster 3.svg", style: PledgeStyleEnum.CARE },
+  { image: "/images/frames/Frame 1.svg", style: PledgeStyleEnum.SUPPORT },
+  { image: "/images/frames/Frame 2.svg", style: PledgeStyleEnum.FUTURE },
+  { image: "/images/frames/Frame 3.svg", style: PledgeStyleEnum.CARE },
 ];
 
 export default function PickAFrame({
