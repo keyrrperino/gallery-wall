@@ -12,7 +12,7 @@ export function PledgeCard({
   style: PledgeStyleEnum;
   active?: boolean;
 }) {
-  if (style === PledgeStyleEnum.PROTECTOR) {
+  if (style === PledgeStyleEnum.SUPPORT) {
     return (
       <div className="w-[600px] h-[691px] flex flex-col items-center bg-[#cfab88] p-3 leading-none gap-5">
         <div className="bg-[#F7EBDF] h-[75%] w-full"></div>

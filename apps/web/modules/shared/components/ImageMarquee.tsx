@@ -1,36 +1,40 @@
-import { motion } from "framer-motion";
-import { useRef, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import AutoScroll from "embla-carousel-auto-scroll";
+
+import { useCallback, useEffect } from "react";
 
 const defaultImages = [
-  "/images/stickers/image 1.png",
-  "/images/stickers/image 2.png",
-  "/images/stickers/image 3.png",
-  "/images/stickers/image 4.png",
-  "/images/stickers/image 5.png",
-  "/images/stickers/image 6.png",
-  "/images/stickers/image 7.png",
-  "/images/stickers/image 8.png",
-  "/images/stickers/image 9.png",
-  "/images/stickers/image 10.png",
+  "/images/stickers/image-1.webp",
+  "/images/stickers/image-2.webp",
+  "/images/stickers/image-3.webp",
+  "/images/stickers/image-4.webp",
+  "/images/stickers/image-5.webp",
 ];
 
 export function ImageMarquee() {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const [controls, setControls] = useState({ x: 0 });
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      dragFree: false,
+      skipSnaps: true,
+      containScroll: false,
+    },
+    [AutoScroll({ playOnInit: true })]
+  );
 
   const images = defaultImages;
+
   return (
-    <div className="relative w-full overflow-hidden pt-[3vh]">
-      <motion.div
-        ref={rowRef}
-        animate={controls}
-        className="flex gap-[5vw] w-max"
-        style={{ x: 0 }}
-      >
-        {[...images, ...images].map((src, idx) => (
-          <img key={idx} src={src} alt="" className="h-[20vh] w-auto" />
-        ))}
-      </motion.div>
+    <div className="relative w-screen overflow-hidden">
+      <div className="embla" ref={emblaRef}>
+        <div className="embla__container flex gap-[5vw]">
+          {[...images, ...images, ...images].map((src, idx) => (
+            <div key={idx} className="embla__slide flex-[0_0_auto]">
+              <img src={src} alt="" className="h-[25vh] w-auto" />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

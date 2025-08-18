@@ -19,41 +19,15 @@ export default function HomePage() {
     ? `?noRemoveBackground=${noRemoveBackground}`
     : "";
 
-  const rowRef = useRef<HTMLDivElement>(null);
-  const controls = useAnimation();
-  const [rowWidth, setRowWidth] = useState(0);
-
-  useEffect(() => {
-    if (rowRef.current) {
-      setRowWidth(rowRef.current.scrollWidth / 2); // Only the width of one set
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!rowWidth) return;
-    const animate = async () => {
-      while (true) {
-        await controls.start({
-          x: -rowWidth,
-          transition: { duration: 20, ease: "linear" },
-        });
-        controls.set({ x: 0 });
-      }
-    };
-    controls.set({ x: 0 });
-    animate();
-    // eslint-disable-next-line
-  }, [rowWidth]);
-
   return (
-    <div className="relative bg-[#F7EBDF]">
-      <Logo className="absolute w-full" />
-      <Background />
+    <div className="relative h-full flex flex-col justify-between gap-20 pb-20 bg-[#F7EBDF]">
+      <Logo />
+      <ImageMarquee />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="relative gap-10 pb-20 px-[100px] flex flex-col justify-end items-center text-black min-h-screen w-full overflow-hidden"
+        className="relative gap-10 pb-20 px-[100px] flex flex-col flex-1 items-center text-black w-full overflow-hidden"
       >
         {/* Main content */}
         <h1 className="text-[7vh] font-text-bold uppercase text-center leading-[1]">
@@ -67,14 +41,13 @@ export default function HomePage() {
           photo to share with the world and be part of a live pledge wall
           growing with every submission.
         </p>
-
-        <SimpleButton
-          className="self-center text-white rounded-full font-bold py-[26px] text-[32px] w-[400px] mx-auto"
-          onClick={() => router.push(`/pledge-a-photo${additionUrl}`)}
-        >
-          BEGIN
-        </SimpleButton>
       </motion.div>
+      <SimpleButton
+        className="self-center text-white rounded-full font-bold py-[26px] text-[32px] w-[400px] mx-auto"
+        onClick={() => router.push(`/pledge-a-photo${additionUrl}`)}
+      >
+        BEGIN
+      </SimpleButton>
     </div>
   );
 }

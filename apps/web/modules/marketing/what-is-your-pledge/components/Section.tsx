@@ -12,7 +12,7 @@ const PLEDGES: {
   style: PledgeStyleEnum;
 }[] = [
   {
-    style: PledgeStyleEnum.PROTECTOR,
+    style: PledgeStyleEnum.SUPPORT,
     bottomText: (
       <>
         I'M A<br />
