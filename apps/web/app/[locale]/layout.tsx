@@ -22,27 +22,6 @@ export const metadata: Metadata = {
   },
 };
 
-const sansFont = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const buttonBaseFont = localFont({
-  src: "../../public/fonts/DINPro-CondBlack.otf",
-  variable: "--font-button-base",
-});
-
-const H1Font = localFont({
-  src: "../../public/fonts/Brothers-Bold.otf",
-  variable: "--h1-bold",
-});
-
-const H1RegularFont = localFont({
-  src: "../../public/fonts/Brothers-Regular.otf",
-  variable: "--h1-regular",
-});
-
-
 export default async function RootLayout({
   children,
   params,
@@ -62,8 +41,7 @@ export default async function RootLayout({
     <html lang={locale}>
       <body
         className={cn(
-          "bg-background text-foreground min-h-screen font-sans antialiased overscroll-none overflow-hidden",
-          sansFont.variable, buttonBaseFont.variable, H1Font.variable, H1RegularFont.variable
+          "bg-background text-foreground min-h-screen font-sans antialiased overscroll-none overflow-hidden"
         )}
       >
         <NextTopLoader color="var(--colors-primary)" />

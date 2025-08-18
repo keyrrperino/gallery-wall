@@ -2,14 +2,41 @@ import { PledgeSlider } from "./PledgeSlider";
 import SimpleButton from "@marketing/home/components/Button";
 import { PledgeStyleEnum } from "../types";
 import clsx from "clsx";
+import { cn } from "@ui/lib";
+import { ReactNode } from "react";
+import { PledgeSliderV2 } from "./PledgeSliderV2";
 
 const PLEDGES: {
-  image: string;
+  topText?: ReactNode | string;
+  bottomText?: ReactNode | string;
   style: PledgeStyleEnum;
 }[] = [
-  { image: "/images/frames/Frame 1.svg", style: PledgeStyleEnum.SUPPORT },
-  { image: "/images/frames/Frame 2.svg", style: PledgeStyleEnum.FUTURE },
-  { image: "/images/frames/Frame 3.svg", style: PledgeStyleEnum.CARE },
+  {
+    style: PledgeStyleEnum.PROTECTOR,
+    bottomText: (
+      <>
+        I'M A<br />
+        COASTAL PROTECTOR
+      </>
+    ),
+  },
+  {
+    style: PledgeStyleEnum.FUTURE,
+    topText: "I SUPPORT",
+    bottomText: "OUR COASTAL FUTURE",
+  },
+  {
+    style: PledgeStyleEnum.CARE,
+    bottomText: (
+      <>
+        <span className="text-[46px]">I STAND</span>
+        <br />
+        <span className="text-[28px]">FOR STRONG</span>
+        <br />
+        <span className="text-[46px]">SHORES</span>
+      </>
+    ),
+  },
 ];
 
 export default function PickAFrame({
@@ -26,32 +53,23 @@ export default function PickAFrame({
   };
 
   return (
-    <div className="flex flex-col items-start bg-white text-black h-full w-full px-[5vw]">
-      <h1 className="
-        text-[3vh] md:text-[4vh]
-        font-text-bold uppercase
-      ">
-        CHOOSE YOUR PLEDGE FRAME
-      </h1>
-      <p className="text-[3vh] mt-[2vh] mb-[3vh] leading-[1]">
-        Tap one to select.
-      </p>
-      <PledgeSlider pledges={PLEDGES} selected={selected} onPick={handlePick} />
-
+    <div className="flex flex-col items-start justify-between overflow-hidden bg-white text-black h-full w-full">
+      <div className="flex flex-col gap-9 px-10">
+        <h1 className="font-text-bold text-[80px] uppercase -tracking-[1.6px] leading-[100%]">
+          PICK A FRAME AND YOUR PLEDGE MESSAGE
+        </h1>
+        <p className="text-2xl text-black/70 leading-[150%]">
+          Choose one pledge to appear with your frame!
+        </p>
+      </div>
+      {/* <PledgeSlider pledges={PLEDGES} selected={selected} onPick={handlePick} /> */}
+      <PledgeSliderV2
+        pledges={PLEDGES}
+        selected={selected}
+        onPick={handlePick}
+      />
       <SimpleButton
-        className={clsx(
-          "fixed",
-          "mt-5",
-          "bottom-[5vh]",
-          "self-center",
-          "text-white",
-          "rounded-full font-bold",
-          "pt-[2vh] md:pt-[3vh]",
-          "pb-[2vh] md:pb-[3vh]",
-          "pr-[11vw]",
-          "pl-[11vw]",
-          "text-[3vh]"
-        )}
+        className="self-center text-white rounded-full font-bold py-[26px] text-[32px] items-center justify-center w-[400px] mx-auto"
         disabled={selected === null}
         onClick={() => onContinue(selected)}
       >

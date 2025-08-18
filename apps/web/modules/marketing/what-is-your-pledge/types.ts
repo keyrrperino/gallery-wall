@@ -9,7 +9,7 @@ export type PlegeItemType = {
 };
 
 export enum PledgeStyleEnum {
-  SUPPORT = "support",
+  PROTECTOR = "protector",
   FUTURE = "future",
   CARE = "care",
 }

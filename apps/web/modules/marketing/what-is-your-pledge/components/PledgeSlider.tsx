@@ -1,37 +1,75 @@
 import "keen-slider/keen-slider.min.css";
-import Image from "next/image";
 import { PledgeStyleEnum } from "../types";
+import { cn } from "@ui/lib";
+import { PledgeCard } from "./PledgeCard";
+import { ReactNode, useEffect } from "react";
+import { useKeenSlider } from "keen-slider/react";
+
+const ResizePlugin = (slider) => {
+  const observer = new ResizeObserver(function () {
+    slider.update();
+  });
+
+  slider.on("created", () => {
+    observer.observe(slider.container);
+  });
+  slider.on("destroyed", () => {
+    observer.unobserve(slider.container);
+  });
+};
 
 export function PledgeSlider({
   pledges,
   selected,
   onPick,
 }: {
-  pledges: { image: string; style: PledgeStyleEnum }[];
+  pledges: {
+    topText?: ReactNode;
+    bottomText?: ReactNode;
+    style: PledgeStyleEnum;
+  }[];
   selected: PledgeStyleEnum | null;
   onPick: (val: PledgeStyleEnum) => void;
 }) {
+  const [sliderRef] = useKeenSlider(
+    {
+      slides: {
+        perView: "auto",
+        spacing: 0,
+      },
+      mode: "free-snap",
+      renderMode: "precision",
+    },
+    [ResizePlugin]
+  );
+
   return (
-    <div
-      className="w-full max-h-[1/3] grid grid-cols-2 md:grid-cols-3 gap-[2vw] pb-[80px]"
-    >
-      {pledges.map((pledge, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => onPick(pledge.style)}
-          className={`relative aspect-square w-full md:w-[27vw] md:h-[27vw] overflow-hidden transition-all duration-300
-            ${selected === pledge.style ? "ring-4 md:ring-[1vw] ring-blue-500" : ""}
-          `}
-        >
-          <Image
-            src={pledge.image}
-            alt={`Pledge ${i + 1}`}
-            fill
-            className="object-cover"
-          />
-        </button>
-      ))}
+    <div className="overflow-hidden w-full">
+      <div ref={sliderRef} className="keen-slider overflow-visible">
+        {pledges.map((pledge, i) => (
+          <div
+            className="keen-slider__slide flex justify-center items-center h-[747px] min-w-[668px] min-h-[747px] max-w-[656px] max-h-[747px]"
+            key={i}
+          >
+            <button
+              type="button"
+              onClick={() => onPick(pledge.style)}
+              className={cn(
+                "w-[600px]",
+                selected === pledge.style
+                  ? "ring-[28px] ring-[#2B90D0]/40"
+                  : "ring-0"
+              )}
+            >
+              <PledgeCard
+                style={pledge.style}
+                topText={pledge.topText}
+                bottomText={pledge.bottomText}
+              />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

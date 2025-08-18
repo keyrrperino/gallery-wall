@@ -14,6 +14,7 @@ import Modal from "@marketing/home/components/Popups/Modal";
 import { v4 } from "uuid";
 import { CountdownTimer } from "@marketing/home/components/CountdownTimer";
 import { KEY, openDB, STORE_NAME } from "../../../../lib/indexDB";
+import { Button } from "@ui/components/button";
 
 enum COUNTDOWN_TIMER_STATE {
   STARTED = "STARTED",
@@ -27,14 +28,21 @@ type SelfieCameraModePropType = {
   onGenerateGIF: (gifUrl: string, videoUrl: string) => void;
   pledge: string;
   userGifRequestId: string;
-}
+};
 
-export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGifRequestId }: SelfieCameraModePropType) {
+export default function SelfieCameraMode({
+  onExit,
+  onGenerateGIF,
+  pledge,
+  userGifRequestId,
+}: SelfieCameraModePropType) {
   const router = useRouter();
   const { user, getGifUrl } = useUser();
   const searchParams = useSearchParams();
   const noRemoveBackground = searchParams.get("noRemoveBackground");
-  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '';
+  const additionUrl = noRemoveBackground
+    ? `?noRemoveBackground=${noRemoveBackground}`
+    : "";
 
   const webcamRef = useRef<Webcam | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -93,15 +101,14 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
     setError(null);
     setRecording(true);
     setPreviewUrl(null);
-    const stream: MediaStream = webcamRef.current?.video?.srcObject as MediaStream;
+    const stream: MediaStream = webcamRef.current?.video
+      ?.srcObject as MediaStream;
     if (!stream) {
       setError("Camera not ready");
       setRecording(false);
       return;
     }
-    let options: MediaRecorderOptions = {
-      
-    };
+    let options: MediaRecorderOptions = {};
     if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
       options = { mimeType: "video/webm;codecs=vp9" };
     } else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
@@ -131,7 +138,6 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
 
       saveBlobToIndexedDB(videoBlob);
 
-
       // // Save to localStorage as Data URL
       // const reader = new FileReader();
       // reader.onload = function () {
@@ -147,105 +153,125 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
   };
 
   function saveBlobToIndexedDB(blob: Blob) {
-    openDB().then((db) => {
-      const tx = db.transaction(STORE_NAME, "readwrite");
-      tx.objectStore(STORE_NAME).put(blob, KEY);
-      return new Promise<void>((resolve, reject) => {
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        tx.objectStore(STORE_NAME).put(blob, KEY);
+        return new Promise<void>((resolve, reject) => {
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
       });
-    }).catch((error) => {
-      console.log(error);
-    });
   }
 
   const createGIF = () => {
-    captureFramesFromStream(getStream(), 2, 12).then((data: {
-      frames: Blob[];
-      width: number;
-      height: number;
-    }) => {
-      const {
-        frames,
-        width,
-        height
-      } = data;
-      // Upload frames as FormData (multipart)
-      const formData = new FormData();
-      frames.forEach((blob, i) => {
-        formData.append("images", blob, `frame${i}.webp`);
-      });
-      formData.append("userGifRequestId", userGifRequestId);
-      formData.append("userId", "1");
-      formData.append("targetWidth", `${width}`);
-      formData.append("targetHeight", `${height}`);
-      formData.append("pledge", pledge);
+    captureFramesFromStream(getStream(), 2, 12)
+      .then((data: { frames: Blob[]; width: number; height: number }) => {
+        const { frames, width, height } = data;
+        // Upload frames as FormData (multipart)
+        const formData = new FormData();
+        frames.forEach((blob, i) => {
+          formData.append("images", blob, `frame${i}.webp`);
+        });
+        formData.append("userGifRequestId", userGifRequestId);
+        formData.append("userId", "1");
+        formData.append("targetWidth", `${width}`);
+        formData.append("targetHeight", `${height}`);
+        formData.append("pledge", pledge);
 
-      getGifUrl(formData, noRemoveBackground ? true : false).then(() => {
-        console.log("success");
-      }).catch(() => {
-        console.log("error");
+        getGifUrl(formData, noRemoveBackground ? true : false)
+          .then(() => {
+            console.log("success");
+          })
+          .catch(() => {
+            console.log("error");
+          });
+      })
+      .catch(() => {
+        setError("Failed to upload frames");
       });
-    }).catch(() => {
-      setError("Failed to upload frames");
-    });
   };
 
-  const captureFramesFromStream = (stream: MediaStream | null, duration = 2, fps = 12) => {
+  const captureFramesFromStream = (
+    stream: MediaStream | null,
+    duration = 2,
+    fps = 12
+  ) => {
     return new Promise((resolve, reject) => {
-        const video = document.createElement("video");
-        video.srcObject = stream;
-        video.play().then(() => {
-        // Always use 672x672 (square)
-        const newWidth = 672;
-        const newHeight = 672;
-        const canvas = document.createElement("canvas");
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          resolve({ frames: [], width: newWidth, height: newHeight });
-          return;
-        }
-
-        const frames: Blob[] = [];
-        let count = 0;
-        const totalFrames = duration * fps;
-
-        const interval = setInterval(() => {
-          // Center crop the video to a 1:1 aspect ratio before resizing
-          const vW = video.videoWidth;
-          const vH = video.videoHeight;
-          let sx = 0, sy = 0, sWidth = vW, sHeight = vH;
-          if (vW > vH) {
-            // Landscape: crop left/right
-            sx = Math.floor((vW - vH) / 2);
-            sWidth = vH;
-          } else if (vH > vW) {
-            // Portrait: crop top/bottom
-            sy = Math.floor((vH - vW) / 2);
-            sHeight = vW;
+      const video = document.createElement("video");
+      video.srcObject = stream;
+      video
+        .play()
+        .then(() => {
+          // Always use 672x672 (square)
+          const newWidth = 672;
+          const newHeight = 672;
+          const canvas = document.createElement("canvas");
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve({ frames: [], width: newWidth, height: newHeight });
+            return;
           }
-          ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, newWidth, newHeight);
-          new Promise<Blob | null>((res) => {
-            return canvas.toBlob(res, "image/webp", 1)
-          }).then((blob) => {
-            if (blob) {
-              frames.push(blob);
+
+          const frames: Blob[] = [];
+          let count = 0;
+          const totalFrames = duration * fps;
+
+          const interval = setInterval(() => {
+            // Center crop the video to a 1:1 aspect ratio before resizing
+            const vW = video.videoWidth;
+            const vH = video.videoHeight;
+            let sx = 0,
+              sy = 0,
+              sWidth = vW,
+              sHeight = vH;
+            if (vW > vH) {
+              // Landscape: crop left/right
+              sx = Math.floor((vW - vH) / 2);
+              sWidth = vH;
+            } else if (vH > vW) {
+              // Portrait: crop top/bottom
+              sy = Math.floor((vH - vW) / 2);
+              sHeight = vW;
             }
-            count++;
-            if (count >= totalFrames) {
-              clearInterval(interval);
-              video.pause();
-              resolve({ frames, width: newWidth, height: newHeight });
-            }
-          }).catch(reject);
-        }, 1000 / fps);  
-      }).catch((error) => {
-        reject(error);
-      });
+            ctx.drawImage(
+              video,
+              sx,
+              sy,
+              sWidth,
+              sHeight,
+              0,
+              0,
+              newWidth,
+              newHeight
+            );
+            new Promise<Blob | null>((res) => {
+              return canvas.toBlob(res, "image/webp", 1);
+            })
+              .then((blob) => {
+                if (blob) {
+                  frames.push(blob);
+                }
+                count++;
+                if (count >= totalFrames) {
+                  clearInterval(interval);
+                  video.pause();
+                  resolve({ frames, width: newWidth, height: newHeight });
+                }
+              })
+              .catch(reject);
+          }, 1000 / fps);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
-  }
+  };
 
   const handleCountdownEnd = async () => {
     setIsCounting(false);
@@ -263,7 +289,7 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
   const generateFace = () => {
     setCountdownState(COUNTDOWN_TIMER_STATE.PAUSE);
     setIsCounting(false);
-    
+
     if (previewUrl) {
       onGenerateGIF(imageUrl ?? "", previewUrl);
     }
@@ -293,83 +319,83 @@ export default function SelfieCameraMode({ onExit, onGenerateGIF, pledge, userGi
       {/* HEADER */}
       <div className="relative top-0 flex w-full items-center justify-between py-[1vh] font-text-bold text-white">
         <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-[1vh]">
-          <div></div>
-          <h1 className="text-[3vh] md:text-[4vw] text-center font-text-bold uppercase leading-[1]">TAKE YOUR VIDEO SELFIE!</h1>
-          <button onClick={onExit}>
-            <Cross2Icon className="w-8 h-8 md:w-[3vw] md:h-[3vw] text-white"/>
-          </button>
+          <Button onClick={onExit} variant="ghost" asChild size="icon">
+            <Cross2Icon className="w-12 h-12 text-white" />
+          </Button>
+          <h1 className="text-[3vh] md:text-[4vw] text-center font-text-bold uppercase leading-[1]">
+            TAKE YOUR VIDEO SELFIE!
+          </h1>
+          <div className="w-12 h-12"></div>
         </div>
       </div>
 
       {/* CAMERA AREA */}
       <div className="flex flex-col items-center justify-start">
         {!previewUrl ? (
-          <div className="flex size-full items-center justify-center w-screen">
-            <div className="relative aspect-square w-[40vh] lg:w-[40vw] h-auto lg:h-[40vw] border-[1.5vh] border-white flex items-center justify-center">
-              <div className="absolute inset-0 h-full w-full">
-                {isCounting && (
-                  <div className="absolute inset-0 h-full w-full bg-black/80 z-10 pointer-events-none" />
-                )}
-                <Webcam
-                  ref={webcamRef}
-                  audio={false}
-                  mirrored={true}
-                  videoConstraints={videoConstraints}
-                  className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? "hidden" : ""}`}
-                />
-              </div>
+          <div className="relative aspect-square w-screen flex items-center justify-center">
+            <div className="absolute inset-0 h-full w-full">
               {isCounting && (
-                <CountdownTimer
-                  key={isCountingKey}
-                  initialCount={3}
-                  onEnd={handleCountdownEnd}
-                />
+                <div className="absolute inset-0 h-screen w-full bg-black/80 z-10 pointer-events-none" />
               )}
+              <Webcam
+                ref={webcamRef}
+                audio={false}
+                mirrored={true}
+                videoConstraints={videoConstraints}
+                className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? "hidden" : ""}`}
+              />
             </div>
+            {isCounting && (
+              <CountdownTimer
+                key={isCountingKey}
+                initialCount={3}
+                onEnd={handleCountdownEnd}
+              />
+            )}
           </div>
         ) : (
           <div className="flex size-full items-center justify-center w-screen">
-            <div className="relative aspect-square w-[40vh] lg:w-[40vw] h-auto lg:h-[40vw] border-[1.5vh] border-white flex items-center justify-center">
-              
-                {previewUrl && 
-                  <video
-                    src={previewUrl}
-                    ref={previewVideoRef}
-                    className="size-full absolute inset-0 h-full w-full object-cover"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  >
-                    <track kind="captions" />
-                  </video>}
+            <div className="relative aspect-square w-screen flex items-center justify-center">
+              {previewUrl && (
+                <video
+                  src={previewUrl}
+                  ref={previewVideoRef}
+                  className="size-full absolute inset-0 h-full w-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                >
+                  <track kind="captions" />
+                </video>
+              )}
             </div>
           </div>
         )}
       </div>
 
       {/* BOTTOM BUTTONS */}
-      <div className="flex w-full justify-center bg-black/75 mt-[3vh]">
+      <div className="flex w-full justify-center bg-black/75 items-center h-full">
         {!isCounting && !videoTaken && !isRecording ? (
           <SnapButton onClick={capture} size="w-[2vh] md:w-[1vh]" />
         ) : (
           <div className="flex w-full">
             {previewUrl && videoTaken && (
-              <div className="flex flex-row w-full items-center justify-around gap-4 py-8">
-                <div></div>
+              <div className="flex flex-row w-full h-full items-center justify-between px-20 py-8">
                 <button
-                  className="font-text-bold text-white text-2xl md:text-[clamp(2rem,3vw,4rem)]"
+                  className="font-text-bold text-white text-[32px]"
                   onClick={retake}
                 >
                   RETAKE
                 </button>
                 <button
-                  className="font-text-bold text-white text-2xl md:text-[clamp(2rem,3vw,4rem)]"
-                  onClick={() => {generateFace();}}
+                  className="font-text-bold text-white text-[32px]"
+                  onClick={() => {
+                    generateFace();
+                  }}
                 >
                   USE THIS SELFIE {">"}
                 </button>
-                <div></div>
               </div>
             )}
           </div>

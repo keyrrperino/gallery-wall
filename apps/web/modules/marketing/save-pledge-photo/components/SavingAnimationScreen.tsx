@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function SavingAnimationScreen({
   onComplete,
-  gifUrl
+  gifUrl,
 }: {
   onComplete: () => void;
   gifUrl: string;
@@ -40,11 +40,11 @@ export default function SavingAnimationScreen({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.3 }}
-            className="absolute inset-0 flex items-center justify-center z-50"
+            className="flex items-center justify-center z-50"
           >
-            <div className="text-[20vh] md:text-[25vw] font-text-bold text-white -mt-24">
+            <span className="text-[100px] font-text-bold text-black -mt-24">
               {countdown}
-            </div>
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -59,11 +59,11 @@ export default function SavingAnimationScreen({
             : {}
         }
       >
-        <div className="w-[35vh] md:w-[25vw] md:w-[35vw] h-[35vh] md:h-[25vw] lg:h-[35vw] bg-gray-200 overflow-hidden rounded-md shadow-md -mt-24">
+        <div className="w-[560px] h-[651px] bg-gray-200 overflow-hidden rounded-md shadow-md -mt-24">
           <img
             src={gifUrl}
             alt="saving selfie"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
       </motion.div>

@@ -13,18 +13,23 @@ import ExitButton from "@marketing/shared/components/ExitButton";
 import { PledgeStyleEnum } from "@marketing/what-is-your-pledge/types";
 import { supabase } from "../../../lib/supabaseClient";
 import { RequestStatusSchema } from "../../../../../packages/database";
+import { Button } from "./button";
 
 export default function MainSlider() {
   // SLIDE STATE
   const searchParams = useSearchParams();
   const noRemoveBackground = searchParams.get("noRemoveBackground");
-  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '?';
+  const additionUrl = noRemoveBackground
+    ? `?noRemoveBackground=${noRemoveBackground}`
+    : "?";
   const [slide, setSlide] = useState(1);
   const totalSlides = 3;
 
   // DATA STATE
   const [selectedFeelings, setSelectedFeelings] = useState<string[]>([]);
-  const [selectedPledge, setSelectedPledge] = useState<PledgeStyleEnum | null>(null);
+  const [selectedPledge, setSelectedPledge] = useState<PledgeStyleEnum | null>(
+    null
+  );
   const [isCameraMode, setIsCameraMode] = useState(false);
   const [userGifRequestId, setUserGifRequestId] = useState<string | null>(null);
 
@@ -63,28 +68,30 @@ export default function MainSlider() {
           requestStatus: RequestStatusSchema.enum.PENDING,
           userId: "1",
           createdAt: new Date().toISOString(), // optional if your DB has a default
-        }
+        },
       ])
       .select("id");
 
-      const userGifRequests = data.data ?? [];
-        if (data.status === 201 && userGifRequests?.length > 0) {
-          setUserGifRequestId(userGifRequests[0].id as string);
-          setIsCameraMode(true);
-        }
-  }
+    const userGifRequests = data.data ?? [];
+    if (data.status === 201 && userGifRequests?.length > 0) {
+      setUserGifRequestId(userGifRequests[0].id as string);
+      setIsCameraMode(true);
+    }
+  };
 
   const onGenerateGIF = async (gifUrl: string, videoUrl: string) => {
     await supabase
       .from("UserGifRequest")
       .update({
         requestStatus: RequestStatusSchema.Enum.PROCESSING,
-        gifUrl
+        gifUrl,
       })
       .eq("id", userGifRequestId);
 
-      router.push(`/enter-pin-code${additionUrl}&videoUrl=${videoUrl}&gif=${gifUrl}&userGifRequestId=${userGifRequestId}`);
-  }
+    router.push(
+      `/enter-pin-code${additionUrl}&videoUrl=${videoUrl}&gif=${gifUrl}&userGifRequestId=${userGifRequestId}`
+    );
+  };
 
   // When we reach slide 3, log both (only once on transition)
   if (slide === 3) {
@@ -93,55 +100,55 @@ export default function MainSlider() {
     console.log("Selected Pledge:", selectedPledge);
     console.log("Selected userGifRequestId:", userGifRequestId);
   }
-    
-  if (isCameraMode) {
-    return <SelfieCameraMode
-      onExit={() => setIsCameraMode(false)}
-      onGenerateGIF={onGenerateGIF}
-      pledge={selectedPledge ?? "support"}
-      userGifRequestId={userGifRequestId ?? ""}
-    />;
-  }
 
+  if (isCameraMode) {
+    return (
+      <SelfieCameraMode
+        onExit={() => setIsCameraMode(false)}
+        onGenerateGIF={onGenerateGIF}
+        pledge={selectedPledge ?? "support"}
+        userGifRequestId={userGifRequestId ?? ""}
+      />
+    );
+  }
 
   const slides = {
-    1: <>
-        <h1 className="
-          text-[3vh] md:text-[4vh]
-          font-text-bold uppercase
-        ">
+    1: (
+      <div className="flex flex-col gap-9">
+        <h1 className="font-text-bold font-bold text-[80px] uppercase -tracking-[1.6px] leading-[100%]">
           HOW DO YOU FEEL ABOUT COASTAL PROTECTION IN SINGAPORE NOW?
         </h1>
-        <p className="text-[2vh] md:text-[4vh] mt-[2vh] mb-[3vh] leading-[1]">
-        Select up to 3 that apply.
+        <p className="text-2xl text-black/70 leading-[150%]">
+          Select up to 3 that apply.
         </p>
-      </>,
-    2: <>
-
-    </>,
-    3: null
-  }
+      </div>
+    ),
+    2: <></>,
+    3: null,
+  };
 
   return (
-    <div className="relative h-screen w-screen bg-white text-black">
+    <div className="relative h-screen w-screen bg-white text-black flex flex-col">
       {/* TOP BAR */}
-      <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-8">
-        <button onClick={handleBack}>
+      <div className="flex w-full flex-col  justify-between gap-8 p-10">
+        <ProgressBar value={progress} />
+        <Button
+          onClick={handleBack}
+          variant="ghost"
+          size="icon"
+          className="w-12 h-12"
+          asChild
+        >
           <ChevronLeftIcon
-            className="text-black hover:text-gray-600 w-8 h-8 md:w-[3vw] md:h-[3vw]"
+            strokeWidth={6}
+            className="!text-black hover:text-gray-600 w-12 h-12"
           />
-        </button>
-        <div className="flex-1 mx-4">
-          <ProgressBar value={progress} />
-        </div>
-        <ExitButton />
+        </Button>
       </div>
-      <div className="px-[5vw]">
-        {slides[slide]}
-      </div>
+      <div className="px-10">{slides[slide]}</div>
 
       {/* SLIDER CONTENT */}
-      <div className="relative h-[75vh] w-full overflow-y-scroll overflow-x-hidden lg:overflow-hidden">
+      <div className="relative w-full overflow-y-scroll overflow-x-hidden lg:overflow-hidden h-full">
         <AnimatePresence mode="wait">
           {slide === 1 && (
             <motion.div
@@ -150,7 +157,7 @@ export default function MainSlider() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute top-0 left-0 w-full h-full"
+              className="absolute top-0 left-0 w-full h-full pb-20"
             >
               <HowDoYouFeelSection
                 onContinue={handleFeelingsContinue}
@@ -166,30 +173,30 @@ export default function MainSlider() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute top-5 left-0 w-full h-full"
+              className="absolute top-0 left-0 w-full h-full pb-20"
             >
               <PickAFrame
                 onContinue={handlePledgeContinue}
-                onPledgeChange={(pledge: PledgeStyleEnum | null) => setSelectedPledge(pledge)}
+                onPledgeChange={(pledge: PledgeStyleEnum | null) =>
+                  setSelectedPledge(pledge)
+                }
                 selected={selectedPledge}
-                />
+              />
             </motion.div>
           )}
 
           {slide === 3 && (
             <motion.div
-                key="selfie"
-                initial={{ x: "100%", opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: "-100%", opacity: 0 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="absolute top-0 left-0 w-full h-full"
+              key="selfie"
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "-100%", opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="absolute top-0 left-0 w-full h-full pb-20"
             >
-                <MainSelfiePage
-                  onStart={() => handleTakeASelfie()}
-                />
+              <MainSelfiePage onStart={() => handleTakeASelfie()} />
             </motion.div>
-            )}
+          )}
         </AnimatePresence>
       </div>
     </div>
