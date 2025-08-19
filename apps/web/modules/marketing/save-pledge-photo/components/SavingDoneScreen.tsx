@@ -15,8 +15,7 @@ export default function SavingDoneScreen() {
     : "?";
 
   const handleContinue = () => {
-    // router.push("/receive-pledge-copy" + additionUrl);
-    router.push("/" + additionUrl);
+    router.push("/receive-pledge-copy" + additionUrl);
   };
 
   return (

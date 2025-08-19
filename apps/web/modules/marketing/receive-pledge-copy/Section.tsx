@@ -7,12 +7,15 @@ import SimpleButton from "@marketing/home/components/Button";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@shared/components/Logo";
+import { useUser } from "@saas/auth/hooks/use-user";
+import QRCodeGenerator from "@marketing/shared/components/QRCodeGenerator";
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export default function PledgeCopy() {
   const router = useRouter();
+  const { gifUrl } = useUser();
   const [email, setEmail] = useState("");
   const [shake, setShake] = useState(false);
   const [inputDisabled, setInputDisabled] = useState(false);
@@ -21,6 +24,12 @@ export default function PledgeCopy() {
   const additionUrl = noRemoveBackground
     ? `?noRemoveBackground=${noRemoveBackground}`
     : "?";
+
+  // Generate the full URL for the gif preview page
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const gifPreviewUrl = gifUrl
+    ? `${baseUrl}/gif-preview?gif=${encodeURIComponent(gifUrl)}`
+    : "";
 
   const valid = isValidEmail(email);
   const isInvalid = email.trim() === "" || !valid;
@@ -64,13 +73,21 @@ export default function PledgeCopy() {
         <h2 className="text-[48px] font-text-bold uppercase">
           DOWNLOAD MY PLEDGE
         </h2>
-        <div className="w-[335px] h-[335px] overflow-hidden rounded-md shadow-md">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
-            alt="qr code"
-            className="w-full h-full object-cover"
+        {gifPreviewUrl ? (
+          <QRCodeGenerator
+            value={gifPreviewUrl}
+            size={335}
+            className="rounded-md"
           />
-        </div>
+        ) : (
+          <div className="w-[335px] h-[335px] flex items-center justify-center bg-gray-200 rounded-md shadow-md">
+            <p className="text-gray-600 text-center">
+              GIF not available
+              <br />
+              Please try again
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

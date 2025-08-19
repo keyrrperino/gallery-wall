@@ -6,10 +6,7 @@ export default async function MarketingLayout({ children }: PropsWithChildren) {
     <UserContextProvider initialUser={null}>
       <div className="bg-cover bg-center bg-no-repeat bg-[#F7EBDF]">
         <main className="relative z-10 flex h-screen w-full items-baseline justify-center overflow-hidden bg-black/30">
-          <div
-            className="flex h-screen w-full items-baseline justify-center"
-            style={{ width: `calc(100vh * ${1080 / 1920})` }}
-          >
+          <div className="flex h-screen w-full items-baseline justify-center">
             {children}
           </div>
         </main>
