@@ -1,7 +1,9 @@
+"use client";
+
 import { PledgeStyleEnum } from "../types";
 import { cn } from "@ui/lib";
 import { PledgeCard } from "./PledgeCard";
-import { ReactNode, useCallback, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
 export function PledgeSliderV2({
