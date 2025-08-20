@@ -6,18 +6,30 @@ import { useState } from "react";
 import SimpleButton from "@marketing/home/components/Button";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Logo } from "@shared/components/Logo";
+import { useUser } from "@saas/auth/hooks/use-user";
+import QRCodeGenerator from "@marketing/shared/components/QRCodeGenerator";
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export default function PledgeCopy() {
-    const router = useRouter();
+  const router = useRouter();
+  const { gifUrl } = useUser();
   const [email, setEmail] = useState("");
   const [shake, setShake] = useState(false);
   const [inputDisabled, setInputDisabled] = useState(false);
   const searchParams = useSearchParams();
   const noRemoveBackground = searchParams.get("noRemoveBackground");
-  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '?';
+  const additionUrl = noRemoveBackground
+    ? `?noRemoveBackground=${noRemoveBackground}`
+    : "?";
+
+  // Generate the full URL for the gif preview page
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const gifPreviewUrl = gifUrl
+    ? `${baseUrl}/gif-preview?gif=${encodeURIComponent(gifUrl)}`
+    : "";
 
   const valid = isValidEmail(email);
   const isInvalid = email.trim() === "" || !valid;
@@ -39,75 +51,43 @@ export default function PledgeCopy() {
   };
 
   return (
-    <div className="flex w-full h-full flex-col gap-12 items-center bg-white">
+    <div className="flex w-full h-full flex-col gap-12 items-center justify-start bg-white">
+      <Logo />
       {/* TOP BAR */}
-      <div className="flex w-full items-center justify-between h-80 px-16 font-text-bold text-black">
-        <button>
-          <ChevronLeftIcon className="text-white" width={120} height={120} />
-        </button>
-        <h2 className="text-[130px] uppercase">Want a copy of your pledge?</h2>
-        <ExitButton />
-      </div>
+      <h1 className="text-[80px] uppercase text-center leading-[1] -tracking-[1.6px]">
+        Want a copy of
+        <br />
+        your pledge?
+      </h1>
 
       {/* INTRO TEXT */}
-      <p className="text-[2vw] text-center mb-48 mx-[15vw] leading-tight">
-        Your pledge has joined others on our Live Pledge Wall!<br />
-        You’re now part of a growing wave of support for Singapore’s coastal
-        future.
+      <p className="text-2xl text-center text-black/70 leading-[1.25]">
+        Your pledge has joined others on our Live Pledge Wall!
+        <br />
+        You&apos;re now part of a growing wave of support for Singapore&apos;s
+        coastal future.
       </p>
 
-      {/* SEND TO EMAIL SECTION */}
-      <div className="flex flex-row w-full items-center justify-between mb-10 px-[15vw]">
-        <h2 className="text-[80px] font-text-bold uppercase">SEND TO MY EMAIL</h2>
-        <div className="flex flex-row gap-10 items-center">
-          {/* EMAIL INPUT */}
-          <input
-            type="email"
-            disabled={inputDisabled}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter email address"
-            className={`border rounded-[32px] px-10 py-14 text-[2vw] w-[30vw] transition-colors ${
-              isInvalid && email !== "" ? "border-red-500" : "border-gray-400"
-            } ${inputDisabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
-          />
-
-          {/* SEND BUTTON */}
-          <motion.div
-            animate={shake ? { x: [-10, 10, -8, 8, -5, 5, 0] } : {}}
-            transition={{ duration: 0.4 }}
-          >
-            <SimpleButton
-              onClick={handleSendEmail}
-              disabled={isInvalid}
-              className={`text-[75px] py-8 px-16 rounded-[32px] font-bold transition-colors ${
-                isInvalid
-                  ? "bg-red-500 text-white cursor-not-allowed"
-                  : "bg-primary text-white hover:bg-primary"
-              }`}
-            >
-              SEND
-            </SimpleButton>
-          </motion.div>
-        </div>
-      </div>
-
-      <div className="w-full px-[15vw]">
-        <hr className="w-full border-black mb-10" />
-      </div>
-
       {/* DOWNLOAD MY PLEDGE SECTION */}
-      <div className="flex flex-row w-full items-start gap-24 px-[15vw]">
-        <h2 className="text-[80px] font-text-bold uppercase">
+      <div className="flex flex-col justify-center items-center w-full mt-16">
+        <h2 className="text-[48px] font-text-bold uppercase">
           DOWNLOAD MY PLEDGE
         </h2>
-        <div className="w-[600px] h-[600px] overflow-hidden rounded-md shadow-md">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
-            alt="qr code"
-            className="w-full h-full object-cover"
+        {gifPreviewUrl ? (
+          <QRCodeGenerator
+            value={gifPreviewUrl}
+            size={335}
+            className="rounded-md"
           />
-        </div>
+        ) : (
+          <div className="w-[335px] h-[335px] flex items-center justify-center bg-gray-200 rounded-md shadow-md">
+            <p className="text-gray-600 text-center">
+              GIF not available
+              <br />
+              Please try again
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

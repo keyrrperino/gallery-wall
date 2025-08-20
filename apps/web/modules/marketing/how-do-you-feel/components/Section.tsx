@@ -5,9 +5,18 @@ import { FeelingsGrid } from "./FeelingsGrid";
 import SimpleButton from "@marketing/home/components/Button";
 import clsx from "clsx";
 import { useResponsive } from "@ui/hooks/use-responsive";
+import { FeelingsFlex } from "./FeelingsFlex";
 
 const FEELINGS = [
-  "Inspired", "Excited", "Supportive", "Assured", "Informed", "Concerned", "Unsure", "Unconvinced", "Skeptical"
+  "Inspired",
+  "Excited",
+  "Positive",
+  "Assured",
+  "Informed",
+  "Concerned",
+  "Unsure",
+  "Indifferent",
+  "Unconvinced",
 ];
 
 export default function HowDoYouFeelSection({
@@ -24,7 +33,7 @@ export default function HowDoYouFeelSection({
 
   const handlePick = (feel: string) => {
     if (selected.includes(feel)) {
-      setSelected(selected.filter(f => f !== feel));
+      setSelected(selected.filter((f) => f !== feel));
     } else if (selected.length < 3) {
       setSelected([...selected, feel]);
     } else {
@@ -43,23 +52,15 @@ export default function HowDoYouFeelSection({
   };
 
   return (
-    <div className="flex flex-col items-start bg-white text-black h-full w-full px-[5vw]">
-      <FeelingsGrid feelings={FEELINGS} selected={selected} onPick={handlePick} />
-      
+    <div className="flex flex-col items-start justify-between pt-24 bg-white text-black h-full w-full px-10">
+      <FeelingsFlex
+        feelings={FEELINGS}
+        selected={selected}
+        onPick={handlePick}
+      />
+
       <SimpleButton
-      className={clsx(
-          "fixed",
-          "mt-5",
-          "bottom-[5vh]",
-          "self-center",
-          "text-white",
-          "rounded-full font-bold",
-          "pt-[2vh] md:pt-[3vh]",
-          "pb-[2vh] md:pb-[3vh]",
-          "pr-[11vw]",
-          "pl-[11vw]",
-          "text-[3vh]"
-      )}
+        className="self-center text-white rounded-full font-bold py-[26px] text-[32px] items-center justify-center w-[400px]"
         disabled={selected.length < 3}
         onClick={handleContinue}
       >

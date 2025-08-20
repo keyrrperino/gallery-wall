@@ -129,6 +129,12 @@ importers:
       deepmerge:
         specifier: ^4.3.1
         version: 4.3.1
+      embla-carousel-auto-scroll:
+        specifier: ^8.6.0
+        version: 8.6.0(embla-carousel@8.6.0)
+      embla-carousel-react:
+        specifier: ^8.6.0
+        version: 8.6.0(react@18.3.1)
       form-data:
         specifier: ^4.0.0
         version: 4.0.0
@@ -7490,6 +7496,36 @@ packages:
 
   /electron-to-chromium@1.4.702:
     resolution: {integrity: sha512-LYLXyEUsZ3nNSwiOWjI88N1PJUAMU2QphQSgGLVkFnb3FxZxNui2Vzi2PaKPgPWbsWbZstZnh6BMf/VQJamjiQ==}
+
+  /embla-carousel-auto-scroll@8.6.0(embla-carousel@8.6.0):
+    resolution: {integrity: sha512-WT9fWhNXFpbQ6kP+aS07oF5IHYLZ1Dx4DkwgCY8Hv2ZyYd2KMCPfMV1q/cA3wFGuLO7GMgKiySLX90/pQkcOdQ==}
+    peerDependencies:
+      embla-carousel: 8.6.0
+    dependencies:
+      embla-carousel: 8.6.0
+    dev: false
+
+  /embla-carousel-react@8.6.0(react@18.3.1):
+    resolution: {integrity: sha512-0/PjqU7geVmo6F734pmPqpyHqiM99olvyecY7zdweCw+6tKEXnrE90pBiBbMMU8s5tICemzpQ3hi5EpxzGW+JA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    dependencies:
+      embla-carousel: 8.6.0
+      embla-carousel-reactive-utils: 8.6.0(embla-carousel@8.6.0)
+      react: 18.3.1
+    dev: false
+
+  /embla-carousel-reactive-utils@8.6.0(embla-carousel@8.6.0):
+    resolution: {integrity: sha512-fMVUDUEx0/uIEDM0Mz3dHznDhfX+znCCDCeIophYb1QGVM7YThSWX+wz11zlYwWFOr74b4QLGg0hrGPJeG2s4A==}
+    peerDependencies:
+      embla-carousel: 8.6.0
+    dependencies:
+      embla-carousel: 8.6.0
+    dev: false
+
+  /embla-carousel@8.6.0:
+    resolution: {integrity: sha512-SjWyZBHJPbqxHOzckOfo8lHisEaJWmwd23XppYFYVh10bU66/Pn5tkVkbkCMZVdbUE5eTCI2nD8OyIP4Z+uwkA==}
+    dev: false
 
   /emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
