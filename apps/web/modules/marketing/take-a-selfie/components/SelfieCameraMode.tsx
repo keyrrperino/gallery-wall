@@ -5,7 +5,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Webcam from "react-webcam";
-import { Cross2Icon } from "@radix-ui/react-icons";
 
 import { useUser } from "@saas/auth/hooks/use-user";
 import SimpleButton from "@marketing/home/components/Button";
@@ -15,6 +14,7 @@ import { v4 } from "uuid";
 import { CountdownTimer } from "@marketing/home/components/CountdownTimer";
 import { KEY, openDB, STORE_NAME } from "../../../../lib/indexDB";
 import { Button } from "@ui/components/button";
+import { XIcon } from "lucide-react";
 
 enum COUNTDOWN_TIMER_STATE {
   STARTED = "STARTED",
@@ -125,7 +125,6 @@ export default function SelfieCameraMode({
     const chunks: BlobPart[] = [];
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) {
-        console.log(e.data);
         chunks.push(e.data);
       }
     };
@@ -163,7 +162,7 @@ export default function SelfieCameraMode({
         });
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   }
 
@@ -184,10 +183,10 @@ export default function SelfieCameraMode({
 
         getGifUrl(formData, noRemoveBackground ? true : false)
           .then(() => {
-            console.log("success");
+            console.info("GIF generation successful");
           })
           .catch(() => {
-            console.log("error");
+            console.error("GIF generation failed");
           });
       })
       .catch(() => {
@@ -320,7 +319,7 @@ export default function SelfieCameraMode({
       <div className="relative top-0 flex w-full items-center justify-between py-[1vh] font-text-bold text-white">
         <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-[1vh]">
           <Button onClick={onExit} variant="ghost" asChild size="icon">
-            <Cross2Icon className="w-12 h-12 text-white" />
+            <XIcon strokeWidth={4} className="w-12 h-12 text-white" />
           </Button>
           <h1 className="text-[3vh] md:text-[4vw] text-center font-text-bold uppercase leading-[1]">
             TAKE YOUR VIDEO SELFIE!
@@ -334,9 +333,6 @@ export default function SelfieCameraMode({
         {!previewUrl ? (
           <div className="relative aspect-square w-screen flex items-center justify-center">
             <div className="absolute inset-0 h-full w-full">
-              {isCounting && (
-                <div className="absolute inset-0 h-screen w-full bg-black/80 z-10 pointer-events-none" />
-              )}
               <Webcam
                 ref={webcamRef}
                 audio={false}

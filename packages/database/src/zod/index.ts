@@ -16,7 +16,7 @@ export const UserSessionScalarFieldEnumSchema = z.enum(['id','userId','createdAt
 
 export const UserScalarFieldEnumSchema = z.enum(['id','email','name','userType','createdAt','updatedAt']);
 
-export const UserGifRequestScalarFieldEnumSchema = z.enum(['id','userId','gifUrl','selfieVideoUrl','isShowed','requestStatus','createdAt','updatedAt']);
+export const UserGifRequestScalarFieldEnumSchema = z.enum(['id','userId','gifUrl','selfieVideoUrl','isShowed','isDownloaded','downloadedAt','requestStatus','createdAt','updatedAt']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -83,6 +83,8 @@ export const UserGifRequestSchema = z.object({
   gifUrl: z.string().nullable(),
   selfieVideoUrl: z.string().nullable(),
   isShowed: z.boolean(),
+  isDownloaded: z.boolean(),
+  downloadedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

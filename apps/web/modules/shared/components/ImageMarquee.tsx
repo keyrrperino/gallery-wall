@@ -18,6 +18,7 @@ export function ImageMarquee() {
       dragFree: false,
       skipSnaps: true,
       containScroll: false,
+      align: "start",
     },
     [AutoScroll({ playOnInit: true })]
   );

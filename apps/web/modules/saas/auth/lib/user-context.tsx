@@ -11,8 +11,10 @@ import { createContext, useEffect, useState } from "react";
 
 type User = ApiOutput["auth"]["user"];
 
-const removeBackgroundRoute = "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif";
-const NoRemoveBackgroundRoute = "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif-no-remove-background";
+const removeBackgroundRoute =
+  "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif";
+const NoRemoveBackgroundRoute =
+  "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif-no-remove-background";
 // const NoRemoveBackgroundRoute = "http://localhost:8000/process-frames-to-gif-no-remove-background";
 
 type UserContext = {
@@ -22,10 +24,13 @@ type UserContext = {
   logout: () => Promise<void>;
   loaded: boolean;
   gifUrl: string | null;
+  gifKey: string | null;
   getGifUrl: (data: FormData, noRemoveBackground?: boolean) => Promise<void>;
   error: string | null;
   isDoneGeneratingGif: boolean;
   setIsDoneGeneratingGif: (value: boolean) => void;
+  userGifRequestId: string | null;
+  setUserGifRequestId: (value: string | null) => void;
 };
 
 const authBroadcastChannel = new BroadcastChannel("auth");
@@ -43,6 +48,7 @@ export const userContext = createContext<UserContext>({
   logout: () => Promise.resolve(),
   loaded: false,
   gifUrl: null,
+  gifKey: null,
   isDoneGeneratingGif: false,
   error: null,
   setIsDoneGeneratingGif: () => {
@@ -52,7 +58,11 @@ export const userContext = createContext<UserContext>({
     return new Promise(() => () => {
       return null;
     });
-  }
+  },
+  userGifRequestId: null,
+  setUserGifRequestId: () => {
+    return;
+  },
 });
 
 export function UserContextProvider({
@@ -65,8 +75,11 @@ export function UserContextProvider({
   const [loaded, setLoaded] = useState(!!initialUser);
   const [user, setUser] = useState<User>(initialUser);
   const [gifUrl, setGifUrl] = useState<string | null>(null);
+  const [gifKey, setGifKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isDoneGeneratingGif, setIsDoneGeneratingGif] = useState<boolean>(false);
+  const [isDoneGeneratingGif, setIsDoneGeneratingGif] =
+    useState<boolean>(false);
+  const [userGifRequestId, setUserGifRequestId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
   const userQuery = apiClient.auth.user.useQuery(undefined, {
@@ -133,32 +146,47 @@ export function UserContextProvider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const getGifUrl = async (formData: FormData, noRemoveBackground?: boolean): Promise<void> => {
+  const getGifUrl = async (
+    formData: FormData,
+    noRemoveBackground?: boolean
+  ): Promise<void> => {
     setIsDoneGeneratingGif(false);
     return new Promise((resolve, reject) => {
-      fetch(noRemoveBackground ? NoRemoveBackgroundRoute : removeBackgroundRoute, {
-        method: "POST",
-        body: formData,
-      }).then((response) => {
-        response.json().then((result: {
-          status: string;
-          gifUrl: string;
-          success: string;
-        }) => {
-          console.log(result);
-          // const newImageUrl = result?.gifUrl ? result.gifUrl as string : null;
-          setGifUrl(result.gifUrl);
-          setIsDoneGeneratingGif(true);
-          resolve();
-        }).catch(() => {
+      fetch(
+        noRemoveBackground ? NoRemoveBackgroundRoute : removeBackgroundRoute,
+        {
+          method: "POST",
+          body: formData,
+        }
+      )
+        .then((response) => {
+          response
+            .json()
+            .then(
+              async (result: {
+                status: string;
+                gifUrl: string;
+                key: string;
+                success: string;
+              }) => {
+                console.info("GIF generation result:", result);
+                setGifUrl(result.gifUrl);
+                setGifKey(result.key);
+
+                setIsDoneGeneratingGif(true);
+                resolve();
+              }
+            )
+            .catch(() => {
+              reject("Failed to upload frames");
+              setError("Failed to upload frames");
+            });
+        })
+        .catch(() => {
           reject("Failed to upload frames");
-          setError("Failed to upload frames");
         });
-      }).catch(() => {
-        reject("Failed to upload frames");
-      });
     });
-  }
+  };
 
   const updateUser = (info: Partial<User>) => {
     if (user) {
@@ -178,10 +206,13 @@ export function UserContextProvider({
         loaded,
         updateUser,
         gifUrl,
+        gifKey,
         getGifUrl,
         error,
         isDoneGeneratingGif,
-        setIsDoneGeneratingGif
+        setIsDoneGeneratingGif,
+        userGifRequestId,
+        setUserGifRequestId,
       }}
     >
       {children}

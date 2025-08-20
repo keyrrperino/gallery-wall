@@ -14,6 +14,7 @@ import { PledgeStyleEnum } from "@marketing/what-is-your-pledge/types";
 import { supabase } from "../../../lib/supabaseClient";
 import { RequestStatusSchema } from "../../../../../packages/database";
 import { Button } from "./button";
+import { useUser } from "@saas/auth/hooks/use-user";
 
 export default function MainSlider() {
   // SLIDE STATE
@@ -31,7 +32,7 @@ export default function MainSlider() {
     null
   );
   const [isCameraMode, setIsCameraMode] = useState(false);
-  const [userGifRequestId, setUserGifRequestId] = useState<string | null>(null);
+  const { userGifRequestId, setUserGifRequestId } = useUser();
 
   const router = useRouter();
   const progress = (slide / totalSlides) * 100;
@@ -55,8 +56,6 @@ export default function MainSlider() {
     if (pledge) {
       setSelectedPledge(pledge);
       setSlide(3);
-      console.log("🎉 Selected feelings:", selectedFeelings);
-      console.log("🎉 Selected pledge:", pledge);
     }
   };
 
@@ -92,14 +91,6 @@ export default function MainSlider() {
       `/enter-pin-code${additionUrl}&videoUrl=${videoUrl}&gif=${gifUrl}&userGifRequestId=${userGifRequestId}`
     );
   };
-
-  // When we reach slide 3, log both (only once on transition)
-  if (slide === 3) {
-    console.log("✅ FINAL SELECTION");
-    console.log("Selected Feelings:", selectedFeelings);
-    console.log("Selected Pledge:", selectedPledge);
-    console.log("Selected userGifRequestId:", userGifRequestId);
-  }
 
   if (isCameraMode) {
     return (

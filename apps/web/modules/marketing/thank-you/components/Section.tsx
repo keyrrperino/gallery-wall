@@ -1,40 +1,14 @@
 "use client";
 
 import { Logo } from "@shared/components/Logo";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useUser } from "@saas/auth/hooks/use-user";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ThankYouSection() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const gifUrl = searchParams.get("gif");
-  const [autoDownloaded, setAutoDownloaded] = useState(false);
   const [countdown, setCountdown] = useState(30);
-
-  // Auto-download the gif when component mounts
-  useEffect(() => {
-    if (gifUrl && !autoDownloaded) {
-      const downloadGif = async () => {
-        try {
-          const response = await fetch(gifUrl);
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = `pledge-gif-${Date.now()}.gif`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-          setAutoDownloaded(true);
-        } catch (error) {
-          console.error("Failed to download gif:", error);
-        }
-      };
-
-      downloadGif();
-    }
-  }, [gifUrl, autoDownloaded]);
+  const { gifUrl } = useUser();
 
   // Countdown timer effect
   useEffect(() => {
@@ -82,25 +56,6 @@ export default function ThankYouSection() {
             className="w-full h-full object-cover"
           />
         </div>
-
-        {autoDownloaded && (
-          <p className="text-green-600 text-lg mt-4 font-medium">
-            ✓ Pledge downloaded successfully!
-          </p>
-        )}
-
-        {/* Manual download button as backup */}
-        <button
-          onClick={() => {
-            const link = document.createElement("a");
-            link.href = gifUrl;
-            link.download = `pledge-gif-${Date.now()}.gif`;
-            link.click();
-          }}
-          className="font-text-bold mt-6 px-8 py-3 bg-black text-white rounded-full text-lg font-medium hover:bg-gray-800 transition-colors"
-        >
-          Download Again
-        </button>
       </div>
 
       {/* COUNTDOWN AND RETURN HOME SECTION */}

@@ -121,7 +121,7 @@ export default function PinEntry() {
         safe to send to the gallery wall.
       </p>
 
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col items-center justify-center gap-10">
         <div className="flex flex-col items-center">
           <div className="w-[30vh] h-[30vh] bg-gray-200 overflow-hidden rounded-md shadow-md">
             {previewUrl && (
@@ -142,14 +142,14 @@ export default function PinEntry() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-[15px]">
+        <div className="flex flex-col w-fit justify-center items-center gap-[15px]">
           {/* Dots */}
           <motion.div
             animate={
               isError ? { x: [-10, 10, -10, 10, 0] } : {} // shake only on error
             }
             transition={{ duration: 0.4 }}
-            className="flex flex-row gap-4 items-center justify-around"
+            className="flex flex-row items-center justify-between"
           >
             {[0, 1, 2, 3].map((i) => {
               let dotColor = "bg-gray-300";
@@ -174,7 +174,7 @@ export default function PinEntry() {
           </motion.div>
 
           {/* Numpad grid */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 w-full">
             {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit, i) => (
               <button
                 key={i}
