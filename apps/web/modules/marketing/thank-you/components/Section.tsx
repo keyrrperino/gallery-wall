@@ -45,7 +45,7 @@ export default function ThankYouSection() {
       return () => clearTimeout(timer);
     } else {
       // Navigate to homepage when countdown reaches 0
-      // router.push("/");
+      router.push("/");
     }
   }, [countdown, router]);
 
@@ -75,7 +75,7 @@ export default function ThankYouSection() {
 
       {/* GIF PREVIEW SECTION */}
       <div className="flex flex-col justify-center items-center w-full flex-1">
-        <div className="w-[450px] h-[541px] overflow-hidden shadow-lg">
+        <div className="w-[560px] h-[560px] overflow-hidden shadow-lg">
           <img
             src={gifUrl}
             alt="Your Pledge GIF"
@@ -85,7 +85,7 @@ export default function ThankYouSection() {
 
         {autoDownloaded && (
           <p className="text-green-600 text-lg mt-4 font-medium">
-            ✓ GIF downloaded successfully!
+            ✓ Pledge downloaded successfully!
           </p>
         )}
 

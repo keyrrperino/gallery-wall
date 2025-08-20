@@ -59,7 +59,7 @@ export default function SavingAnimationScreen({
             : {}
         }
       >
-        <div className="w-[560px] h-[651px] bg-gray-200 overflow-hidden rounded-md shadow-md -mt-24">
+        <div className="w-[560px] h-[560px] bg-gray-200 overflow-hidden rounded-md shadow-md -mt-24">
           <img
             src={gifUrl}
             alt="saving selfie"
