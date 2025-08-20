@@ -29,27 +29,8 @@ export default function PledgeCopy() {
   // Generate the full URL for the gif preview page
   const baseUrl = getBaseUrl();
   const gifPreviewUrl = gifUrl
-    ? `${baseUrl}/gif-preview?gif=${encodeURIComponent(gifUrl)}`
+    ? `${baseUrl}/thank-you?gif=${encodeURIComponent(gifUrl)}`
     : "";
-
-  const valid = isValidEmail(email);
-  const isInvalid = email.trim() === "" || !valid;
-
-  const handleSendEmail = () => {
-    if (isInvalid) {
-      // trigger shake animation
-      setShake(true);
-      setInputDisabled(true); // disable input while shaking
-      setTimeout(() => {
-        setShake(false);
-        setInputDisabled(false); // re-enable input after shaking
-      }, 500);
-      return;
-    }
-
-    console.log("📧 Sending pledge to:", email);
-    router.push("/thank-you" + additionUrl);
-  };
 
   return (
     <div className="flex w-full h-full flex-col gap-12 items-center justify-start bg-white">

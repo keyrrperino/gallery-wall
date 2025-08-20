@@ -1,68 +1,118 @@
 "use client";
 
-import ExitButton from "@marketing/shared/components/ExitButton";
-import { ChevronLeftIcon } from "lucide-react";
+import { Logo } from "@shared/components/Logo";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ThankYouScreen() {
-  const [seconds, setSeconds] = useState(30);
-  const router = useRouter();
-
+export default function ThankYouSection() {
   const searchParams = useSearchParams();
-  const noRemoveBackground = searchParams.get("noRemoveBackground");
-  const additionUrl = noRemoveBackground
-    ? `?noRemoveBackground=${noRemoveBackground}`
-    : "";
+  const router = useRouter();
+  const gifUrl = searchParams.get("gif");
+  const [autoDownloaded, setAutoDownloaded] = useState(false);
+  const [countdown, setCountdown] = useState(30);
 
+  // Auto-download the gif when component mounts
   useEffect(() => {
-    if (seconds <= 0) {
-      router.push("/" + additionUrl);
-      return;
+    if (gifUrl && !autoDownloaded) {
+      const downloadGif = async () => {
+        try {
+          const response = await fetch(gifUrl);
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `pledge-gif-${Date.now()}.gif`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          setAutoDownloaded(true);
+        } catch (error) {
+          console.error("Failed to download gif:", error);
+        }
+      };
+
+      downloadGif();
     }
-    const timer = setTimeout(() => setSeconds((prev) => prev - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [seconds, router]);
+  }, [gifUrl, autoDownloaded]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      // Navigate to homepage when countdown reaches 0
+      // router.push("/");
+    }
+  }, [countdown, router]);
+
+  const handleReturnHome = () => {
+    router.push("/");
+  };
+
+  if (!gifUrl) {
+    return (
+      <div className="flex w-full h-full flex-col gap-12 items-center justify-start bg-white">
+        <Logo />
+        <h1 className="text-[48px] uppercase text-center leading-[1] -tracking-[1.6px]">
+          No GIF URL provided
+        </h1>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex w-full h-full flex-col gap-12 items-center bg-white">
-      {/* TOP BAR */}
-      <div className="flex w-full items-center justify-between h-80 px-16 font-text-bold text-black">
-        <button onClick={() => router.back()}>
-          <ChevronLeftIcon
-            className="text-black hover:text-gray-600"
-            width={120}
-            height={120}
+    <div className="flex w-full h-full flex-col gap-14 items-center justify-start bg-white">
+      <Logo />
+
+      {/* MAIN HEADING */}
+      <h1 className="text-[80px] uppercase text-center leading-[1] -tracking-[1.6px]">
+        Thank you!
+      </h1>
+
+      {/* GIF PREVIEW SECTION */}
+      <div className="flex flex-col justify-center items-center w-full flex-1">
+        <div className="w-[450px] h-[541px] overflow-hidden shadow-lg">
+          <img
+            src={gifUrl}
+            alt="Your Pledge GIF"
+            className="w-full h-full object-cover"
           />
+        </div>
+
+        {autoDownloaded && (
+          <p className="text-green-600 text-lg mt-4 font-medium">
+            ✓ GIF downloaded successfully!
+          </p>
+        )}
+
+        {/* Manual download button as backup */}
+        <button
+          onClick={() => {
+            const link = document.createElement("a");
+            link.href = gifUrl;
+            link.download = `pledge-gif-${Date.now()}.gif`;
+            link.click();
+          }}
+          className="font-text-bold mt-6 px-8 py-3 bg-black text-white rounded-full text-lg font-medium hover:bg-gray-800 transition-colors"
+        >
+          Download Again
         </button>
-        <h2 className="text-[130px] uppercase">THANK YOU!</h2>
-        <ExitButton />
       </div>
 
-      {/* INTRO TEXT */}
-      <p className="text-[2vw] text-center mb-24 mx-[15vw] leading-tight">
-        Keep an eye on your inbox! Your pledge will be landing there soon.
-        <br />
-        Thanks for joining us on this adventure!
-      </p>
-
-      <div className="w-[33vw] h-[33vw] bg-gray-200 overflow-hidden rounded-md shadow-md">
-        <img
-          src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"
-          alt="selfie preview"
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-      <div className="flex flex-col items-center justify-center bg-white text-black gap-6 leading-none mt-28">
-        <p className="text-[2vw] font-sans text-center text-black/75">
-          Returning to homepage in {seconds} second{seconds !== 1 ? "s" : ""}...
+      {/* COUNTDOWN AND RETURN HOME SECTION */}
+      <div className="flex flex-col justify-center items-center gap-2 p-2 rounded-[48px] mt-8 pb-20">
+        <p className="text-xl font-text-regular not-italic leading-[1.25] text-center text-black/70">
+          Returning to homepage in {countdown} seconds...
         </p>
         <button
-          onClick={() => router.push("/" + additionUrl)}
-          className="text-[#20409A] text-[75px] rounded-full font-text-bold"
+          onClick={handleReturnHome}
+          className="text-[32px] font-text-bold font-bold text-[#20409A] leading-[1.5] hover:underline transition-all"
         >
-          RETURN TO HOMEPAGE NOW
+          Return to Homepage now
         </button>
       </div>
     </div>
