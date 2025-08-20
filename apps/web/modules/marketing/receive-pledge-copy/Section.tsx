@@ -180,48 +180,20 @@ export default function PledgeCopy() {
           DOWNLOAD MY PLEDGE
         </h2>
 
-        {downloadPledgeUrl ? (
-          <div className="flex flex-col items-center gap-6">
-            <QRCodeGenerator
-              value={downloadPledgeUrl}
-              size={335}
-              className="rounded-md"
-            />
+        <div className="flex flex-col items-center gap-6">
+          <QRCodeGenerator
+            value={downloadPledgeUrl}
+            size={335}
+            className="rounded-md"
+          />
+          {downloadPledgeUrl && (
             <div className="flex flex-col items-center gap-4">
               <p className="text-sm text-gray-600 text-center">
                 Scan to download your pledge
               </p>
-              <div className="text-center">
-                <p className="text-sm text-gray-500 mb-2">
-                  Or download directly:
-                </p>
-                <SimpleButton
-                  variant="primary"
-                  className="px-8 py-3 text-2xl"
-                  onClick={() => {
-                    // Create a temporary link to trigger download
-                    const link = document.createElement("a");
-                    link.href = downloadPledgeUrl;
-                    link.download = generateCustomFilename();
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                >
-                  Download My Pledge
-                </SimpleButton>
-              </div>
             </div>
-          </div>
-        ) : (
-          <div className="w-[335px] h-[335px] flex items-center justify-center bg-gray-200 rounded-md shadow-md">
-            <p className="text-gray-600 text-center">
-              GIF not available
-              <br />
-              Please try again
-            </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

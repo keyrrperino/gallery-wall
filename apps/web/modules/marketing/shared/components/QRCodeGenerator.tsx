@@ -18,9 +18,15 @@ export default function QRCodeGenerator({
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    if (!canvasRef.current || !value) {
+    if (!canvasRef.current) {
       setIsLoading(false);
       setHasError(true);
+      return;
+    }
+
+    if (!value) {
+      setIsLoading(true);
+      setHasError(false);
       return;
     }
 
