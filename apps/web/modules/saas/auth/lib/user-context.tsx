@@ -11,9 +11,9 @@ import { createContext, useEffect, useState } from "react";
 
 type User = ApiOutput["auth"]["user"];
 
-const removeBackgroundRoute = "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif";
+// const removeBackgroundRoute = "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif";
 const NoRemoveBackgroundRoute = "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif-no-remove-background";
-// const NoRemoveBackgroundRoute = "http://localhost:8000/process-frames-to-gif-no-remove-background";
+const removeBackgroundRoute = "http://localhost:8000/process-frames-to-gif-with-animated-frame-overlay";
 
 type UserContext = {
   user: User;

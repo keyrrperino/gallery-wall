@@ -40,7 +40,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Optional override for a single overlay path (not typically used when selecting from FRAME_MAP)
 FRAME_OVERLAY_PATH = os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frame_overlay.png"))
 
-FRAME_MAP_GIF = {
+FRAME_MAP = {
     "care": {
         # "color": (43, 144, 208),
         "color": (255, 255, 255),
@@ -86,33 +86,6 @@ FRAME_MAP_GIF = {
                     f"animated-dry-orange-{shape}.gif",
                 ),
             )
-            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
-        ]
-    },
-}
-
-FRAME_MAP = {
-    "care": {
-        # "color": (43, 144, 208),
-        "color": (255, 255, 255),
-        "frames": [
-            os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"blue-{shape}.png"))
-            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
-        ]
-    },
-    "future": {
-        # "color": (114, 143, 61),
-        "color": (255, 255, 255),
-        "frames": [
-            os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"green-{shape}.png"))
-            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
-        ]
-    },
-    "support": {
-        # "color": (247, 235, 223),
-        "color": (255, 255, 255),
-        "frames": [
-            os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"dry-orange-{shape}.png"))
             for shape in ["star", "sun", "diamond", "circle", "hexagon"]
         ]
     },
@@ -390,9 +363,9 @@ async def process_frames_to_gif_with_animated_frame_overlay(
     images: List[UploadFile] = File(...),
     pledge: str = Form(...),
 ):
-    if pledge not in FRAME_MAP_GIF:
+    if pledge not in FRAME_MAP:
         raise HTTPException(status_code=400, detail=f"Invalid pledge: {pledge}")
-    color = FRAME_MAP_GIF[pledge]["color"]
+    color = FRAME_MAP[pledge]["color"]
 
     # Path to animated overlay GIF (720x720, 24fps, 2s)
     animated_overlay_path = os.path.join(os.path.dirname(__file__), "lib", "frames", "animated-frame.gif")
