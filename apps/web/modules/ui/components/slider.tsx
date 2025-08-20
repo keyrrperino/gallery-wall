@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeftIcon } from "@radix-ui/react-icons";
+import { ChevronLeftIcon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import HowDoYouFeelSection from "@marketing/how-do-you-feel/components/Section";
 import PickAFrame from "@marketing/what-is-your-pledge/components/Section";
@@ -132,15 +132,9 @@ export default function MainSlider() {
       {/* TOP BAR */}
       <div className="flex w-full flex-col  justify-between gap-8 p-10">
         <ProgressBar value={progress} />
-        <Button
-          onClick={handleBack}
-          variant="ghost"
-          size="icon"
-          className="w-12 h-12"
-          asChild
-        >
+        <Button onClick={handleBack} variant="ghost" size="icon" asChild>
           <ChevronLeftIcon
-            strokeWidth={6}
+            strokeWidth={4}
             className="!text-black hover:text-gray-600 w-12 h-12"
           />
         </Button>

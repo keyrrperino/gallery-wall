@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Cross2Icon } from "@radix-ui/react-icons";
 import ConfirmExitModal from "./ConfirmExitModal";
+import { XIcon } from "lucide-react";
+import { Button } from "@ui/components/button";
 
 export default function ExitButton() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const noRemoveBackground = searchParams.get("noRemoveBackground");
-  const additionUrl = noRemoveBackground ? `?noRemoveBackground=${noRemoveBackground}` : '';
+  const additionUrl = noRemoveBackground
+    ? `?noRemoveBackground=${noRemoveBackground}`
+    : "";
 
   const handleConfirm = () => {
     setOpen(false);
@@ -19,13 +22,16 @@ export default function ExitButton() {
 
   return (
     <>
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => setOpen(true)}
-        className="p-2 hover:opacity-70 transition"
+        className="hover:opacity-70 transition"
         aria-label="Exit"
+        asChild
       >
-        <Cross2Icon color="black" className="w-8 h-8 md:w-[3vw] md:h-[3vw]" />
-      </button>
+        <XIcon color="black" className="w-12 h-12" strokeWidth={4} />
+      </Button>
 
       {open && (
         <ConfirmExitModal
