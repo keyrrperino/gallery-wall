@@ -17,9 +17,15 @@ export function ApiClientProvider({ children }: PropsWithChildren) {
         httpBatchLink({
           url: baseUrl + "/api",
           transformer: superjson,
+          fetch(url, options) {
+            return fetch(url, {
+              ...options,
+              credentials: "include",
+            });
+          },
         }),
       ],
-    }),
+    })
   );
   return (
     <apiClient.Provider client={trpcClient} queryClient={queryClient}>

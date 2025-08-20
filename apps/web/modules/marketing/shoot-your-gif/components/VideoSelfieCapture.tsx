@@ -12,8 +12,10 @@ export default function VideoSelfieCapture() {
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [gifUrl, setGifUrl] = React.useState<string | null>(null);
 
-  const getSignedUploadUrlMutation = apiClient.uploads.signedUploadUrlGifs.useMutation();
-  const getSupabaseSignedUrlMutation = apiClient.uploads.supabaseSignedUrl.useMutation();
+  const getSignedUploadUrlMutation =
+    apiClient.uploads.signedUploadUrlGifs.useMutation();
+  const getSupabaseSignedUrlMutation =
+    apiClient.uploads.supabaseSignedUrl.useMutation();
 
   // Record 3 seconds
   const handleRecord = async () => {
@@ -83,7 +85,9 @@ export default function VideoSelfieCapture() {
       // Call Firebase function to process video to GIF
 
       console.log(url);
-      console.log(`https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}`);
+      console.log(
+        `https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}`
+      );
 
       const firebaseUrl = `https://us-central1-pub-coastal.cloudfunctions.net/convertVideoUrlToGIF?videoUrl=${url}&width=1080`;
 
@@ -148,15 +152,23 @@ export default function VideoSelfieCapture() {
         </video>
       )}
       {gifUrl && (
-        <img src={gifUrl} alt="Generated GIF" className="rounded-lg border w-full max-w-xs aspect-video" />
+        <img
+          src={gifUrl}
+          alt="Generated GIF"
+          className="rounded-lg border w-full max-w-xs aspect-video"
+        />
       )}
       <button
         onClick={handleRecord}
         disabled={recording || loading}
         className="px-6 py-2 rounded text-white disabled:opacity-50"
       >
-        {recording ? "Recording..." : loading ? "Processing..." : "Record 3s Selfie"}
+        {recording
+          ? "Recording..."
+          : loading
+            ? "Processing..."
+            : "Record 3s Selfie"}
       </button>
     </div>
   );
-} 
+}

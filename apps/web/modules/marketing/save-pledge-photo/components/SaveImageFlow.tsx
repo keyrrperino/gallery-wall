@@ -7,7 +7,7 @@ import SavingAnimationScreen from "./SavingAnimationScreen";
 import ConfirmRetake from "./ConfirmRetake";
 import { useRouter, useSearchParams } from "next/navigation";
 import SavingDoneScreen from "./SavingDoneScreen";
-import { supabase } from "../../../../lib/supabaseClient";
+import { supabase, clearSupabaseAuth } from "../../../../lib/supabaseClient";
 import { RequestStatusSchema } from "../../../../../../packages/database";
 import { useUser } from "@saas/auth/hooks/use-user";
 import { Logo } from "@shared/components/Logo";
@@ -26,15 +26,37 @@ export default function SaveImageFlow() {
   const router = useRouter();
 
   const onComplete = async () => {
-    await supabase
-      .from("UserGifRequest")
-      .update({
-        gifUrl,
-        requestStatus: RequestStatusSchema.Enum.SUCCESS,
-      })
-      .eq("id", userGifRequestId);
+    try {
+      const { error } = await supabase
+        .from("UserGifRequest")
+        .update({
+          gifUrl,
+          requestStatus: RequestStatusSchema.Enum.SUCCESS,
+        })
+        .eq("id", userGifRequestId);
 
-    setPhase("done");
+      if (error) {
+        // Check if it's a JWT error
+        if (
+          error.message?.includes("JWT") ||
+          error.message?.includes("InvalidJWT") ||
+          error.message?.includes("Invalid Compact JWS")
+        ) {
+          console.error("JWT error detected, clearing auth tokens...");
+          clearSupabaseAuth();
+          // You might want to show a user-friendly message here
+          alert("Authentication error. Please refresh the page and try again.");
+          return;
+        }
+        throw error;
+      }
+
+      setPhase("done");
+    } catch (error) {
+      console.error("Error updating gif request:", error);
+      // Handle other errors appropriately
+      alert("Failed to save. Please try again.");
+    }
   };
 
   return (

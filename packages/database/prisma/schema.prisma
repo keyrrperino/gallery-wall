@@ -69,6 +69,8 @@ model UserGifRequest {
   gifUrl         String?
   selfieVideoUrl String?
   isShowed       Boolean       @default(false)
+  isDownloaded   Boolean       @default(false)
+  downloadedAt   DateTime?
   requestStatus  RequestStatus
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now())

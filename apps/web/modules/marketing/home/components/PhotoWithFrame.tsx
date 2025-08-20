@@ -4,17 +4,16 @@ import { useEffect } from "react";
 
 export enum PhotoWithFrameState {
   IS_LOADING = "IS_LOADING",
-  LOADED = "LOADED"
+  LOADED = "LOADED",
 }
 
 type PhotoWithFrameTypes = {
   imageUrl: string;
   onGenerateFrame: (imageWithFrame: string) => void;
   onStateChange: (state: PhotoWithFrameState) => void;
-}
+};
 
 export function PhotoWithFrame(props: PhotoWithFrameTypes) {
-
   const { imageUrl, onGenerateFrame, onStateChange } = props;
 
   const getMarginImageBased = (setNo: string) => {
@@ -29,9 +28,9 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
         return -200;
 
       default:
-        return 0
+        return 0;
     }
-  }
+  };
 
   useEffect(() => {
     onStateChange && onStateChange(PhotoWithFrameState.IS_LOADING);
@@ -40,12 +39,12 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
     const imgEle2 = new Image();
     const resEle = document.getElementById("printable");
 
-    const setNo = imageUrl.split("?setNo=")[1]
+    const setNo = imageUrl.split("?setNo=")[1];
     console.log({ imageUrl });
 
     const marginTop = getMarginImageBased(setNo);
 
-    console.log({ marginTop })
+    console.log({ marginTop });
 
     imgEle1.onload = () => {
       imgEle2.onload = () => {
@@ -75,12 +74,7 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
       imgEle2.src = "/images/ai-frame.png"; // Set the source for imgEle2
     };
     imgEle1.src = `/_next/image?url=${encodeURIComponent(imageUrl)}&w=3840&q=100`;
-  }, [
-    imageUrl
-  ]);
+  }, [imageUrl]);
 
-  return (
-    <>
-    </>
-  );
+  return <></>;
 }
