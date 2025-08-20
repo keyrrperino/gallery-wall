@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@shared/components/Logo";
 import { useUser } from "@saas/auth/hooks/use-user";
 import QRCodeGenerator from "@marketing/shared/components/QRCodeGenerator";
+import { getBaseUrl } from "utils";
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -26,7 +27,7 @@ export default function PledgeCopy() {
     : "?";
 
   // Generate the full URL for the gif preview page
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const baseUrl = getBaseUrl();
   const gifPreviewUrl = gifUrl
     ? `${baseUrl}/gif-preview?gif=${encodeURIComponent(gifUrl)}`
     : "";
