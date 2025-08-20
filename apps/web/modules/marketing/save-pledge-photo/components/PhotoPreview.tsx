@@ -63,7 +63,7 @@ export default function PhotoPreview({
           transition: { duration: 1, ease: "easeInOut" },
         }}
       >
-        <div className="w-[560px] h-[651px] bg-gray-200 overflow-hidden rounded-md shadow-md">
+        <div className="w-[560px] h-[560px] bg-gray-200 overflow-hidden rounded-md shadow-md">
           <img
             src={gifUrl}
             alt="selfie preview"

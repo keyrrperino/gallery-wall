@@ -19,7 +19,7 @@ export default function QRCodeGenerator({
     if (!canvasRef.current || !value) return;
 
     // Use QR Server API to generate QR code
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&format=png&margin=10`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&format=png&margin=35`;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
