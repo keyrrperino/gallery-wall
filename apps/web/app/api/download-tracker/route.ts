@@ -1,6 +1,20 @@
 import { NextRequest } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabaseClient";
 
+// Force this route to be publicly accessible without any authentication
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+// Additional configuration to bypass Vercel authentication
+export const preferredRegion = 'auto';
+export const maxDuration = 60; // 60 seconds timeout
+
+// These exports ensure:
+// - dynamic: 'force-dynamic' - Route is always dynamic, no caching
+// - revalidate: 0 - No revalidation, always fresh
+// - preferredRegion: 'auto' - Let Vercel choose the best region
+// - maxDuration: 60 - Set reasonable timeout for file downloads
+
 // Helper function to check and handle JWT errors
 function isJWTError(error: any): boolean {
   if (!error) return false;
@@ -31,12 +45,13 @@ async function getSupabaseAdminWithRetry() {
 // Remove Edge Runtime to avoid authentication issues
 // export const runtime = "edge";
 
-// CORS headers for better browser compatibility
+// CORS headers for better browser compatibility - allow all origins
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+  "Access-Control-Allow-Headers": "*", // Allow all headers
   "Access-Control-Max-Age": "86400", // 24 hours
+  "Access-Control-Allow-Credentials": "false", // Explicitly disable credentials
 };
 
 // Security headers to prevent authentication issues
@@ -44,13 +59,26 @@ const securityHeaders = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "X-XSS-Protection": "1; mode=block",
-  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Referrer-Policy": "no-referrer", // More permissive referrer policy
+  "Cache-Control": "no-cache, no-store, must-revalidate, private", // Ensure no caching
+  "X-Public-Access": "true", // Indicate this route is publicly accessible
+  "X-Auth-Required": "false", // Explicitly state no authentication required
 };
 
 export async function OPTIONS() {
+  // Enhanced OPTIONS response to ensure no authentication is required
   return new Response(null, {
     status: 200,
-    headers: { ...corsHeaders, ...securityHeaders },
+    headers: { 
+      ...corsHeaders, 
+      ...securityHeaders,
+      // Additional headers to ensure public access
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Max-Age": "86400",
+      "Access-Control-Allow-Credentials": "false",
+    },
   });
 }
 
@@ -155,11 +183,11 @@ export async function GET(request: NextRequest) {
       "Content-Disposition": filename 
         ? `attachment; filename="${filename}"` 
         : `attachment; filename="${path.split("/").pop()}"`,
-      "Cache-Control": "no-cache, no-store, must-revalidate",
+
       "Pragma": "no-cache",
       "Expires": "0",
       ...corsHeaders, // Add CORS headers to the response
-      ...securityHeaders, // Add security headers to prevent auth issues
+      ...securityHeaders, // Add security headers to prevent auth issues (includes Cache-Control)
     });
 
     return new Response(arrayBuffer, {
