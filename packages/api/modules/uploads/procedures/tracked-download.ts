@@ -33,10 +33,6 @@ export const createTrackedDownloadUrl = publicProcedure
         return process.env.NEXT_PUBLIC_BASE_URL;
       }
       
-      if (process.env.VERCEL_URL) {
-        return `https://${process.env.VERCEL_URL}`;
-      }
-      
       // Development fallback
       return "http://localhost:3000";
     };
