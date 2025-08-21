@@ -26,11 +26,14 @@ export function ImageMarquee() {
   const images = defaultImages;
 
   return (
-    <div className="relative w-screen overflow-hidden">
+    <div className="relative w-screen overflow-hidden pointer-events-none">
       <div className="embla" ref={emblaRef}>
         <div className="embla__container flex gap-[5vw]">
           {[...images, ...images, ...images].map((src, idx) => (
-            <div key={idx} className="embla__slide flex-[0_0_auto]">
+            <div
+              key={idx}
+              className="embla__slide flex-[0_0_auto] last:mr-[5vw]"
+            >
               <img src={src} alt="" className="h-[25vh] w-auto" />
             </div>
           ))}
