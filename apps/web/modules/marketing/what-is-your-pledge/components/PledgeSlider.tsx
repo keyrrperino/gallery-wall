@@ -1,22 +1,10 @@
-import "keen-slider/keen-slider.min.css";
+"use client";
+
 import { PledgeStyleEnum } from "../types";
 import { cn } from "@ui/lib";
-import { PledgeCard } from "./PledgeCard";
 import { ReactNode, useEffect } from "react";
-import { useKeenSlider } from "keen-slider/react";
-
-const ResizePlugin = (slider) => {
-  const observer = new ResizeObserver(function () {
-    slider.update();
-  });
-
-  slider.on("created", () => {
-    observer.observe(slider.container);
-  });
-  slider.on("destroyed", () => {
-    observer.unobserve(slider.container);
-  });
-};
+import useEmblaCarousel from "embla-carousel-react";
+import Image from "next/image";
 
 export function PledgeSlider({
   pledges,
@@ -24,51 +12,75 @@ export function PledgeSlider({
   onPick,
 }: {
   pledges: {
-    topText?: ReactNode;
-    bottomText?: ReactNode;
+    image: string;
     style: PledgeStyleEnum;
   }[];
   selected: PledgeStyleEnum | null;
   onPick: (val: PledgeStyleEnum) => void;
 }) {
-  const [sliderRef] = useKeenSlider(
-    {
-      slides: {
-        perView: "auto",
-        spacing: 0,
-      },
-      mode: "free-snap",
-      renderMode: "precision",
-    },
-    [ResizePlugin]
-  );
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    containScroll: "keepSnaps",
+    dragFree: true,
+  });
+
+  // Update carousel when slides change
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.reInit();
+    }
+  }, [emblaApi, pledges]);
+
+  // Handle resize observer for responsive updates
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      emblaApi.reInit();
+    });
+
+    const container = emblaApi.containerNode();
+    if (container) {
+      resizeObserver.observe(container);
+    }
+
+    return () => {
+      if (container) {
+        resizeObserver.unobserve(container);
+      }
+    };
+  }, [emblaApi]);
+
+  const handlePick = (pledge: PledgeStyleEnum) => {
+    onPick(pledge);
+    emblaApi?.scrollTo(pledges.findIndex((p) => p.style === pledge));
+  };
 
   return (
-    <div className="overflow-hidden w-full">
-      <div ref={sliderRef} className="keen-slider overflow-visible">
-        {pledges.map((pledge, i) => (
-          <div
-            className="keen-slider__slide flex justify-center items-center h-[747px] min-w-[668px] min-h-[747px] max-w-[656px] max-h-[747px]"
-            key={i}
-          >
+    <div className="overflow-hidden w-full p-10">
+      <div ref={emblaRef} className="embla">
+        <div className="embla__container flex gap-10">
+          {pledges.map((pledge, i) => (
             <button
+              key={i}
               type="button"
-              onClick={() => onPick(pledge.style)}
+              onClick={() => handlePick(pledge.style)}
               className={cn(
-                "w-[600px]",
+                "portrait:w-[600px] portrait:h-[600px] landscape:w-[400px] landscape:h-[400px] embla__slide aspect-square",
                 selected === pledge.style
                   ? "ring-[28px] ring-[#2B90D0]/40"
                   : "ring-0"
               )}
             >
-              <PledgeCard
-                style={pledge.style}
-                topText={pledge.topText}
-                bottomText={pledge.bottomText}
+              <Image
+                src={pledge.image}
+                alt="Pledge"
+                width={600}
+                height={600}
+                className="portrait:!w-[600px] portrait:!h-[600px] landscape:!w-[400px] landscape:!h-[400px] aspect-square"
               />
             </button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
