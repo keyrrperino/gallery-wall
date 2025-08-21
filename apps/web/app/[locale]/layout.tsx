@@ -39,6 +39,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
+      <head>
+        <link rel="stylesheet" href="https://use.typekit.net/sam0gkj.css" />
+      </head>
       <body
         className={cn(
           "bg-background text-foreground min-h-screen font-sans antialiased overscroll-none overflow-hidden"

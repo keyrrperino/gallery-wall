@@ -121,7 +121,7 @@ export default function PinEntry() {
         safe to send to the gallery wall.
       </p>
 
-      <div className="flex flex-col items-center justify-center gap-10">
+      <div className="flex portrait:flex-col landscape:flex-row items-center justify-center gap-10">
         <div className="flex flex-col items-center">
           <div className="w-[30vh] h-[30vh] bg-gray-200 overflow-hidden rounded-md shadow-md">
             {previewUrl && (

@@ -1,41 +1,22 @@
-import { PledgeSlider } from "./PledgeSlider";
 import SimpleButton from "@marketing/home/components/Button";
 import { PledgeStyleEnum } from "../types";
-import clsx from "clsx";
-import { cn } from "@ui/lib";
-import { ReactNode } from "react";
 import { PledgeSliderV2 } from "./PledgeSliderV2";
 
 const PLEDGES: {
-  topText?: ReactNode | string;
-  bottomText?: ReactNode | string;
+  image: string;
   style: PledgeStyleEnum;
 }[] = [
   {
     style: PledgeStyleEnum.SUPPORT,
-    bottomText: (
-      <>
-        I'M A<br />
-        COASTAL PROTECTOR
-      </>
-    ),
+    image: "/images/frames/frame-1.svg",
   },
   {
     style: PledgeStyleEnum.FUTURE,
-    topText: "I SUPPORT",
-    bottomText: "OUR COASTAL FUTURE",
+    image: "/images/frames/frame-2.svg",
   },
   {
     style: PledgeStyleEnum.CARE,
-    bottomText: (
-      <>
-        <span className="text-[46px]">I STAND</span>
-        <br />
-        <span className="text-[28px]">FOR STRONG</span>
-        <br />
-        <span className="text-[46px]">SHORES</span>
-      </>
-    ),
+    image: "/images/frames/frame-3.svg",
   },
 ];
 

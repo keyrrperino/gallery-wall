@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fonts */
+.font-text-regular {
+  font-family: "neue-haas-grotesk-display", sans-serif;
+  letter-spacing: normal;
+  line-height: 125%;
+}
+.font-button-base,
+.font-text-bold {
+  font-family: "novecento-sans-condensed", sans-serif;
+  font-weight: 700;
+}
+
+h1,
+h2 {
+  font-family: "novecento-sans-condensed", sans-serif;
+  font-weight: 700;
+}
+h3,
+h4,
+h5,
+h6 {
+  font-family: "novecento-sans-condensed", sans-serif;
+  font-weight: 600;
+}
+p {
+  font-family: "neue-haas-grotesk-display", sans-serif;
+  letter-spacing: normal;
+  line-height: 125%;
+}
+/* Fonts End */
+
 @layer base {
   * {
     @apply border-border;
@@ -47,89 +78,6 @@
 
 pre.shiki {
   @apply mb-4 rounded-lg p-6;
-}
-
-@font-face {
-  font-family: "Novecento CondBold";
-  src: url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.eot");
-  src:
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.eot?#iefix")
-      format("embedded-opentype"),
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.woff2")
-      format("woff2"),
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.woff")
-      format("woff"),
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.ttf")
-      format("truetype"),
-    url("https://db.onlinewebfonts.com/t/20f3462f0bc12874d2d8566cf7881720.svg#Novecento CondBold")
-      format("svg");
-}
-
-@font-face {
-  font-family: "Novecento Normal";
-  src: url("https://db.onlinewebfonts.com/t/be36571afc0b06380fbb72ff9d03f23f.eot");
-  src:
-    url("https://db.onlinewebfonts.com/t/be36571afc0b06380fbb72ff9d03f23f.eot?#iefix")
-      format("embedded-opentype"),
-    url("https://db.onlinewebfonts.com/t/be36571afc0b06380fbb72ff9d03f23f.woff2")
-      format("woff2"),
-    url("https://db.onlinewebfonts.com/t/be36571afc0b06380fbb72ff9d03f23f.woff")
-      format("woff"),
-    url("https://db.onlinewebfonts.com/t/be36571afc0b06380fbb72ff9d03f23f.ttf")
-      format("truetype"),
-    url("https://db.onlinewebfonts.com/t/be36571afc0b06380fbb72ff9d03f23f.svg#Novecento Normal")
-      format("svg");
-}
-
-@font-face {
-  font-family: "Novecento Medium";
-  src: url("https://db.onlinewebfonts.com/t/008b756f1e5c7e6cd28554b3d82ed7ad.eot");
-  src:
-    url("https://db.onlinewebfonts.com/t/008b756f1e5c7e6cd28554b3d82ed7ad.eot?#iefix")
-      format("embedded-opentype"),
-    url("https://db.onlinewebfonts.com/t/008b756f1e5c7e6cd28554b3d82ed7ad.woff2")
-      format("woff2"),
-    url("https://db.onlinewebfonts.com/t/008b756f1e5c7e6cd28554b3d82ed7ad.woff")
-      format("woff"),
-    url("https://db.onlinewebfonts.com/t/008b756f1e5c7e6cd28554b3d82ed7ad.ttf")
-      format("truetype"),
-    url("https://db.onlinewebfonts.com/t/008b756f1e5c7e6cd28554b3d82ed7ad.svg#Novecento Medium")
-      format("svg");
-}
-
-@font-face {
-  font-family: "Haas Grot Text Trial";
-  src: url("/fonts/neuehaasgrotdisp-55roman-trial.otf") format("opentype");
-}
-
-h1,
-h2 {
-  font-family: "Novecento CondBold", sans-serif;
-}
-
-p {
-  font-family: "Haas Grot Text Trial", sans-serif;
-}
-
-.font-button-base {
-  font-family: "Novecento CondBold", sans-serif;
-}
-
-.font-text-regular {
-  font-family: "Haas Grot Text Trial", sans-serif;
-  font-weight: bolder;
-}
-
-.font-text-bold {
-  font-family: "Novecento CondBold", sans-serif;
-  font-weight: normal;
-}
-
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Novecento Medium", sans-serif;
 }
 
 @keyframes anim {

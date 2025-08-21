@@ -9,11 +9,11 @@ type MainSelfiePagePropsType = {
 export default function MainSelfiePage({ onStart }: MainSelfiePagePropsType) {
   return (
     <div className="flex flex-col items-start justify-between bg-white text-black h-full w-full px-[5vw]">
-      <div className="w-full">
+      <div className="w-full flex flex-col gap-9">
         <h1 className="text-[80px] font-text-bold uppercase leading-[1] -tracking-[1.6px]">
           TAKE A VIDEO SELFIE!
         </h1>
-        <p className="text-2xl text-black/70 mt-4 leading-[1]">
+        <p className="text-2xl text-black/70 leading-[1.5]">
           Smile, move a little, and let the camera roll 🎥
           <br />
           <br />

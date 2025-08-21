@@ -35,7 +35,7 @@ export default function LoadingScreen() {
     }
   }, [isDoneGeneratingGif, gifUrl, router]);
 
-  const loadingText = `Generating your Unique Pledge Photo${".".repeat(dotCount)}`;
+  const loadingEllipsis = ".".repeat(dotCount);
 
   return (
     <div className="h-full w-full overflow-hidden bg-white flex flex-col items-center gap-[180px] relative">
@@ -48,7 +48,8 @@ export default function LoadingScreen() {
 
       <div className="flex flex-col items-center justify-center gap-9">
         <p className="text-black text-[80px] font-text-bold z-10 leading-none text-center">
-          {loadingText}
+          Generating your Unique
+          <br /> Pledge Photo{loadingEllipsis}
         </p>
         <span className="text-2xl text-black/70 font-text-regular text-center leading-tight">
           Hang tight!

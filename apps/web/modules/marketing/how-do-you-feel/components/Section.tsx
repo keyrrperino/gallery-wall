@@ -52,20 +52,29 @@ export default function HowDoYouFeelSection({
   };
 
   return (
-    <div className="flex flex-col items-start justify-between pt-24 bg-white text-black h-full w-full px-10">
-      <FeelingsFlex
-        feelings={FEELINGS}
-        selected={selected}
-        onPick={handlePick}
-      />
-
-      <SimpleButton
-        className="self-center text-white rounded-full font-bold py-[26px] text-[32px] items-center justify-center w-[400px]"
-        disabled={selected.length < 3}
-        onClick={handleContinue}
-      >
-        CONTINUE
-      </SimpleButton>
+    <div className="flex flex-col items-start bg-white text-black h-full w-full px-10">
+      <div className="flex flex-col gap-9">
+        <h1 className="font-text-bold font-bold text-[80px] uppercase -tracking-[1.6px] leading-[100%]">
+          HOW DO YOU FEEL ABOUT COASTAL PROTECTION IN SINGAPORE NOW?
+        </h1>
+        <p className="text-2xl text-black/70 leading-[150%]">
+          Select up to 3 that apply.
+        </p>
+      </div>
+      <div className="flex flex-col justify-between pt-[120px] h-full">
+        <FeelingsFlex
+          feelings={FEELINGS}
+          selected={selected}
+          onPick={handlePick}
+        />
+        <SimpleButton
+          className="self-center text-white rounded-full font-bold py-[26px] text-[32px] items-center justify-center w-[400px]"
+          disabled={selected.length < 3}
+          onClick={handleContinue}
+        >
+          CONTINUE
+        </SimpleButton>
+      </div>
     </div>
   );
 }
