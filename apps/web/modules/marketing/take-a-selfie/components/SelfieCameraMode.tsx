@@ -14,7 +14,7 @@ import { v4 } from "uuid";
 import { CountdownTimer } from "@marketing/home/components/CountdownTimer";
 import { KEY, openDB, STORE_NAME } from "../../../../lib/indexDB";
 import { Button } from "@ui/components/button";
-import { XIcon } from "lucide-react";
+import { ChevronRightIcon, XIcon } from "lucide-react";
 
 enum COUNTDOWN_TIMER_STATE {
   STARTED = "STARTED",
@@ -305,7 +305,7 @@ export default function SelfieCameraMode({
   const videoConstraints = { facingMode: "user" };
 
   return (
-    <div className="bg-black h-full w-full flex flex-col items-center">
+    <div className="bg-black h-dvh w-screen flex flex-col justify-between items-center">
       {hasError && (
         <Modal isOpen>
           <div className="text-center text-4xl font-bold text-white">
@@ -316,85 +316,82 @@ export default function SelfieCameraMode({
       )}
 
       {/* HEADER */}
-      <div className="relative top-0 flex w-full items-center justify-between py-[1vh] font-text-bold text-white">
-        <div className="flex w-full items-center justify-between px-[5vw] py-[3vh] gap-[1vh]">
-          <Button onClick={onExit} variant="ghost" asChild size="icon">
-            <XIcon strokeWidth={4} className="w-12 h-12 text-white" />
-          </Button>
-          <h1 className="text-[3vh] md:text-[4vw] text-center font-text-bold uppercase leading-[1]">
-            TAKE YOUR VIDEO SELFIE!
-          </h1>
-          <div className="w-12 h-12"></div>
-        </div>
+      <div className="flex-shrink-0 relative top-0 font-text-bold text-white flex w-full items-center justify-between px-6 py-16">
+        <Button onClick={onExit} variant="ghost" asChild size="icon">
+          <XIcon strokeWidth={4} className="w-12 h-12 text-white" />
+        </Button>
+        <h1 className="text-[64px] text-center font-text-bold uppercase leading-[1] tracking-[-1.28px]">
+          TAKE YOUR VIDEO SELFIE!
+        </h1>
+        <div className="w-12 h-12"></div>
       </div>
 
       {/* CAMERA AREA */}
-      <div className="flex flex-col items-center justify-start">
-        {!previewUrl ? (
-          <div className="relative aspect-square w-screen flex items-center justify-center">
-            <div className="absolute inset-0 h-full w-full">
-              <Webcam
-                ref={webcamRef}
-                audio={false}
-                mirrored={true}
-                videoConstraints={videoConstraints}
-                className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? "hidden" : ""}`}
-              />
-            </div>
-            {isCounting && (
-              <CountdownTimer
-                key={isCountingKey}
-                initialCount={3}
-                onEnd={handleCountdownEnd}
-              />
-            )}
-          </div>
-        ) : (
-          <div className="flex size-full items-center justify-center w-screen">
-            <div className="relative aspect-square w-screen flex items-center justify-center">
-              {previewUrl && (
-                <video
-                  src={previewUrl}
-                  ref={previewVideoRef}
-                  className="size-full absolute inset-0 h-full w-full object-cover"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                >
-                  <track kind="captions" />
-                </video>
+      <div className="h-[60dvh] w-full flex flex-col items-center justify-center">
+        <div className="relative aspect-square h-full flex items-center justify-center border-[16px] border-white">
+          {!previewUrl ? (
+            <>
+              <div className="absolute inset-0 h-full w-full">
+                <Webcam
+                  ref={webcamRef}
+                  audio={false}
+                  mirrored={true}
+                  videoConstraints={videoConstraints}
+                  className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? "hidden" : ""}`}
+                />
+              </div>
+              {isCounting && (
+                <CountdownTimer
+                  key={isCountingKey}
+                  initialCount={3}
+                  onEnd={handleCountdownEnd}
+                />
               )}
-            </div>
-          </div>
-        )}
+            </>
+          ) : (
+            <video
+              src={previewUrl}
+              ref={previewVideoRef}
+              className="size-full absolute inset-0 h-full w-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+            >
+              <track kind="captions" />
+            </video>
+          )}
+        </div>
       </div>
 
       {/* BOTTOM BUTTONS */}
-      <div className="flex w-full justify-center bg-black/75 items-center h-full">
-        {!isCounting && !videoTaken && !isRecording ? (
-          <SnapButton onClick={capture} size="w-[2vh] md:w-[1vh]" />
-        ) : (
-          <div className="flex w-full">
-            {previewUrl && videoTaken && (
-              <div className="flex flex-row w-full h-full items-center justify-between px-20 py-8">
-                <button
-                  className="font-text-bold text-white text-[32px]"
-                  onClick={retake}
-                >
-                  RETAKE
-                </button>
-                <button
-                  className="font-text-bold text-white text-[32px]"
-                  onClick={() => {
-                    generateFace();
-                  }}
-                >
-                  USE THIS SELFIE {">"}
-                </button>
-              </div>
-            )}
+      <div className="flex w-full h-52 justify-center bg-black/75 items-center">
+        {previewUrl && videoTaken && !isRecording ? (
+          <div className="flex flex-row w-full h-full items-center justify-between px-20 py-8">
+            <button
+              className="font-text-bold text-white text-[32px]"
+              onClick={retake}
+            >
+              RETAKE
+            </button>
+            <Button
+              variant="link"
+              className="font-text-bold text-white text-[32px]"
+              onClick={() => {
+                generateFace();
+              }}
+            >
+              USE THIS SELFIE <ChevronRightIcon className="w-8 h-8" />
+            </Button>
           </div>
+        ) : (
+          <SnapButton
+            onClick={capture}
+            size="w-[72px] h-[72px]"
+            isRecording={isRecording}
+            isCounting={isCounting}
+            recordingDuration={2}
+          />
         )}
       </div>
     </div>

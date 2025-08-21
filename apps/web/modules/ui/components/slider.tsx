@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeftIcon } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import HowDoYouFeelSection from "@marketing/how-do-you-feel/components/Section";
 import PickAFrame from "@marketing/what-is-your-pledge/components/Section";
 import MainSelfiePage from "@marketing/take-a-selfie/components/MainSelfiePage";
@@ -15,6 +15,7 @@ import { supabase } from "../../../lib/supabaseClient";
 import { RequestStatusSchema } from "../../../../../packages/database";
 import { Button } from "./button";
 import { useUser } from "@saas/auth/hooks/use-user";
+import { cn } from "@ui/lib";
 
 export default function MainSlider() {
   // SLIDE STATE
@@ -36,6 +37,12 @@ export default function MainSlider() {
 
   const router = useRouter();
   const progress = (slide / totalSlides) * 100;
+
+  // Calculate translate position for the container
+  const getContainerTransform = () => {
+    const offset = -(slide - 1) * 100;
+    return `translateX(${offset}%)`;
+  };
 
   const handleBack = () => {
     if (slide === 1) {
@@ -103,21 +110,6 @@ export default function MainSlider() {
     );
   }
 
-  const slides = {
-    1: (
-      <div className="flex flex-col gap-9">
-        <h1 className="font-text-bold font-bold text-[80px] uppercase -tracking-[1.6px] leading-[100%]">
-          HOW DO YOU FEEL ABOUT COASTAL PROTECTION IN SINGAPORE NOW?
-        </h1>
-        <p className="text-2xl text-black/70 leading-[150%]">
-          Select up to 3 that apply.
-        </p>
-      </div>
-    ),
-    2: <></>,
-    3: null,
-  };
-
   return (
     <div className="relative h-screen w-screen bg-white text-black flex flex-col">
       {/* TOP BAR */}
@@ -130,59 +122,53 @@ export default function MainSlider() {
           />
         </Button>
       </div>
-      <div className="px-10">{slides[slide]}</div>
 
       {/* SLIDER CONTENT */}
-      <div className="relative w-full overflow-y-scroll overflow-x-hidden lg:overflow-hidden h-full">
-        <AnimatePresence mode="wait">
-          {slide === 1 && (
-            <motion.div
-              key="feelings"
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute top-0 left-0 w-full h-full pb-20"
-            >
-              <HowDoYouFeelSection
-                onContinue={handleFeelingsContinue}
-                initialSelected={selectedFeelings}
-              />
-            </motion.div>
-          )}
+      <div className="relative w-full overflow-hidden h-full">
+        <motion.div
+          className="flex flex-row w-full h-full"
+          animate={{ transform: getContainerTransform() }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
+          {/* Slide 1 - How Do You Feel */}
+          <div
+            className={cn(
+              "w-full h-full flex-shrink-0 pb-20 overflow-y-scroll lg:overflow-hidden transition-opacity duration-500",
+              slide === 1 ? "opacity-100" : "opacity-0"
+            )}
+          >
+            <HowDoYouFeelSection
+              onContinue={handleFeelingsContinue}
+              initialSelected={selectedFeelings}
+            />
+          </div>
 
-          {slide === 2 && (
-            <motion.div
-              key="pickaframe"
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute top-0 left-0 w-full h-full pb-20"
-            >
-              <PickAFrame
-                onContinue={handlePledgeContinue}
-                onPledgeChange={(pledge: PledgeStyleEnum | null) =>
-                  setSelectedPledge(pledge)
-                }
-                selected={selectedPledge}
-              />
-            </motion.div>
-          )}
+          {/* Slide 2 - Pick a Frame */}
+          <div
+            className={cn(
+              "w-full h-full flex-shrink-0 pb-20 overflow-y-scroll lg:overflow-hidden transition-opacity duration-500",
+              slide === 2 ? "opacity-100" : "opacity-0"
+            )}
+          >
+            <PickAFrame
+              onContinue={handlePledgeContinue}
+              onPledgeChange={(pledge: PledgeStyleEnum | null) =>
+                setSelectedPledge(pledge)
+              }
+              selected={selectedPledge}
+            />
+          </div>
 
-          {slide === 3 && (
-            <motion.div
-              key="selfie"
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute top-0 left-0 w-full h-full pb-20"
-            >
-              <MainSelfiePage onStart={() => handleTakeASelfie()} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Slide 3 - Take a Selfie */}
+          <div
+            className={cn(
+              "w-full h-full flex-shrink-0 pb-20 overflow-y-scroll lg:overflow-hidden transition-opacity duration-500",
+              slide === 3 ? "opacity-100" : "opacity-0"
+            )}
+          >
+            <MainSelfiePage onStart={() => handleTakeASelfie()} />
+          </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -43,7 +43,6 @@ export default function SaveImageFlow() {
           error.message?.includes("Invalid Compact JWS")
         ) {
           console.error("JWT error detected, clearing auth tokens...");
-          // You might want to show a user-friendly message here
           alert("Authentication error. Please refresh the page and try again.");
           return;
         }

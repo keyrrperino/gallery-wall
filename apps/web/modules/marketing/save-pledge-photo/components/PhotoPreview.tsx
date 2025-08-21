@@ -42,7 +42,7 @@ export default function PhotoPreview({
     }
   }, [countdown, onComplete]);
   return (
-    <div className="flex w-full h-full flex-col items-center bg-white gap-2 relative">
+    <div className="flex w-full h-full flex-col items-center bg-white gap-16 relative">
       <motion.div
         key={countdown}
         initial={phase === "saving" ? { opacity: 0, scale: 0.8 } : false}
@@ -50,9 +50,9 @@ export default function PhotoPreview({
         transition={phase === "saving" ? { duration: 0.3 } : undefined}
         className="flex items-center justify-center z-50"
       >
-        <h1 className="text-[80px] uppercase text-center px-10 leading-[1] mt-16 mx-20">
+        <h1 className="text-[80px] uppercase text-center px-10 leading-[1] mx-20">
           {phase === "saving" && countdown > 0 && !fly && countdown}
-          {phase === "preview" && headerText}
+          {phase === "preview" && "HERE'S YOUR UNIQUE PLEDGE PHOTO!"}
         </h1>
       </motion.div>
 

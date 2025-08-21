@@ -37,11 +37,7 @@ export default function PledgeCopy() {
       }
     );
 
-  // Generate a custom filename based on user data and timestamp
-  const generateCustomFilename = useCallback(() => {
-    const timestamp = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
-    return `my_pledge_${timestamp}.gif`;
-  }, []);
+  const customFilename = "pub_pledge_wall.gif";
 
   // Set initial download status when data is loaded
   useEffect(() => {
@@ -112,7 +108,6 @@ export default function PledgeCopy() {
         }
 
         // Create tracked download URL with custom filename
-        const customFilename = generateCustomFilename();
         const { url } = await createTrackedDownloadUrlMutation.mutateAsync({
           filePath: gifPath || "",
           bucket: "gifs",
@@ -127,7 +122,6 @@ export default function PledgeCopy() {
         console.error("Failed to create tracked download URL:", error);
         if (!cancelled) {
           // Fallback to original gifUrl with download parameter
-          const customFilename = generateCustomFilename();
           setSignedGifUrl(
             gifUrl
               ? `${gifUrl}?download=${encodeURIComponent(customFilename)}`
@@ -142,7 +136,7 @@ export default function PledgeCopy() {
     return () => {
       cancelled = true;
     };
-  }, [gifUrl, generateCustomFilename]);
+  }, [gifUrl]);
 
   // Redirect to thank you page when download is detected
   useEffect(() => {
@@ -160,10 +154,8 @@ export default function PledgeCopy() {
     <div className="flex w-full h-full flex-col gap-12 items-center justify-start bg-white">
       <Logo />
       {/* TOP BAR */}
-      <h1 className="text-[80px] uppercase text-center leading-[1] -tracking-[1.6px]">
-        Want a copy of
-        <br />
-        your pledge?
+      <h1 className="text-[80px] uppercase text-center leading-[1] -tracking-[1.6px] portrait:mx-[300px] landscape:mx-20">
+        Want a copy of your pledge?
       </h1>
 
       {/* INTRO TEXT */}
@@ -175,7 +167,7 @@ export default function PledgeCopy() {
       </p>
 
       {/* DOWNLOAD MY PLEDGE SECTION */}
-      <div className="flex flex-col justify-center items-center w-full mt-16">
+      <div className="flex flex-col justify-center items-center w-full portrait:mt-16 landscape:mt-0">
         <h2 className="text-[48px] font-text-bold uppercase">
           DOWNLOAD MY PLEDGE
         </h2>

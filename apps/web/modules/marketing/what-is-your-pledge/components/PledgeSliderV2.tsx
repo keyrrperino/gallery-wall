@@ -2,9 +2,9 @@
 
 import { PledgeStyleEnum } from "../types";
 import { cn } from "@ui/lib";
-import { PledgeCard } from "./PledgeCard";
 import { ReactNode, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+import Image from "next/image";
 
 export function PledgeSliderV2({
   pledges,
@@ -12,8 +12,7 @@ export function PledgeSliderV2({
   onPick,
 }: {
   pledges: {
-    topText?: ReactNode;
-    bottomText?: ReactNode;
+    image: string;
     style: PledgeStyleEnum;
   }[];
   selected: PledgeStyleEnum | null;
@@ -66,16 +65,18 @@ export function PledgeSliderV2({
               type="button"
               onClick={() => handlePick(pledge.style)}
               className={cn(
-                "w-[600px] embla__slide",
+                "portrait:w-[600px] portrait:h-[600px] landscape:w-[400px] landscape:h-[400px] embla__slide aspect-square",
                 selected === pledge.style
                   ? "ring-[28px] ring-[#2B90D0]/40"
                   : "ring-0"
               )}
             >
-              <PledgeCard
-                style={pledge.style}
-                topText={pledge.topText}
-                bottomText={pledge.bottomText}
+              <Image
+                src={pledge.image}
+                alt="Pledge"
+                width={600}
+                height={600}
+                className="portrait:!w-[600px] portrait:!h-[600px] landscape:!w-[400px] landscape:!h-[400px] aspect-square"
               />
             </button>
           ))}
