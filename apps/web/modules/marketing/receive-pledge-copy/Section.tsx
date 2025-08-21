@@ -154,7 +154,7 @@ export default function PledgeCopy() {
     <div className="flex w-full h-full flex-col gap-12 items-center justify-start bg-white">
       <Logo />
       {/* TOP BAR */}
-      <h1 className="text-[80px] uppercase text-center leading-[1] -tracking-[1.6px] portrait:mx-[150px] landscape:mx-20">
+      <h1 className="text-[80px] uppercase text-center leading-[1] -tracking-[1.6px] portrait:mx-[300px] landscape:mx-20">
         Want a copy of your pledge?
       </h1>
 
