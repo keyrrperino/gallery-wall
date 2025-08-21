@@ -37,59 +37,8 @@ session = new_session("u2net")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Optional override for a single overlay path (not typically used when selecting from FRAME_MAP)
+# Path to your transparent PNG frame (should be 1080p, RGBA)
 FRAME_OVERLAY_PATH = os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frame_overlay.png"))
-
-FRAME_MAP_GIF = {
-    "care": {
-        # "color": (43, 144, 208),
-        "color": (255, 255, 255),
-        "frames": [
-            os.environ.get(
-                "FRAME_OVERLAY_PATH",
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "lib",
-                    "frames",
-                    f"animated-blue-{shape}.gif",
-                ),
-            )
-            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
-        ]
-    },
-    "future": {
-        # "color": (114, 143, 61),
-        "color": (255, 255, 255),
-        "frames": [
-            os.environ.get(
-                "FRAME_OVERLAY_PATH",
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "lib",
-                    "frames",
-                    f"animated-green-{shape}.gif",
-                ),
-            )
-            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
-        ]
-    },
-    "support": {
-        # "color": (247, 235, 223),
-        "color": (255, 255, 255),
-        "frames": [
-            os.environ.get(
-                "FRAME_OVERLAY_PATH",
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "lib",
-                    "frames",
-                    f"animated-dry-orange-{shape}.gif",
-                ),
-            )
-            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
-        ]
-    },
-}
 
 FRAME_MAP = {
     "care": {
@@ -113,6 +62,30 @@ FRAME_MAP = {
         "color": (255, 255, 255),
         "frames": [
             os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"dry-orange-{shape}.png"))
+            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
+        ]
+    },
+}
+
+ANIMATED_FRAME_MAP = {
+    "care": {
+        "color": (255, 255, 255),
+        "frames": [
+            os.path.join(os.path.dirname(__file__), "lib", "frames", f"animated-blue-{shape}.gif")
+            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
+        ]
+    },
+    "future": {
+        "color": (255, 255, 255),
+        "frames": [
+            os.path.join(os.path.dirname(__file__), "lib", "frames", f"animated-green-{shape}.gif")
+            for shape in ["star", "sun", "diamond", "circle", "hexagon"]
+        ]
+    },
+    "support": {
+        "color": (255, 255, 255),
+        "frames": [
+            os.path.join(os.path.dirname(__file__), "lib", "frames", f"animated-dry-orange-{shape}.gif")
             for shape in ["star", "sun", "diamond", "circle", "hexagon"]
         ]
     },
@@ -280,6 +253,133 @@ async def process_frames_to_gif(
         "key": key
     })
 
+@app.post("/process-frames-to-gif-animated-overlay")
+async def process_frames_to_gif_with_animated_frame_overlay(
+    userGifRequestId: str = Form(...),
+    userId: str = Form(...),
+    images: List[UploadFile] = File(...),
+    pledge: str = Form(...),
+):
+    if pledge not in ANIMATED_FRAME_MAP:
+        raise HTTPException(status_code=400, detail=f"Invalid pledge: {pledge}")
+
+    color = ANIMATED_FRAME_MAP[pledge]["color"]
+    frame_choices = ANIMATED_FRAME_MAP[pledge]["frames"]
+    overlay_gif_path = random.choice(frame_choices)
+
+    # Load animated overlay frames (RGBA, 720x720)
+    try:
+        overlay_gif = Image.open(overlay_gif_path)
+        overlay_frames: List[Image.Image] = []
+        for frame in ImageSequence.Iterator(overlay_gif):
+            rgba = frame.convert("RGBA")
+            if rgba.size != (720, 720):
+                rgba = rgba.resize((720, 720), Image.LANCZOS)
+            overlay_frames.append(rgba)
+        if not overlay_frames:
+            raise Exception("No frames found in overlay GIF")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load overlay GIF: {e}")
+
+    expected_frames = len(images)
+    if expected_frames not in (12, 24):
+        raise HTTPException(status_code=400, detail=f"Expected 12 or 24 images, got {expected_frames}")
+
+    # Select overlay frames to match the number of input frames
+    step = max(1, len(overlay_frames) // expected_frames)
+    selected_overlay_frames = [overlay_frames[(i * step) % len(overlay_frames)] for i in range(expected_frames)]
+
+    async def process_single_image(idx, upload_file):
+        try:
+            img_bytes = await upload_file.read()
+            img = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
+            # Remove background
+            out_img = await asyncio.to_thread(remove, img, session=session)
+            # Center the 672x672 image on a 720x720 canvas
+            if out_img.width != 672 or out_img.height != 672:
+                out_img = out_img.resize((672, 672), Image.LANCZOS)
+            base_canvas = Image.new("RGBA", (720, 720), (0, 0, 0, 0))
+            offset = ((720 - 672) // 2, (720 - 672) // 2)
+            base_canvas.paste(out_img, offset, out_img)
+            # Overlay the animated frame for this index
+            overlay_frame = selected_overlay_frames[idx]
+            composited = Image.alpha_composite(base_canvas, overlay_frame)
+            # Remove transparency: paste on solid background
+            background = Image.new("RGB", composited.size, color)
+            background.paste(composited, mask=composited.split()[-1])
+            return background
+        except Exception as e:
+            raise Exception(f"Frame {idx+1} failed: {e}")
+
+    # Process all images in parallel
+    try:
+        processed_images = await asyncio.gather(*[
+            process_single_image(idx, upload_file) for idx, upload_file in enumerate(images)
+        ])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image processing failed: {e}")
+
+    # Validate frames
+    if len(processed_images) not in (12, 24):
+        raise HTTPException(status_code=500, detail=f"Expected 12 or 24 processed images, got {len(processed_images)}")
+    base_size = processed_images[0].size
+    for idx, img in enumerate(processed_images):
+        if not isinstance(img, Image.Image):
+            raise HTTPException(status_code=500, detail=f"Frame {idx+1} is not a valid image: {type(img)}")
+        if img.size != base_size:
+            raise HTTPException(status_code=500, detail=f"Frame {idx+1} size {img.size} does not match first frame size {base_size}")
+
+    # Encode to GIF via ImageMagick for quality and size
+    import tempfile, os
+    frame_buffers = []
+    for idx, img in enumerate(processed_images):
+        buf = io.BytesIO()
+        img.save(buf, format="WEBP")
+        buf.seek(0)
+        frame_buffers.append(buf)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        frame_paths = []
+        for idx, buf in enumerate(frame_buffers):
+            frame_path = os.path.join(tmpdir, f"frame_{idx:03d}.webp")
+            with open(frame_path, "wb") as f:
+                f.write(buf.read())
+            frame_paths.append(frame_path)
+        gif_path = os.path.join(tmpdir, "output.gif")
+        # Keep timing consistent with existing outputs (~2s total)
+        delay = 17 if len(processed_images) == 12 else 8
+        convert_cmd = [
+            "convert",
+            "-delay", str(delay),
+            "-loop", "0",
+            *frame_paths,
+            "-layers", "OptimizeTransparency",
+            gif_path
+        ]
+        try:
+            subprocess.run(convert_cmd, check=True)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"ImageMagick GIF encoding failed: {e}")
+        with open(gif_path, "rb") as f:
+            gif_bytes = f.read()
+
+    key = f"gifs/{userId}/{userGifRequestId}/final-animated.gif"
+    try:
+        res = supabase.storage.from_(SUPABASE_BUCKET).upload(
+            key,
+            gif_bytes,
+            file_options={"content-type": "image/gif", "upsert": "true"}
+        )
+        signed = supabase.storage.from_(SUPABASE_BUCKET).create_signed_url(key, 631152000)
+        signed_url = signed.get("signedURL") or signed.get("signed_url") or signed.get("url")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Supabase upload failed: {e}")
+
+    return JSONResponse({
+        "status": "SUCCESS",
+        "gifUrl": signed_url,
+        "key": key
+    })
+
 @app.post("/process-frames-to-gif-no-remove-background")
 async def process_frames_to_gif_no_background_remove(
     userGifRequestId: str = Form(...),
@@ -349,159 +449,6 @@ async def process_frames_to_gif_no_background_remove(
         gif_path = os.path.join(tmpdir, "output.gif")
         # Use ImageMagick to create a high-quality GIF
         delay = 17 if len(processed_images) == 12 else 8
-        convert_cmd = [
-            "convert",
-            "-delay", str(delay),
-            "-loop", "0",
-            *frame_paths,
-            "-layers", "OptimizeTransparency",
-            gif_path
-        ]
-        try:
-            subprocess.run(convert_cmd, check=True)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"ImageMagick GIF encoding failed: {e}")
-        with open(gif_path, "rb") as f:
-            gif_bytes = f.read()
-
-    key = f"gifs/{userId}/{userGifRequestId}/final.gif"
-    try:
-        res = supabase.storage.from_(SUPABASE_BUCKET).upload(
-            key,
-            gif_bytes,
-            file_options={"content-type": "image/gif", "upsert": "true"}
-        )
-        signed = supabase.storage.from_(SUPABASE_BUCKET).create_signed_url(key, 631152000)
-        signed_url = signed.get("signedURL") or signed.get("signed_url") or signed.get("url")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Supabase upload failed: {e}")
-
-    return JSONResponse({
-        "status": "SUCCESS",
-        "gifUrl": signed_url,
-        "key": key
-    })
-
-
-@app.post("/process-frames-to-gif-with-animated-frame-overlay")
-async def process_frames_to_gif_with_animated_frame_overlay(
-    userGifRequestId: str = Form(...),
-    userId: str = Form(...),
-    images: List[UploadFile] = File(...),
-    pledge: str = Form(...),
-):
-    if pledge not in FRAME_MAP_GIF:
-        raise HTTPException(status_code=400, detail=f"Invalid pledge: {pledge}")
-    color = FRAME_MAP_GIF[pledge]["color"]
-
-    # Path to animated overlay GIF (720x720, 24fps, 2s)
-    animated_overlay_path = os.path.join(os.path.dirname(__file__), "lib", "frames", "animated-frame.gif")
-    if not os.path.exists(animated_overlay_path):
-        raise HTTPException(status_code=500, detail=f"Animated overlay not found at {animated_overlay_path}")
-
-    async def process_single_image(idx, upload_file):
-        try:
-            img_bytes = await upload_file.read()
-            img = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
-            # Remove background
-            out_img = await asyncio.to_thread(remove, img, session=session)
-            # Center the 672x672 image on a 720x720 canvas
-            if out_img.width != 672 or out_img.height != 672:
-                out_img = out_img.resize((672, 672), Image.LANCZOS)
-            base_canvas = Image.new("RGBA", (720, 720), (0, 0, 0, 0))
-            offset = ((720 - 672) // 2, (720 - 672) // 2)
-            base_canvas.paste(out_img, offset, out_img)
-            # Return RGBA canvas with subject centered (no background color yet)
-            return base_canvas
-        except Exception as e:
-            raise Exception(f"Frame {idx+1} failed: {e}")
-
-    # Process all images in parallel to get subject canvases
-    try:
-        subject_canvases = await asyncio.gather(*[
-            process_single_image(idx, upload_file) for idx, upload_file in enumerate(images)
-        ])
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Image processing failed: {e}")
-
-    # Validate frame count (expect 12 or 24)
-    if len(subject_canvases) not in (12, 24):
-        raise HTTPException(status_code=500, detail=f"Expected 12 or 24 processed images, got {len(subject_canvases)}")
-
-    # Extract animated overlay frames using ImageMagick to handle coalescing properly
-    import tempfile, glob
-    with tempfile.TemporaryDirectory() as overlay_tmpdir:
-        overlay_out_pattern = os.path.join(overlay_tmpdir, "overlay_%03d.png")
-        extract_cmd = [
-            "convert",
-            animated_overlay_path,
-            "-coalesce",
-            overlay_out_pattern,
-        ]
-        try:
-            subprocess.run(extract_cmd, check=True)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to extract animated overlay frames: {e}")
-
-        overlay_paths = sorted(glob.glob(os.path.join(overlay_tmpdir, "overlay_*.png")))
-        if not overlay_paths:
-            raise HTTPException(status_code=500, detail="No overlay frames extracted from animated GIF")
-
-        overlay_frame_count = len(overlay_paths)
-        subject_frame_count = len(subject_canvases)
-
-        # Determine mapping from subject frame index -> overlay frame index
-        if overlay_frame_count >= subject_frame_count:
-            step = max(1, overlay_frame_count // subject_frame_count)
-            index_map = [min(i * step, overlay_frame_count - 1) for i in range(subject_frame_count)]
-        else:
-            # If fewer overlay frames than subject frames, loop the overlay
-            index_map = [i % overlay_frame_count for i in range(subject_frame_count)]
-
-        # Composite overlay frames onto subject canvases, then remove transparency on solid background color
-        composited_frames = []
-        for i in range(subject_frame_count):
-            subject_rgba = subject_canvases[i]
-            try:
-                overlay_rgba = Image.open(overlay_paths[index_map[i]]).convert("RGBA")
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to load overlay frame {index_map[i]}: {e}")
-            # Ensure overlay is 720x720
-            if overlay_rgba.size != (720, 720):
-                overlay_rgba = overlay_rgba.resize((720, 720), Image.LANCZOS)
-
-            composited = Image.alpha_composite(subject_rgba, overlay_rgba)
-            # Paste onto solid background to remove transparency for GIF encoding path (RGB)
-            background = Image.new("RGB", composited.size, color)
-            background.paste(composited, mask=composited.split()[-1])
-            composited_frames.append(background)
-
-    # Sanity check sizes
-    base_size = composited_frames[0].size
-    for idx, img in enumerate(composited_frames):
-        if not isinstance(img, Image.Image):
-            raise HTTPException(status_code=500, detail=f"Frame {idx+1} is not a valid image: {type(img)}")
-        if img.size != base_size:
-            raise HTTPException(status_code=500, detail=f"Frame {idx+1} size {img.size} does not match first frame size {base_size}")
-
-    # Encode final GIF via ImageMagick for optimal quality
-    frame_buffers = []
-    for idx, img in enumerate(composited_frames):
-        buf = io.BytesIO()
-        img.save(buf, format="WEBP")
-        buf.seek(0)
-        frame_buffers.append(buf)
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        frame_paths = []
-        for idx, buf in enumerate(frame_buffers):
-            frame_path = os.path.join(tmpdir, f"frame_{idx:03d}.webp")
-            with open(frame_path, "wb") as f:
-                f.write(buf.read())
-            frame_paths.append(frame_path)
-        gif_path = os.path.join(tmpdir, "output.gif")
-        # Keep existing timing heuristics (12 -> ~6 fps, 24 -> ~12.5 fps)
-        delay = 17 if len(composited_frames) == 12 else 8
         convert_cmd = [
             "convert",
             "-delay", str(delay),
