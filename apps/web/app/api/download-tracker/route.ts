@@ -28,20 +28,29 @@ async function getSupabaseAdminWithRetry() {
   }
 }
 
-// Configure this route to use Edge Runtime
-export const runtime = "edge";
+// Remove Edge Runtime to avoid authentication issues
+// export const runtime = "edge";
 
 // CORS headers for better browser compatibility
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+  "Access-Control-Max-Age": "86400", // 24 hours
+};
+
+// Security headers to prevent authentication issues
+const securityHeaders = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
 };
 
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
-    headers: corsHeaders,
+    headers: { ...corsHeaders, ...securityHeaders },
   });
 }
 
@@ -61,7 +70,10 @@ export async function GET(request: NextRequest) {
         }),
         {
           status: 400,
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            ...corsHeaders 
+          },
         }
       );
     }
@@ -100,7 +112,10 @@ export async function GET(request: NextRequest) {
         }),
         {
           status: 404,
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            ...corsHeaders 
+          },
         }
       );
     }
@@ -126,7 +141,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Convert blob to ArrayBuffer for Edge Runtime
+    // Convert blob to ArrayBuffer (works in both Edge and Node.js runtimes)
     const arrayBuffer = await fileData.arrayBuffer();
     
     // Determine content type based on file extension
@@ -143,6 +158,8 @@ export async function GET(request: NextRequest) {
       "Cache-Control": "no-cache, no-store, must-revalidate",
       "Pragma": "no-cache",
       "Expires": "0",
+      ...corsHeaders, // Add CORS headers to the response
+      ...securityHeaders, // Add security headers to prevent auth issues
     });
 
     return new Response(arrayBuffer, {
@@ -151,15 +168,18 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Download tracker error:", error);
-    return new Response(
-      JSON.stringify({
-        error: "Internal server error",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+          return new Response(
+        JSON.stringify({
+          error: "Internal server error",
+        }),
+        {
+          status: 500,
+          headers: { 
+            "Content-Type": "application/json",
+            ...corsHeaders 
+          },
+        }
+      );
   }
 }
 
