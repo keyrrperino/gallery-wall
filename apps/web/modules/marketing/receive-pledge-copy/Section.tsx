@@ -18,7 +18,7 @@ export default function PledgeCopy() {
     ? `?noRemoveBackground=${noRemoveBackground}`
     : "?";
 
-  const [signedGifUrl, setSignedGifUrl] = useState<string>("");
+  const [downloadPledgeUrl, setDownloadPledgeUrl] = useState<string>("");
   const [downloadStatus, setDownloadStatus] = useState<{
     isDownloaded: boolean;
     downloadedAt: string | null;
@@ -38,6 +38,10 @@ export default function PledgeCopy() {
     );
 
   const customFilename = "pub_pledge_wall.gif";
+
+  const redirectToThankYou = useCallback(() => {
+    router.push(`/thank-you${additionUrl}`);
+  }, [router, additionUrl]);
 
   // Set initial download status when data is loaded
   useEffect(() => {
@@ -91,7 +95,7 @@ export default function PledgeCopy() {
 
     const createTrackedDownloadUrl = async () => {
       if (!gifUrl && !cancelled) {
-        setSignedGifUrl("");
+        setDownloadPledgeUrl("");
         return;
       }
 
@@ -116,13 +120,13 @@ export default function PledgeCopy() {
         });
 
         if (!cancelled) {
-          setSignedGifUrl(url);
+          setDownloadPledgeUrl(url);
         }
       } catch (error) {
         console.error("Failed to create tracked download URL:", error);
         if (!cancelled) {
           // Fallback to original gifUrl with download parameter
-          setSignedGifUrl(
+          setDownloadPledgeUrl(
             gifUrl
               ? `${gifUrl}?download=${encodeURIComponent(customFilename)}`
               : ""
@@ -143,15 +147,13 @@ export default function PledgeCopy() {
     if (downloadStatus?.isDownloaded) {
       // Small delay to ensure download completed, then redirect
       setTimeout(() => {
-        router.push(`/thank-you${additionUrl}`);
+        redirectToThankYou();
       }, 1000);
     }
-  }, [downloadStatus?.isDownloaded, router, additionUrl]);
-
-  const downloadPledgeUrl = signedGifUrl;
+  }, [downloadStatus?.isDownloaded, redirectToThankYou]);
 
   return (
-    <div className="flex w-full h-full flex-col gap-12 items-center justify-start bg-white">
+    <div className="flex w-full h-full flex-col gap-12 items-center justify-start bg-white pb-20">
       <Logo />
       {/* TOP BAR */}
       <h1 className="text-[80px] uppercase text-center leading-[1] -tracking-[1.6px] portrait:mx-[300px] landscape:mx-20">
@@ -167,25 +169,34 @@ export default function PledgeCopy() {
       </p>
 
       {/* DOWNLOAD MY PLEDGE SECTION */}
-      <div className="flex flex-col justify-center items-center w-full portrait:mt-16 landscape:mt-0">
-        <h2 className="text-[48px] font-text-bold uppercase">
-          DOWNLOAD MY PLEDGE
-        </h2>
+      <div className="flex flex-col justify-between h-full items-center w-full portrait:mt-16 landscape:mt-0">
+        <div className="flex flex-col gap-9">
+          <h2 className="text-[48px] font-text-bold uppercase">
+            DOWNLOAD MY PLEDGE
+          </h2>
 
-        <div className="flex flex-col items-center gap-6">
-          <QRCodeGenerator
-            value={downloadPledgeUrl}
-            size={335}
-            className="rounded-md"
-          />
-          {downloadPledgeUrl && (
-            <div className="flex flex-col items-center gap-4">
-              <p className="text-sm text-gray-600 text-center">
-                Scan to download your pledge
-              </p>
-            </div>
-          )}
+          <div className="flex flex-col items-center gap-6">
+            <QRCodeGenerator
+              value={downloadPledgeUrl}
+              size={335}
+              className="rounded-md"
+            />
+            {downloadPledgeUrl && (
+              <div className="flex flex-col items-center gap-4">
+                <p className="text-sm text-gray-600 text-center">
+                  Scan to download your pledge
+                </p>
+              </div>
+            )}
+          </div>
         </div>
+
+        <SimpleButton
+          className="self-center text-white rounded-full font-bold py-[26px] text-[32px] items-center justify-center w-[400px]"
+          onClick={redirectToThankYou}
+        >
+          SKIP
+        </SimpleButton>
       </div>
     </div>
   );
