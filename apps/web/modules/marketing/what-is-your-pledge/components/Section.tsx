@@ -1,6 +1,6 @@
 import SimpleButton from "@marketing/home/components/Button";
 import { PledgeStyleEnum } from "../types";
-import { PledgeSliderV2 } from "./PledgeSliderV2";
+import { PledgeSlider } from "./PledgeSlider";
 
 const PLEDGES: {
   image: string;
@@ -43,12 +43,7 @@ export default function PickAFrame({
           Choose one pledge to appear with your frame!
         </p>
       </div>
-      {/* <PledgeSlider pledges={PLEDGES} selected={selected} onPick={handlePick} /> */}
-      <PledgeSliderV2
-        pledges={PLEDGES}
-        selected={selected}
-        onPick={handlePick}
-      />
+      <PledgeSlider pledges={PLEDGES} selected={selected} onPick={handlePick} />
       <SimpleButton
         className="self-center text-white rounded-full font-bold py-[26px] text-[32px] items-center justify-center w-[400px] mx-auto"
         disabled={selected === null}
