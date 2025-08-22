@@ -123,7 +123,7 @@ export default function PinEntry() {
 
       <div className="flex items-center justify-center gap-10 portrait:flex-col landscape:flex-row">
         <div className="flex flex-col items-center">
-          <div className="h-[30vh] w-[30vh] overflow-hidden rounded-md bg-gray-200 shadow-md">
+          <div className="overflow-hidden rounded-md bg-gray-200 shadow-md portrait:h-[30vh] portrait:w-[30vh] landscape:h-[40vh] landscape:w-[40vh]">
             {previewUrl && (
               <video
                 src={previewUrl}
@@ -137,7 +137,7 @@ export default function PinEntry() {
               </video>
             )}
           </div>
-          <div className="font-text-bold w-[30vh] bg-[#F7EBDF] p-[1vw] text-center text-[3vh] font-bold uppercase">
+          <div className="font-text-bold bg-[#F7EBDF] p-[1vw] text-center text-[3vh] font-bold uppercase portrait:w-[30vh] landscape:w-[40vh]">
             My Video Selfie
           </div>
         </div>

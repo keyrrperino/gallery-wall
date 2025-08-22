@@ -38,7 +38,7 @@ export default function LoadingScreen() {
   const loadingEllipsis = '.'.repeat(dotCount);
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center gap-[180px] overflow-hidden bg-white">
+    <div className="relative flex h-full w-full flex-col items-center overflow-hidden bg-white pb-20 portrait:gap-[100px] landscape:justify-between">
       {/* TOP BAR */}
       <div className="flex w-full flex-row items-center justify-between px-16 pt-[46px]">
         <div className="h-12 w-12"></div>

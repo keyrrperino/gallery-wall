@@ -1,6 +1,7 @@
 'use client';
 
 import SimpleButton from '@marketing/home/components/Button';
+import { cn } from '@ui/lib';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
@@ -17,8 +18,6 @@ export default function PhotoPreview({
   phase: 'preview' | 'saving' | 'done';
   onComplete: () => void;
 }) {
-  const headerText = "Here's your unique pledge photo!";
-
   const [countdown, setCountdown] = useState(3);
   const [fly, setFly] = useState(false);
 
@@ -48,12 +47,21 @@ export default function PhotoPreview({
         initial={phase === 'saving' ? { opacity: 0, scale: 0.8 } : false}
         animate={phase === 'saving' ? { opacity: 1, scale: 1 } : false}
         transition={phase === 'saving' ? { duration: 0.3 } : undefined}
-        className="z-50 flex items-center justify-center"
+        className="relative z-50 flex items-center justify-center"
       >
-        <h1 className="mx-20 px-10 text-center text-[80px] uppercase leading-[1]">
-          {phase === 'saving' && countdown > 0 && !fly && countdown}
-          {phase === 'preview' && "HERE'S YOUR UNIQUE PLEDGE PHOTO!"}
+        <h1
+          className={cn(
+            'font-text-bold text-center text-[80px] uppercase leading-[1] portrait:px-48',
+            phase === 'preview' ? 'opacity-1' : 'opacity-0'
+          )}
+        >
+          HERE'S YOUR UNIQUE PLEDGE PHOTO!
         </h1>
+        {phase === 'saving' && countdown > 0 && !fly && (
+          <h1 className="font-text-bold absolute top-0 text-[80px] uppercase leading-[1]">
+            {countdown}
+          </h1>
+        )}
       </motion.div>
 
       <motion.div
@@ -63,7 +71,7 @@ export default function PhotoPreview({
           transition: { duration: 1, ease: 'easeInOut' },
         }}
       >
-        <div className="h-[560px] w-[560px] overflow-hidden rounded-md bg-gray-200 shadow-md">
+        <div className="overflow-hidden rounded-md bg-gray-200 shadow-md portrait:h-[560px] portrait:w-[560px] landscape:h-[460px] landscape:w-[460px]">
           <img
             src={gifUrl}
             alt="selfie preview"
@@ -72,23 +80,26 @@ export default function PhotoPreview({
         </div>
       </motion.div>
 
-      {phase === 'preview' && (
-        <div className="flex flex-row justify-between gap-9">
-          <SimpleButton
-            onClick={onRetake}
-            className="font-text-bold w-[428px] bg-transparent py-[26px] text-[3vw] uppercase text-[#20409A]"
-          >
-            Take Another Selfie
-          </SimpleButton>
+      <div
+        className={cn(
+          'flex flex-row justify-between gap-9',
+          phase === 'preview' ? 'opacity-1' : 'pointer-events-none opacity-0'
+        )}
+      >
+        <SimpleButton
+          onClick={onRetake}
+          className="font-text-bold w-[428px] bg-transparent py-[26px] text-[3vw] uppercase text-[#20409A]"
+        >
+          Take Another Selfie
+        </SimpleButton>
 
-          <SimpleButton
-            onClick={onUsePhoto}
-            className="font-text-bold w-[428px] py-[26px] text-[3vw] uppercase"
-          >
-            This looks good!
-          </SimpleButton>
-        </div>
-      )}
+        <SimpleButton
+          onClick={onUsePhoto}
+          className="font-text-bold w-[428px] py-[26px] text-[3vw] uppercase"
+        >
+          This looks good!
+        </SimpleButton>
+      </div>
     </div>
   );
 }

@@ -367,16 +367,17 @@ export default function SelfieCameraMode({
       {/* BOTTOM BUTTONS */}
       <div className="flex h-52 w-full items-center justify-center bg-black/75">
         {previewUrl && videoTaken && !isRecording ? (
-          <div className="flex h-full w-full flex-row items-center justify-between px-20 py-8">
-            <button
-              className="font-text-bold text-[32px] text-white"
+          <div className="flex h-full w-full flex-row items-center justify-between px-20 py-8 landscape:w-[60dvh] landscape:px-0">
+            <Button
+              variant="link"
+              className="font-text-bold h-auto text-[32px] text-white"
               onClick={retake}
             >
               RETAKE
-            </button>
+            </Button>
             <Button
               variant="link"
-              className="font-text-bold text-[32px] text-white"
+              className="font-text-bold h-auto text-[32px] text-white"
               onClick={() => {
                 generateFace();
               }}

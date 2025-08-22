@@ -58,7 +58,7 @@ export default function SaveImageFlow() {
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-center gap-[1vw] bg-white pb-20">
+    <div className="flex h-full w-full flex-col items-center justify-between gap-9 bg-white pb-20">
       {/* TOP BAR */}
       <div
         className={cn(
