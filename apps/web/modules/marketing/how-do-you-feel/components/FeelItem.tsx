@@ -15,10 +15,10 @@ export function FeelItem({ displayText, selected, onClick }: FeelItemProps) {
       variant={selected ? 'default' : 'secondary'}
       onClick={onClick}
       className={cn(
-        'font-text-regular relative h-auto rounded-2xl px-8 py-3 text-[32px] !font-semibold leading-[150%] transition',
+        'font-text-regular relative h-auto rounded-2xl px-8 py-3 text-[32px] !font-extrabold leading-[150%] !tracking-wider transition',
         selected
           ? 'bg-[#CEAA89] text-white'
-          : 'bg-[#F7EBDF] text-gray-800 hover:bg-[#F7EBDF]'
+          : 'bg-[#F7EBDF] text-black hover:bg-[#F7EBDF]'
       )}
     >
       {displayText}

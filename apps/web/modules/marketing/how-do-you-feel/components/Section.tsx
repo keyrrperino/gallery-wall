@@ -57,8 +57,8 @@ export default function HowDoYouFeelSection({
         <h1 className="font-text-bold text-[80px] font-bold uppercase leading-[100%] -tracking-[1.6px]">
           HOW DO YOU FEEL ABOUT COASTAL PROTECTION IN SINGAPORE NOW?
         </h1>
-        <p className="text-2xl leading-[150%] text-black/70">
-          Select up to 3 that apply.
+        <p className="text-2xl leading-[125%] text-black/70">
+          SELECT 3 THAT APPLY
         </p>
       </div>
       <div className="flex h-full flex-col justify-between pt-[120px]">
