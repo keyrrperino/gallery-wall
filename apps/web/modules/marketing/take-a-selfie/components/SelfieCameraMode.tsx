@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Webcam from "react-webcam";
+import { useState, useRef, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Webcam from 'react-webcam';
 
-import { useUser } from "@saas/auth/hooks/use-user";
-import SimpleButton from "@marketing/home/components/Button";
-import SnapButton from "@marketing/home/components/SnapButton";
-import Modal from "@marketing/home/components/Popups/Modal";
-import { v4 } from "uuid";
-import { CountdownTimer } from "@marketing/home/components/CountdownTimer";
-import { KEY, openDB, STORE_NAME } from "../../../../lib/indexDB";
-import { Button } from "@ui/components/button";
-import { ChevronRightIcon, XIcon } from "lucide-react";
+import { useUser } from '@saas/auth/hooks/use-user';
+import SimpleButton from '@marketing/home/components/Button';
+import SnapButton from '@marketing/home/components/SnapButton';
+import Modal from '@marketing/home/components/Popups/Modal';
+import { v4 } from 'uuid';
+import { CountdownTimer } from '@marketing/home/components/CountdownTimer';
+import { KEY, openDB, STORE_NAME } from '../../../../lib/indexDB';
+import { Button } from '@ui/components/button';
+import { ChevronRightIcon, XIcon } from 'lucide-react';
 
 enum COUNTDOWN_TIMER_STATE {
-  STARTED = "STARTED",
-  END = "END",
-  PAUSE = "PAUSE",
-  STOP = "STOP",
+  STARTED = 'STARTED',
+  END = 'END',
+  PAUSE = 'PAUSE',
+  STOP = 'STOP',
 }
 
 type SelfieCameraModePropType = {
@@ -39,10 +39,10 @@ export default function SelfieCameraMode({
   const router = useRouter();
   const { user, getGifUrl } = useUser();
   const searchParams = useSearchParams();
-  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const noRemoveBackground = searchParams.get('noRemoveBackground');
   const additionUrl = noRemoveBackground
     ? `?noRemoveBackground=${noRemoveBackground}`
-    : "";
+    : '';
 
   const webcamRef = useRef<Webcam | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -51,7 +51,7 @@ export default function SelfieCameraMode({
   const [, setStream] = useState<MediaStream | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isCounting, setIsCounting] = useState<boolean>(false);
-  const [isCountingKey, setIsCountingKey] = useState<string>("");
+  const [isCountingKey, setIsCountingKey] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [, setTimer] = useState<number>(60);
   const [, setError] = useState<string | null>(null);
@@ -78,7 +78,7 @@ export default function SelfieCameraMode({
 
   useEffect(() => {
     if (user !== null && !user?.name) {
-      router.push("/" + additionUrl);
+      router.push('/' + additionUrl);
     }
   }, [user]);
 
@@ -104,19 +104,19 @@ export default function SelfieCameraMode({
     const stream: MediaStream = webcamRef.current?.video
       ?.srcObject as MediaStream;
     if (!stream) {
-      setError("Camera not ready");
+      setError('Camera not ready');
       setRecording(false);
       return;
     }
     let options: MediaRecorderOptions = {};
-    if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
-      options = { mimeType: "video/webm;codecs=vp9" };
-    } else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
-      options = { mimeType: "video/webm;codecs=vp8" };
-    } else if (MediaRecorder.isTypeSupported("video/webm")) {
-      options = { mimeType: "video/webm" };
-    } else if (MediaRecorder.isTypeSupported("video/mp4")) {
-      options = { mimeType: "video/mp4" };
+    if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+      options = { mimeType: 'video/webm;codecs=vp9' };
+    } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+      options = { mimeType: 'video/webm;codecs=vp8' };
+    } else if (MediaRecorder.isTypeSupported('video/webm')) {
+      options = { mimeType: 'video/webm' };
+    } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+      options = { mimeType: 'video/mp4' };
     } else {
       options = {}; // Let the browser pick
     }
@@ -130,7 +130,7 @@ export default function SelfieCameraMode({
     };
 
     recorder.onstop = () => {
-      const videoBlob = new Blob(chunks, { type: "video/webm" });
+      const videoBlob = new Blob(chunks, { type: 'video/webm' });
       setPreviewUrl(URL.createObjectURL(videoBlob));
       setRecording(false);
       setVideoTaken(true);
@@ -154,7 +154,7 @@ export default function SelfieCameraMode({
   function saveBlobToIndexedDB(blob: Blob) {
     openDB()
       .then((db) => {
-        const tx = db.transaction(STORE_NAME, "readwrite");
+        const tx = db.transaction(STORE_NAME, 'readwrite');
         tx.objectStore(STORE_NAME).put(blob, KEY);
         return new Promise<void>((resolve, reject) => {
           tx.oncomplete = () => resolve();
@@ -173,24 +173,24 @@ export default function SelfieCameraMode({
         // Upload frames as FormData (multipart)
         const formData = new FormData();
         frames.forEach((blob, i) => {
-          formData.append("images", blob, `frame${i}.webp`);
+          formData.append('images', blob, `frame${i}.webp`);
         });
-        formData.append("userGifRequestId", userGifRequestId);
-        formData.append("userId", "1");
-        formData.append("targetWidth", `${width}`);
-        formData.append("targetHeight", `${height}`);
-        formData.append("pledge", pledge);
+        formData.append('userGifRequestId', userGifRequestId);
+        formData.append('userId', '1');
+        formData.append('targetWidth', `${width}`);
+        formData.append('targetHeight', `${height}`);
+        formData.append('pledge', pledge);
 
         getGifUrl(formData, noRemoveBackground ? true : false)
           .then(() => {
-            console.info("GIF generation successful");
+            console.info('GIF generation successful');
           })
           .catch(() => {
-            console.error("GIF generation failed");
+            console.error('GIF generation failed');
           });
       })
       .catch(() => {
-        setError("Failed to upload frames");
+        setError('Failed to upload frames');
       });
   };
 
@@ -200,7 +200,7 @@ export default function SelfieCameraMode({
     fps = 12
   ) => {
     return new Promise((resolve, reject) => {
-      const video = document.createElement("video");
+      const video = document.createElement('video');
       video.srcObject = stream;
       video
         .play()
@@ -208,10 +208,10 @@ export default function SelfieCameraMode({
           // Always use 672x672 (square)
           const newWidth = 672;
           const newHeight = 672;
-          const canvas = document.createElement("canvas");
+          const canvas = document.createElement('canvas');
           canvas.width = newWidth;
           canvas.height = newHeight;
-          const ctx = canvas.getContext("2d");
+          const ctx = canvas.getContext('2d');
           if (!ctx) {
             resolve({ frames: [], width: newWidth, height: newHeight });
             return;
@@ -250,7 +250,7 @@ export default function SelfieCameraMode({
               newHeight
             );
             new Promise<Blob | null>((res) => {
-              return canvas.toBlob(res, "image/webp", 1);
+              return canvas.toBlob(res, 'image/webp', 1);
             })
               .then((blob) => {
                 if (blob) {
@@ -290,7 +290,7 @@ export default function SelfieCameraMode({
     setIsCounting(false);
 
     if (previewUrl) {
-      onGenerateGIF(imageUrl ?? "", previewUrl);
+      onGenerateGIF(imageUrl ?? '', previewUrl);
     }
   };
 
@@ -302,10 +302,10 @@ export default function SelfieCameraMode({
     setCountdownState(COUNTDOWN_TIMER_STATE.STARTED);
   };
 
-  const videoConstraints = { facingMode: "user" };
+  const videoConstraints = { facingMode: 'user' };
 
   return (
-    <div className="bg-black h-dvh w-screen flex flex-col justify-between items-center">
+    <div className="flex h-dvh w-screen flex-col items-center justify-between bg-black">
       {hasError && (
         <Modal isOpen>
           <div className="text-center text-4xl font-bold text-white">
@@ -316,19 +316,19 @@ export default function SelfieCameraMode({
       )}
 
       {/* HEADER */}
-      <div className="flex-shrink-0 relative top-0 font-text-bold text-white flex w-full items-center justify-between px-6 py-16">
+      <div className="font-text-bold relative top-0 flex w-full flex-shrink-0 items-center justify-between px-6 py-16 text-white">
         <Button onClick={onExit} variant="ghost" asChild size="icon">
-          <XIcon strokeWidth={4} className="w-12 h-12 text-white" />
+          <XIcon strokeWidth={4} className="h-12 w-12 text-white" />
         </Button>
-        <h1 className="text-[64px] text-center font-text-bold uppercase leading-[1] tracking-[-1.28px]">
+        <h1 className="font-text-bold text-center text-[64px] uppercase leading-[1] tracking-[-1.28px]">
           TAKE YOUR VIDEO SELFIE!
         </h1>
-        <div className="w-12 h-12"></div>
+        <div className="h-12 w-12"></div>
       </div>
 
       {/* CAMERA AREA */}
-      <div className="h-[60dvh] w-full flex flex-col items-center justify-center">
-        <div className="relative aspect-square h-full flex items-center justify-center border-[16px] border-white">
+      <div className="flex h-[60dvh] w-full flex-col items-center justify-center">
+        <div className="relative flex aspect-square h-full items-center justify-center border-[16px] border-white">
           {!previewUrl ? (
             <>
               <div className="absolute inset-0 h-full w-full">
@@ -337,7 +337,7 @@ export default function SelfieCameraMode({
                   audio={false}
                   mirrored={true}
                   videoConstraints={videoConstraints}
-                  className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? "hidden" : ""}`}
+                  className={`absolute inset-0 h-full w-full object-cover ${imageUrl ? 'hidden' : ''}`}
                 />
               </div>
               {isCounting && (
@@ -352,7 +352,7 @@ export default function SelfieCameraMode({
             <video
               src={previewUrl}
               ref={previewVideoRef}
-              className="size-full absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 size-full h-full w-full object-cover"
               autoPlay
               loop
               muted
@@ -365,23 +365,23 @@ export default function SelfieCameraMode({
       </div>
 
       {/* BOTTOM BUTTONS */}
-      <div className="flex w-full h-52 justify-center bg-black/75 items-center">
+      <div className="flex h-52 w-full items-center justify-center bg-black/75">
         {previewUrl && videoTaken && !isRecording ? (
-          <div className="flex flex-row w-full h-full items-center justify-between px-20 py-8">
+          <div className="flex h-full w-full flex-row items-center justify-between px-20 py-8">
             <button
-              className="font-text-bold text-white text-[32px]"
+              className="font-text-bold text-[32px] text-white"
               onClick={retake}
             >
               RETAKE
             </button>
             <Button
               variant="link"
-              className="font-text-bold text-white text-[32px]"
+              className="font-text-bold text-[32px] text-white"
               onClick={() => {
                 generateFace();
               }}
             >
-              USE THIS SELFIE <ChevronRightIcon className="w-8 h-8" />
+              USE THIS SELFIE <ChevronRightIcon className="h-8 w-8" />
             </Button>
           </div>
         ) : (

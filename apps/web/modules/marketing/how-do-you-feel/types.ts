@@ -1,4 +1,4 @@
 export type FeelItemType = {
-	displayText: string;
+  displayText: string;
   onClick?: (value?: string) => void;
 };

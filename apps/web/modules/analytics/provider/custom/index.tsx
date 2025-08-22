@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 export function AnalyticsScript() {
   // return your script here
@@ -8,7 +8,7 @@ export function AnalyticsScript() {
 export function useAnalytics() {
   const trackEvent = (event: string, data: Record<string, unknown>) => {
     // call your analytics service to track a custom event here
-    console.info("tracking event", event, data);
+    console.info('tracking event', event, data);
   };
 
   return {

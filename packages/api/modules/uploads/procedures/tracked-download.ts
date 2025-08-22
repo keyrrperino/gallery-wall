@@ -1,17 +1,17 @@
-import { z } from "zod";
-import { protectedProcedure, publicProcedure } from "../../../trpc/base";
-import { db } from "database";
-import { createClient } from "@supabase/supabase-js";
+import { z } from 'zod';
+import { protectedProcedure, publicProcedure } from '../../../trpc/base';
+import { db } from 'database';
+import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase admin client for realtime functionality
 const getSupabaseAdmin = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  
+
   if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error("Supabase credentials not configured");
+    throw new Error('Supabase credentials not configured');
   }
-  
+
   return createClient(supabaseUrl, supabaseServiceKey);
 };
 
@@ -19,7 +19,7 @@ export const createTrackedDownloadUrl = publicProcedure
   .input(
     z.object({
       filePath: z.string().min(1),
-      bucket: z.string().min(1).default("gifs"),
+      bucket: z.string().min(1).default('gifs'),
       filename: z.string().optional(),
       userGifRequestId: z.string().optional(), // Use userGifRequestId for tracking
     })
@@ -32,11 +32,11 @@ export const createTrackedDownloadUrl = publicProcedure
       if (process.env.NEXT_PUBLIC_BASE_URL) {
         return process.env.NEXT_PUBLIC_BASE_URL;
       }
-      
+
       // Development fallback
-      return "http://localhost:3000";
+      return 'http://localhost:3000';
     };
-    
+
     const baseUrl = getBaseUrl();
 
     // Create the tracked download URL using Next.js Edge Runtime API route
@@ -55,11 +55,11 @@ export const createTrackedDownloadUrl = publicProcedure
 
     const trackedUrl = `${baseUrl}/api/download-tracker?${params.toString()}`;
 
-    return { 
+    return {
       url: trackedUrl,
       filePath,
-      bucket, 
-      userGifRequestId
+      bucket,
+      userGifRequestId,
     };
   });
 
@@ -83,7 +83,8 @@ export const getDownloadStatus = publicProcedure
       .limit(1)
       .single();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
+    if (error && error.code !== 'PGRST116') {
+      // PGRST116 is "not found" error
       console.error('Error fetching download status:', error);
       throw new Error('Failed to fetch download status');
     }
@@ -124,7 +125,7 @@ export const markAsDownloaded = publicProcedure
       return { success: (data?.length || 0) > 0 };
     }
 
-    throw new Error("Request ID is required");
+    throw new Error('Request ID is required');
   });
 
 // Helper procedure to subscribe to download status changes in realtime
@@ -136,7 +137,7 @@ export const subscribeToDownloadStatus = publicProcedure
   )
   .query(async ({ input, ctx }) => {
     const { userGifRequestId } = input;
-    
+
     // This procedure provides the table name and filter for client-side realtime subscriptions
     return {
       table: 'UserGifRequest',

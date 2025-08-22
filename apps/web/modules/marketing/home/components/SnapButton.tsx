@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { cn } from "@ui/lib";
-import React, { useState, useEffect } from "react";
-import RecordingProgress from "./RecordingProgress";
+import { cn } from '@ui/lib';
+import React, { useState, useEffect } from 'react';
+import RecordingProgress from './RecordingProgress';
 
 type SnapButtonProps = {
   onClick: () => void;
@@ -47,13 +47,13 @@ const SnapButton: React.FC<SnapButtonProps> = ({
     <div className="relative">
       <button
         className={cn(
-          "font-button-base flex items-center hover:scale-90 justify-normal outline-none transition-all duration-300 focus:outline-none bg-red-500  rounded-full border-4 border-white",
-          isRecording && "pointer-events-none bg-[#484848] border-[#484848]",
+          'font-button-base flex items-center justify-normal rounded-full border-4 border-white bg-red-500 outline-none transition-all duration-300 hover:scale-90 focus:outline-none',
+          isRecording && 'pointer-events-none border-[#484848] bg-[#484848]',
           size
         )}
         disabled={isRecording}
         style={{
-          cursor: "pointer",
+          cursor: 'pointer',
         }}
         onClick={onClick}
       ></button>
@@ -62,9 +62,9 @@ const SnapButton: React.FC<SnapButtonProps> = ({
           <RecordingProgress
             progress={progress}
             maxProgress={100}
-            className="absolute top-0 left-0 w-[72px] h-[72px]"
+            className="absolute left-0 top-0 h-[72px] w-[72px]"
           />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36px] h-[36px] bg-red-500 rounded-md"></div>
+          <div className="absolute left-1/2 top-1/2 h-[36px] w-[36px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-red-500"></div>
         </>
       )}
     </div>

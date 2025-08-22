@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
 // @ts-expect-error package is not installed per default
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from '@vercel/analytics/react';
 // @ts-expect-error package is not installed per default
-import { track } from "@vercel/analytics";
+import { track } from '@vercel/analytics';
 
 export function AnalyticsScript() {
   return <Analytics />;

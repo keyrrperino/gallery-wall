@@ -1,45 +1,48 @@
-import { db } from "database";
-import { sendBrevo } from "mail/provider";
-import { z } from "zod";
-import { protectedProcedure } from "../../../trpc/base";
-
+import { db } from 'database';
+import { sendBrevo } from 'mail/provider';
+import { z } from 'zod';
+import { protectedProcedure } from '../../../trpc/base';
 
 export const sendEmail = protectedProcedure
-  .input(z.object({
-    imageUrl: z.string().url(),
-    email: z.string().email(),
-    imageBase64: z.string()
-  }))
-  .output(z.object({
-    status: z.string()
-  }))
-  .mutation(async ({ input: { imageUrl, email, imageBase64 }, ctx: { user } }) => {
-    if (!user) {
-      throw new Error("Unauthenticated user");
-    }
-
-    await db.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        email
-      }
+  .input(
+    z.object({
+      imageUrl: z.string().url(),
+      email: z.string().email(),
+      imageBase64: z.string(),
     })
+  )
+  .output(
+    z.object({
+      status: z.string(),
+    })
+  )
+  .mutation(
+    async ({ input: { imageUrl, email, imageBase64 }, ctx: { user } }) => {
+      if (!user) {
+        throw new Error('Unauthenticated user');
+      }
 
-    let imageBase64Data;
+      await db.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          email,
+        },
+      });
 
-    if (!imageBase64) {
+      let imageBase64Data;
 
-      const imageUrlResponse = await fetch(imageUrl);
-      const arrayBuffer = await imageUrlResponse.arrayBuffer();
+      if (!imageBase64) {
+        const imageUrlResponse = await fetch(imageUrl);
+        const arrayBuffer = await imageUrlResponse.arrayBuffer();
 
-      imageBase64Data = Buffer.from(arrayBuffer).toString("base64");
-    } else {
-      imageBase64Data = imageBase64.split("data:image/png;base64,")[1];
-    }
+        imageBase64Data = Buffer.from(arrayBuffer).toString('base64');
+      } else {
+        imageBase64Data = imageBase64.split('data:image/png;base64,')[1];
+      }
 
-    const htmlContent = `
+      const htmlContent = `
       <!DOCTYPE html>
       <html lang="en">
       
@@ -123,33 +126,34 @@ export const sendEmail = protectedProcedure
       </html>
     `;
 
-    await sendBrevo({
-      to: email,
-      toName: user.name ?? "",
-      text: "Download the face generated photo below.",
-      html: htmlContent,
-      attachments: [
-        {
-          "content": imageBase64Data,
-          "name": "selfie.jpeg",
-        }
-      ]
-    });
+      await sendBrevo({
+        to: email,
+        toName: user.name ?? '',
+        text: 'Download the face generated photo below.',
+        html: htmlContent,
+        attachments: [
+          {
+            content: imageBase64Data,
+            name: 'selfie.jpeg',
+          },
+        ],
+      });
 
-    // await sendSendgrid({
-    //   to: email,
-    //   toName: user.name ?? "",
-    //   text: "Download the face generated photo below.",
-    //   attachments: [
-    //     {
-    //       "content": imageBase64Data,
-    //       "type": sendgridAttachmentTypes["image/jpeg"],
-    //       "filename": "selfie.jpeg",
-    //       "disposition": "inline",
-    //       "content_ID": "image-inline"
-    //     }
-    //   ]
-    // });
+      // await sendSendgrid({
+      //   to: email,
+      //   toName: user.name ?? "",
+      //   text: "Download the face generated photo below.",
+      //   attachments: [
+      //     {
+      //       "content": imageBase64Data,
+      //       "type": sendgridAttachmentTypes["image/jpeg"],
+      //       "filename": "selfie.jpeg",
+      //       "disposition": "inline",
+      //       "content_ID": "image-inline"
+      //     }
+      //   ]
+      // });
 
-    return { status: "SUCCESS" };
-  });
+      return { status: 'SUCCESS' };
+    }
+  );

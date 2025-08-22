@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { apiClient } from "@shared/lib/api-client";
-import { clearCache } from "@shared/lib/cache";
-import { useQueryClient } from "@tanstack/react-query";
-import { getQueryKey } from "@trpc/react-query";
-import type { ApiOutput } from "api/trpc/router";
-import { useRouter } from "next/navigation";
-import type { PropsWithChildren } from "react";
-import { createContext, useEffect, useState } from "react";
+import { apiClient } from '@shared/lib/api-client';
+import { clearCache } from '@shared/lib/cache';
+import { useQueryClient } from '@tanstack/react-query';
+import { getQueryKey } from '@trpc/react-query';
+import type { ApiOutput } from 'api/trpc/router';
+import { useRouter } from 'next/navigation';
+import type { PropsWithChildren } from 'react';
+import { createContext, useEffect, useState } from 'react';
 
-type User = ApiOutput["auth"]["user"];
+type User = ApiOutput['auth']['user'];
 
 const removeBackgroundRoute =
-  "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif";
+  'https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif';
 const NoRemoveBackgroundRoute =
-  "https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif-no-remove-background";
+  'https://python-functions-665982940607.asia-southeast1.run.app/process-frames-to-gif-no-remove-background';
 // const NoRemoveBackgroundRoute = "http://localhost:8000/process-frames-to-gif-no-remove-background";
 
 type UserContext = {
@@ -33,9 +33,9 @@ type UserContext = {
   setUserGifRequestId: (value: string | null) => void;
 };
 
-const authBroadcastChannel = new BroadcastChannel("auth");
+const authBroadcastChannel = new BroadcastChannel('auth');
 type AuthEvent = {
-  type: "loaded" | "logout" | "login";
+  type: 'loaded' | 'logout' | 'login';
   user: User | null;
 };
 
@@ -96,11 +96,11 @@ export function UserContextProvider({
   const logout = async () => {
     await logoutMutation.mutateAsync();
     await clearCache();
-    router.replace("/");
+    router.replace('/');
     queryClient.removeQueries({ queryKey: getQueryKey(apiClient.auth) });
     setUser(null);
     authBroadcastChannel.postMessage({
-      type: "logout",
+      type: 'logout',
       user: null,
     } satisfies AuthEvent);
   };
@@ -120,7 +120,7 @@ export function UserContextProvider({
   useEffect(() => {
     if (user && loaded) {
       authBroadcastChannel.postMessage({
-        type: "loaded",
+        type: 'loaded',
         user: user,
       });
     }
@@ -129,20 +129,20 @@ export function UserContextProvider({
   useEffect(() => {
     const handleAuthEvent = (event: MessageEvent<AuthEvent>) => {
       if (JSON.stringify(event.data.user) !== JSON.stringify(user)) {
-        if (event.data.type === "logout") {
+        if (event.data.type === 'logout') {
           queryClient.removeQueries({ queryKey: getQueryKey(apiClient.auth) });
           setUser(null);
-          router.replace("/");
+          router.replace('/');
         } else {
           setUser(event.data.user);
         }
       }
     };
 
-    authBroadcastChannel.addEventListener("message", handleAuthEvent);
+    authBroadcastChannel.addEventListener('message', handleAuthEvent);
 
     return () =>
-      authBroadcastChannel.removeEventListener("message", handleAuthEvent);
+      authBroadcastChannel.removeEventListener('message', handleAuthEvent);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
@@ -155,7 +155,7 @@ export function UserContextProvider({
       fetch(
         noRemoveBackground ? NoRemoveBackgroundRoute : removeBackgroundRoute,
         {
-          method: "POST",
+          method: 'POST',
           body: formData,
         }
       )
@@ -169,7 +169,7 @@ export function UserContextProvider({
                 key: string;
                 success: string;
               }) => {
-                console.info("GIF generation result:", result);
+                console.info('GIF generation result:', result);
                 setGifUrl(result.gifUrl);
                 setGifKey(result.key);
 
@@ -178,12 +178,12 @@ export function UserContextProvider({
               }
             )
             .catch(() => {
-              reject("Failed to upload frames");
-              setError("Failed to upload frames");
+              reject('Failed to upload frames');
+              setError('Failed to upload frames');
             });
         })
         .catch(() => {
-          reject("Failed to upload frames");
+          reject('Failed to upload frames');
         });
     });
   };

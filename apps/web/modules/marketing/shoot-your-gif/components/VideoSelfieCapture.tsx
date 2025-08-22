@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { apiClient } from "@shared/lib/api-client";
-import { v4 as uuid } from "uuid";
+import * as React from 'react';
+import { apiClient } from '@shared/lib/api-client';
+import { v4 as uuid } from 'uuid';
 
 export default function VideoSelfieCapture() {
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -25,11 +25,11 @@ export default function VideoSelfieCapture() {
     setPreviewUrl(null);
     const stream = videoRef.current?.srcObject as MediaStream;
     if (!stream) {
-      setError("Camera not ready");
+      setError('Camera not ready');
       setRecording(false);
       return;
     }
-    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
     const chunks: BlobPart[] = [];
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) {
@@ -37,7 +37,7 @@ export default function VideoSelfieCapture() {
       }
     };
     recorder.onstop = async () => {
-      const videoBlob = new Blob(chunks, { type: "video/webm" });
+      const videoBlob = new Blob(chunks, { type: 'video/webm' });
       setPreviewUrl(URL.createObjectURL(videoBlob));
       await uploadVideoAndProcess(videoBlob);
     };
@@ -55,7 +55,7 @@ export default function VideoSelfieCapture() {
     setGifUrl(null);
     try {
       const path = `videos/${uuid()}.webm`;
-      const bucket = "gifs";
+      const bucket = 'gifs';
       // Get signed upload URL
       const uploadUrl = await getSignedUploadUrlMutation.mutateAsync({
         path,
@@ -64,15 +64,15 @@ export default function VideoSelfieCapture() {
 
       // Upload the video
       const response = await fetch(uploadUrl, {
-        method: "PUT",
+        method: 'PUT',
         body: videoBlob,
         headers: {
-          "Content-Type": "video/webm",
+          'Content-Type': 'video/webm',
         },
       });
 
       if (!response.ok) {
-        throw new Error("Failed to upload video");
+        throw new Error('Failed to upload video');
       }
 
       // Get the signed URL for the uploaded video (valid for 1 day)
@@ -101,9 +101,9 @@ export default function VideoSelfieCapture() {
       setLoading(false);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err?.message || "Upload or processing failed.");
+        setError(err?.message || 'Upload or processing failed.');
       } else {
-        setError("Upload or processing failed.");
+        setError('Upload or processing failed.');
       }
       setLoading(false);
     }
@@ -115,14 +115,14 @@ export default function VideoSelfieCapture() {
     void (async () => {
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" },
+          video: { facingMode: 'user' },
           audio: false,
         });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
       } catch (e) {
-        setError("Unable to access camera. Please allow camera access.");
+        setError('Unable to access camera. Please allow camera access.');
       }
     })();
     return () => {
@@ -139,14 +139,14 @@ export default function VideoSelfieCapture() {
         autoPlay
         playsInline
         muted
-        className="rounded-lg border w-full max-w-xs aspect-video bg-black"
+        className="aspect-video w-full max-w-xs rounded-lg border bg-black"
       />
       {error && <div className="text-red-500">{error}</div>}
       {previewUrl && (
         <video
           src={previewUrl}
           controls
-          className="rounded-lg border w-full max-w-xs aspect-video"
+          className="aspect-video w-full max-w-xs rounded-lg border"
         >
           <track kind="captions" />
         </video>
@@ -155,19 +155,19 @@ export default function VideoSelfieCapture() {
         <img
           src={gifUrl}
           alt="Generated GIF"
-          className="rounded-lg border w-full max-w-xs aspect-video"
+          className="aspect-video w-full max-w-xs rounded-lg border"
         />
       )}
       <button
         onClick={handleRecord}
         disabled={recording || loading}
-        className="px-6 py-2 rounded text-white disabled:opacity-50"
+        className="rounded px-6 py-2 text-white disabled:opacity-50"
       >
         {recording
-          ? "Recording..."
+          ? 'Recording...'
           : loading
-            ? "Processing..."
-            : "Record 3s Selfie"}
+            ? 'Processing...'
+            : 'Record 3s Selfie'}
       </button>
     </div>
   );

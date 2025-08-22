@@ -1,15 +1,15 @@
-import type { inferAsyncReturnType } from "@trpc/server";
-import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import { lucia } from "auth";
-import { cookies } from "next/headers";
+import type { inferAsyncReturnType } from '@trpc/server';
+import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch';
+import { lucia } from 'auth';
+import { cookies } from 'next/headers';
 
 export async function createContext(
-  params?: FetchCreateContextFnOptions | { isAdmin?: boolean },
+  params?: FetchCreateContextFnOptions | { isAdmin?: boolean }
 ) {
-  console.log("lucia.sessionCookieName: ", lucia.sessionCookieName);
+  console.log('lucia.sessionCookieName: ', lucia.sessionCookieName);
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
 
-  console.log("sessionId: ", sessionId)
+  console.log('sessionId: ', sessionId);
 
   let luciaSession;
 
@@ -17,7 +17,6 @@ export async function createContext(
     luciaSession = sessionId
       ? await lucia.validateSession(sessionId)
       : { user: null, session: null };
-
   } catch {
     luciaSession = { user: null, session: null };
   }
@@ -26,9 +25,8 @@ export async function createContext(
     user: luciaSession?.user,
     session: luciaSession?.session,
     responseHeaders:
-      params && "resHeaders" in params ? params.resHeaders : undefined,
-    req:
-      params && "req" in params ? params.req : undefined,
+      params && 'resHeaders' in params ? params.resHeaders : undefined,
+    req: params && 'req' in params ? params.req : undefined,
   };
 }
 

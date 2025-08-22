@@ -1,13 +1,13 @@
-import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
-import { PrismaClient } from "database";
-import type { User } from "lucia";
-import { Lucia } from "lucia";
+import { PrismaAdapter } from '@lucia-auth/adapter-prisma';
+import { PrismaClient } from 'database';
+import type { User } from 'lucia';
+import { Lucia } from 'lucia';
 import type {
   DatabaseSessionAttributes,
   DatabaseUserAttributes,
-} from "../types";
+} from '../types';
 
-declare module "lucia" {
+declare module 'lucia' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Register {
     Lucia: typeof lucia;
@@ -24,7 +24,7 @@ export const lucia = new Lucia(adapter, {
   sessionCookie: {
     expires: false,
     attributes: {
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === 'production',
     },
   },
   getUserAttributes(data) {
@@ -36,4 +36,4 @@ export const lucia = new Lucia(adapter, {
 });
 
 export type SessionUser = User;
-export { Scrypt, type Session } from "lucia";
+export { Scrypt, type Session } from 'lucia';

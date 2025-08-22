@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { PledgeStyleEnum } from "../types";
-import { cn } from "@ui/lib";
-import { ReactNode, useEffect } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import Image from "next/image";
+import { PledgeStyleEnum } from '../types';
+import { cn } from '@ui/lib';
+import { ReactNode, useEffect } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
+import Image from 'next/image';
 
 export function PledgeSlider({
   pledges,
@@ -19,7 +19,7 @@ export function PledgeSlider({
   onPick: (val: PledgeStyleEnum) => void;
 }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    containScroll: "keepSnaps",
+    containScroll: 'keepSnaps',
     dragFree: true,
   });
 
@@ -56,7 +56,7 @@ export function PledgeSlider({
   };
 
   return (
-    <div className="overflow-hidden w-full p-10">
+    <div className="w-full overflow-hidden p-10">
       <div ref={emblaRef} className="embla">
         <div className="embla__container flex gap-10">
           {pledges.map((pledge, i) => (
@@ -65,10 +65,10 @@ export function PledgeSlider({
               type="button"
               onClick={() => handlePick(pledge.style)}
               className={cn(
-                "portrait:w-[600px] portrait:h-[600px] landscape:w-[400px] landscape:h-[400px] embla__slide aspect-square",
+                'embla__slide aspect-square portrait:h-[600px] portrait:w-[600px] landscape:h-[400px] landscape:w-[400px]',
                 selected === pledge.style
-                  ? "ring-[28px] ring-[#2B90D0]/40"
-                  : "ring-0"
+                  ? 'ring-[28px] ring-[#2B90D0]/40'
+                  : 'ring-0'
               )}
             >
               <Image
@@ -76,7 +76,7 @@ export function PledgeSlider({
                 alt="Pledge"
                 width={600}
                 height={600}
-                className="portrait:!w-[600px] portrait:!h-[600px] landscape:!w-[400px] landscape:!h-[400px] aspect-square"
+                className="aspect-square portrait:!h-[600px] portrait:!w-[600px] landscape:!h-[400px] landscape:!w-[400px]"
               />
             </button>
           ))}

@@ -1,5 +1,5 @@
-import Modal from "@marketing/home/components/Popups/Modal";
-import { useEffect, useState } from "react";
+import Modal from '@marketing/home/components/Popups/Modal';
+import { useEffect, useState } from 'react';
 
 function ProcessingModal() {
   const [dots, setDots] = useState(0);
@@ -15,11 +15,11 @@ function ProcessingModal() {
   return (
     <Modal isOpen>
       <p className="font-button-base text-center text-5xl uppercase text-white">
-        Processing{".".repeat(dots)}
+        Processing{'.'.repeat(dots)}
       </p>
       <p className="font-button-base mt-5 max-w-[600px] text-2xl uppercase text-white">
         It will take around a minute and a half.
-        </p>
+      </p>
     </Modal>
   );
 }

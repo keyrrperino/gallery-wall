@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import Script from "next/script";
+import Script from 'next/script';
 
 const pirschCode = process.env.NEXT_PUBLIC_PIRSCH_CODE!;
 
@@ -19,7 +19,7 @@ export function AnalyticsScript() {
 export function useAnalytics() {
   const trackEvent = (event: string, data?: Record<string, unknown>) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    if (typeof window === "undefined" || !(window as any).pirsch) {
+    if (typeof window === 'undefined' || !(window as any).pirsch) {
       return;
     }
 

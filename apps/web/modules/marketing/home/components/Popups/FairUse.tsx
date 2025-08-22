@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import SimpleButton from "../Button";
+import SimpleButton from '../Button';
 
 const FairUsePopup: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,7 +16,7 @@ const FairUsePopup: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 transition-all ${isOpen ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 transition-all ${isOpen ? 'scale-100 opacity-100' : 'scale-110 opacity-0'}`}
     >
       {/* Popup Content */}
 

@@ -1,6 +1,6 @@
-import { UserGifRequestSchema, db } from "database";
-import { z } from "zod";
-import { publicProcedure } from "../../../trpc/base";
+import { UserGifRequestSchema, db } from 'database';
+import { z } from 'zod';
+import { publicProcedure } from '../../../trpc/base';
 
 export const requests = publicProcedure
   .input(
@@ -8,7 +8,7 @@ export const requests = publicProcedure
       limit: z.number().optional().default(25),
       offset: z.number().optional().default(0),
       searchTerm: z.string().optional(),
-    }),
+    })
   )
   .output(
     z.object({
@@ -19,26 +19,26 @@ export const requests = publicProcedure
         })
       ),
       total: z.number(),
-    }),
+    })
   )
   .query(async ({ input: { limit, offset, searchTerm } }) => {
-    const sanitizedSearchTerm = (searchTerm ?? "").trim().toLowerCase();
+    const sanitizedSearchTerm = (searchTerm ?? '').trim().toLowerCase();
 
     const where = sanitizedSearchTerm
       ? {
-        OR: [
-          {
-            userId: {
-              contains: sanitizedSearchTerm,
+          OR: [
+            {
+              userId: {
+                contains: sanitizedSearchTerm,
+              },
             },
-          },
-          {
-            userId: {
-              contains: sanitizedSearchTerm,
+            {
+              userId: {
+                contains: sanitizedSearchTerm,
+              },
             },
-          },
-        ],
-      }
+          ],
+        }
       : {};
 
     const requests = await db.userGifRequest.findMany({

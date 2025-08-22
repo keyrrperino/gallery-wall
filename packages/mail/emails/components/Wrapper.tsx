@@ -5,10 +5,10 @@ import {
   Html,
   Section,
   Tailwind,
-} from "@react-email/components";
-import { PropsWithChildren } from "react";
-import { lightVariables } from "tailwind-config/tailwind.config";
-import { Logo } from "./Logo";
+} from '@react-email/components';
+import { PropsWithChildren } from 'react';
+import { lightVariables } from 'tailwind-config/tailwind.config';
+import { Logo } from './Logo';
 
 export default function Wrapper({ children }: PropsWithChildren) {
   return (
@@ -33,35 +33,35 @@ export default function Wrapper({ children }: PropsWithChildren) {
                 foreground: lightVariables.colors.foreground,
                 primary: {
                   DEFAULT: lightVariables.colors.primary,
-                  foreground: lightVariables.colors["primary-foreground"],
+                  foreground: lightVariables.colors['primary-foreground'],
                 },
                 secondary: {
                   DEFAULT: lightVariables.colors.secondary,
-                  foreground: lightVariables.colors["secondary-foreground"],
+                  foreground: lightVariables.colors['secondary-foreground'],
                 },
                 destructive: {
                   DEFAULT: lightVariables.colors.destructive,
-                  foreground: lightVariables.colors["destructive-foreground"],
+                  foreground: lightVariables.colors['destructive-foreground'],
                 },
                 success: {
                   DEFAULT: lightVariables.colors.success,
-                  foreground: lightVariables.colors["success-foreground"],
+                  foreground: lightVariables.colors['success-foreground'],
                 },
                 muted: {
                   DEFAULT: lightVariables.colors.muted,
-                  foreground: lightVariables.colors["muted-foreground"],
+                  foreground: lightVariables.colors['muted-foreground'],
                 },
                 accent: {
                   DEFAULT: lightVariables.colors.accent,
-                  foreground: lightVariables.colors["accent-foreground"],
+                  foreground: lightVariables.colors['accent-foreground'],
                 },
                 popover: {
                   DEFAULT: lightVariables.colors.popover,
-                  foreground: lightVariables.colors["popover-foreground"],
+                  foreground: lightVariables.colors['popover-foreground'],
                 },
                 card: {
                   DEFAULT: lightVariables.colors.card,
-                  foreground: lightVariables.colors["card-foreground"],
+                  foreground: lightVariables.colors['card-foreground'],
                 },
               },
             },

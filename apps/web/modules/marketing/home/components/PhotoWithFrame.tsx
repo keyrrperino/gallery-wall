@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 export enum PhotoWithFrameState {
-  IS_LOADING = "IS_LOADING",
-  LOADED = "LOADED",
+  IS_LOADING = 'IS_LOADING',
+  LOADED = 'LOADED',
 }
 
 type PhotoWithFrameTypes = {
@@ -18,13 +18,13 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
 
   const getMarginImageBased = (setNo: string) => {
     switch (setNo) {
-      case "0":
+      case '0':
         return -300;
 
-      case "1":
+      case '1':
         return 0;
 
-      case "2":
+      case '2':
         return -200;
 
       default:
@@ -37,9 +37,9 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
 
     const imgEle1 = new Image();
     const imgEle2 = new Image();
-    const resEle = document.getElementById("printable");
+    const resEle = document.getElementById('printable');
 
-    const setNo = imageUrl.split("?setNo=")[1];
+    const setNo = imageUrl.split('?setNo=')[1];
     console.log({ imageUrl });
 
     const marginTop = getMarginImageBased(setNo);
@@ -49,7 +49,7 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
     imgEle1.onload = () => {
       imgEle2.onload = () => {
         if (resEle instanceof HTMLCanvasElement) {
-          const context = resEle.getContext("2d");
+          const context = resEle.getContext('2d');
 
           if (context) {
             const aspectRatio = imgEle2.naturalWidth / imgEle2.naturalHeight;
@@ -65,13 +65,13 @@ export function PhotoWithFrame(props: PhotoWithFrameTypes) {
             context.drawImage(imgEle1, 0, marginTop, imgEle2.width, newHeight2);
             context.globalAlpha = 1;
             context.drawImage(imgEle2, 0, 0);
-            const imageUrlBase64FromCanvas = resEle.toDataURL("image/png");
+            const imageUrlBase64FromCanvas = resEle.toDataURL('image/png');
             onGenerateFrame(imageUrlBase64FromCanvas);
             onStateChange && onStateChange(PhotoWithFrameState.LOADED);
           }
         }
       };
-      imgEle2.src = "/images/ai-frame.png"; // Set the source for imgEle2
+      imgEle2.src = '/images/ai-frame.png'; // Set the source for imgEle2
     };
     imgEle1.src = `/_next/image?url=${encodeURIComponent(imageUrl)}&w=3840&q=100`;
   }, [imageUrl]);

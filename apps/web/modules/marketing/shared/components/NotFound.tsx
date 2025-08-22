@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Link } from "@i18n";
-import { Button } from "@ui/components/button";
-import { UndoIcon } from "lucide-react";
+import { Link } from '@i18n';
+import { Button } from '@ui/components/button';
+import { UndoIcon } from 'lucide-react';
 
 export function NotFound() {
   return (

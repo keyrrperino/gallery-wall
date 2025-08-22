@@ -22,7 +22,7 @@ export default function RecordingProgress({
       viewBox="0 0 72 72"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ transform: "rotate(-90deg)" }}
+      style={{ transform: 'rotate(-90deg)' }}
       className={className}
     >
       <circle

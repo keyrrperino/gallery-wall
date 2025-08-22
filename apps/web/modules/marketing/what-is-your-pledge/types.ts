@@ -1,7 +1,7 @@
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { StaticImport } from 'next/dist/shared/lib/get-img-props';
 
 export type PlegeItemType = {
-	topText: string;
+  topText: string;
   img?: StaticImport | string;
   bottomText: string;
   onClick?: (value: string) => void;
@@ -9,7 +9,7 @@ export type PlegeItemType = {
 };
 
 export enum PledgeStyleEnum {
-  SUPPORT = "support",
-  FUTURE = "future",
-  CARE = "care",
+  SUPPORT = 'support',
+  FUTURE = 'future',
+  CARE = 'care',
 }

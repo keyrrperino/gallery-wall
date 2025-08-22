@@ -1,32 +1,32 @@
-import { appConfig } from "@config";
-import { defineCollection, defineConfig } from "@content-collections/core";
-import { compileMDX } from "@content-collections/mdx";
-import { slugifyHeadline } from "@shared/lib/content";
-import rehypeShiki from "@shikijs/rehype";
-import markdownToc from "markdown-toc";
-import rehypeImgSize from "rehype-img-size";
-import { z } from "zod";
+import { appConfig } from '@config';
+import { defineCollection, defineConfig } from '@content-collections/core';
+import { compileMDX } from '@content-collections/mdx';
+import { slugifyHeadline } from '@shared/lib/content';
+import rehypeShiki from '@shikijs/rehype';
+import markdownToc from 'markdown-toc';
+import rehypeImgSize from 'rehype-img-size';
+import { z } from 'zod';
 
 function sanitizePath(path: string) {
   return path
-    .replace(/(\.[a-zA-Z\\-]{2,5})$/, "")
-    .replace(/^\//, "")
-    .replace(/\/$/, "")
-    .replace(/index$/, "");
+    .replace(/(\.[a-zA-Z\\-]{2,5})$/, '')
+    .replace(/^\//, '')
+    .replace(/\/$/, '')
+    .replace(/index$/, '');
 }
 
 function getLocaleFromFilePath(path: string) {
   return (
     path
       .match(/(\.[a-zA-Z\\-]{2,5})+\.(md|mdx|json)$/)?.[1]
-      ?.replace(".", "") ?? appConfig.i18n.defaultLocale
+      ?.replace('.', '') ?? appConfig.i18n.defaultLocale
   );
 }
 
 const posts = defineCollection({
-  name: "posts",
-  directory: "content/posts",
-  include: "**/*.{mdx,md}",
+  name: 'posts',
+  directory: 'content/posts',
+  include: '**/*.{mdx,md}',
   schema: (z) => ({
     title: z.string(),
     date: z.string(),
@@ -44,8 +44,8 @@ const posts = defineCollection({
         [
           rehypeShiki,
           {
-            theme: "nord",
-            langs: ["python"],
+            theme: 'nord',
+            langs: ['python'],
           },
         ],
       ],
@@ -61,9 +61,9 @@ const posts = defineCollection({
 });
 
 const legalPages = defineCollection({
-  name: "legalPages",
-  directory: "content/legal",
-  include: "**/*.{mdx,md}",
+  name: 'legalPages',
+  directory: 'content/legal',
+  include: '**/*.{mdx,md}',
   schema: (z) => ({
     title: z.string(),
   }),
@@ -80,9 +80,9 @@ const legalPages = defineCollection({
 });
 
 const documentationPages = defineCollection({
-  name: "documentationPages",
-  directory: "content/documentation",
-  include: "**/*.{mdx,md}",
+  name: 'documentationPages',
+  directory: 'content/documentation',
+  include: '**/*.{mdx,md}',
   schema: (z) => ({
     title: z.string(),
     subtitle: z.string().optional(),
@@ -93,11 +93,11 @@ const documentationPages = defineCollection({
         [
           rehypeShiki,
           {
-            theme: "nord",
-            langs: ["python"],
+            theme: 'nord',
+            langs: ['python'],
           },
         ],
-        [rehypeImgSize, { dir: "public" }],
+        [rehypeImgSize, { dir: 'public' }],
       ],
     });
 
@@ -120,10 +120,10 @@ const documentationPages = defineCollection({
 });
 
 const documentationMeta = defineCollection({
-  name: "documentationMeta",
-  directory: "content/documentation",
-  include: "**/*.json",
-  parser: "json",
+  name: 'documentationMeta',
+  directory: 'content/documentation',
+  include: '**/*.json',
+  parser: 'json',
   schema: () => ({
     items: z.record(
       z.union([
@@ -131,13 +131,13 @@ const documentationMeta = defineCollection({
         z.object({
           title: z.string(),
         }),
-      ]),
+      ])
     ),
   }),
   transform: async (document) => {
     return {
       data: document.items,
-      path: document._meta.path.split("/").slice(0, -1).join("/"),
+      path: document._meta.path.split('/').slice(0, -1).join('/'),
       locale: getLocaleFromFilePath(document._meta.filePath),
     };
   },

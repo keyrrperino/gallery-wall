@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import Script from "next/script";
+import Script from 'next/script';
 
 const plausibleUrl = process.env.NEXT_PUBLIC_PLAUSIBLE_URL!;
 
@@ -18,7 +18,7 @@ export function AnalyticsScript() {
 export function useAnalytics() {
   const trackEvent = (event: string, data?: Record<string, unknown>) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    if (typeof window === "undefined" || !(window as any).plausible) {
+    if (typeof window === 'undefined' || !(window as any).plausible) {
       return;
     }
 

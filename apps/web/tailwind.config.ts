@@ -1,8 +1,8 @@
-import baseConfig from "tailwind-config/tailwind.config";
-import type { Config } from "tailwindcss";
+import baseConfig from 'tailwind-config/tailwind.config';
+import type { Config } from 'tailwindcss';
 
 export default {
   presets: [baseConfig],
-  content: ["./app/**/*.tsx", "./modules/**/*.tsx"],
-  safelist: ["ml-2", "ml-4", "ml-6", "ml-8", "ml-10"],
+  content: ['./app/**/*.tsx', './modules/**/*.tsx'],
+  safelist: ['ml-2', 'ml-4', 'ml-6', 'ml-8', 'ml-10'],
 } satisfies Config;

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { AlertCircleIcon, BellIcon, CheckIcon, LoaderIcon } from "lucide-react";
-import type { JSXElementConstructor } from "react";
-import { useToast } from "../hooks/use-toast";
-import type { ToastProps } from "./toast";
+import { AlertCircleIcon, BellIcon, CheckIcon, LoaderIcon } from 'lucide-react';
+import type { JSXElementConstructor } from 'react';
+import { useToast } from '../hooks/use-toast';
+import type { ToastProps } from './toast';
 import {
   Toast,
   ToastClose,
@@ -11,10 +11,10 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "./toast";
+} from './toast';
 
 const variantIcons: Record<
-  NonNullable<ToastProps["variant"]>,
+  NonNullable<ToastProps['variant']>,
   JSXElementConstructor<{ className?: string }>
 > = {
   default: BellIcon,
@@ -39,7 +39,7 @@ export function Toaster() {
               {ToastIcon !== undefined && (
                 <ToastIcon
                   className={`size-6 shrink-0 opacity-50 ${
-                    props.variant === "loading" ? "animate-spin" : ""
+                    props.variant === 'loading' ? 'animate-spin' : ''
                   }`}
                 />
               )}

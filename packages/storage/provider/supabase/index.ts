@@ -1,8 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 import type {
   GetSignedUploadUrlHandler,
   GetSignedUrlHander,
-} from "../../types";
+} from '../../types';
 
 let supabaseClient: ReturnType<typeof createClient> | null = null;
 const getSupabaseAdminClient = () => {
@@ -12,12 +12,12 @@ const getSupabaseAdminClient = () => {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   if (!supabaseUrl) {
-    throw new Error("Missing env variable NEXT_PUBLIC_SUPABASE_URL");
+    throw new Error('Missing env variable NEXT_PUBLIC_SUPABASE_URL');
   }
 
   const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   if (!supabaseServiceRoleKey) {
-    throw new Error("Missing env variable SUPABASE_SERVICE_ROLE_KEY");
+    throw new Error('Missing env variable SUPABASE_SERVICE_ROLE_KEY');
   }
 
   supabaseClient = createClient(supabaseUrl, supabaseServiceRoleKey);
@@ -27,7 +27,7 @@ const getSupabaseAdminClient = () => {
 
 export const getSupabaseSignedUploadUrl: GetSignedUploadUrlHandler = async (
   path,
-  { bucket },
+  { bucket }
 ) => {
   const supabaseClient = getSupabaseAdminClient();
   const { data, error } = await supabaseClient.storage
@@ -36,7 +36,7 @@ export const getSupabaseSignedUploadUrl: GetSignedUploadUrlHandler = async (
 
   if (error) {
     console.error(error);
-    throw new Error("Could not get signed url");
+    throw new Error('Could not get signed url');
   }
 
   return data.signedUrl;
@@ -44,7 +44,7 @@ export const getSupabaseSignedUploadUrl: GetSignedUploadUrlHandler = async (
 
 export const getSupabaseSignedUrl: GetSignedUrlHander = async (
   path,
-  { bucket, expiresIn },
+  { bucket, expiresIn }
 ) => {
   const supabaseClient = getSupabaseAdminClient();
   const { data, error } = await supabaseClient.storage
@@ -53,7 +53,7 @@ export const getSupabaseSignedUrl: GetSignedUrlHander = async (
 
   if (error) {
     console.error(error);
-    throw new Error("Could not get signed url");
+    throw new Error('Could not get signed url');
   }
 
   return data.signedUrl;

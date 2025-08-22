@@ -9,8 +9,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        headline: ['"Novecento Sans"', 'sans-serif'],
-        body: ['"Neue Haas Grotesk"', 'sans-serif'],
+        headline: ['"novecento-sans-condensed"', 'sans-serif'],
+        body: ['"neue-haas-grotesk-display"', 'sans-serif'],
       },
     },
   },

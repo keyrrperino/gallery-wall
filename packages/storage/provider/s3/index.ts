@@ -1,115 +1,115 @@
 import {
-	GetObjectCommand,
-	PutObjectCommand,
-	S3Client,
-} from "@aws-sdk/client-s3";
-import { getSignedUrl as getS3SignedUrl } from "@aws-sdk/s3-request-presigner";
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl as getS3SignedUrl } from '@aws-sdk/s3-request-presigner';
 import type {
-	GetSignedUploadUrlHandler,
-	GetSignedUrlHander,
-} from "../../types";
-import { Readable } from "stream";
+  GetSignedUploadUrlHandler,
+  GetSignedUrlHander,
+} from '../../types';
+import { Readable } from 'stream';
 
 let s3Client: S3Client | null = null;
 
 const getS3Client = () => {
-	if (s3Client) {
-		return s3Client;
-	}
+  if (s3Client) {
+    return s3Client;
+  }
 
-	const s3Endpoint = process.env.S3_ENDPOINT as string;
-	if (!s3Endpoint) {
-		throw new Error("Missing env variable S3_ENDPOINT");
-	}
+  const s3Endpoint = process.env.S3_ENDPOINT as string;
+  if (!s3Endpoint) {
+    throw new Error('Missing env variable S3_ENDPOINT');
+  }
 
-	const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID as string;
-	if (!s3AccessKeyId) {
-		throw new Error("Missing env variable S3_ACCESS_KEY_ID");
-	}
+  const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID as string;
+  if (!s3AccessKeyId) {
+    throw new Error('Missing env variable S3_ACCESS_KEY_ID');
+  }
 
-	const s3SecretAccessKey = process.env.S3_SECRET_ACCESS_KEY as string;
-	if (!s3SecretAccessKey) {
-		throw new Error("Missing env variable S3_SECRET_ACCESS_KEY");
-	}
+  const s3SecretAccessKey = process.env.S3_SECRET_ACCESS_KEY as string;
+  if (!s3SecretAccessKey) {
+    throw new Error('Missing env variable S3_SECRET_ACCESS_KEY');
+  }
 
-	s3Client = new S3Client({
-		region: "auto",
-		endpoint: s3Endpoint,
-		forcePathStyle: true,
-		credentials: {
-			accessKeyId: s3AccessKeyId,
-			secretAccessKey: s3SecretAccessKey,
-		},
-	});
+  s3Client = new S3Client({
+    region: 'auto',
+    endpoint: s3Endpoint,
+    forcePathStyle: true,
+    credentials: {
+      accessKeyId: s3AccessKeyId,
+      secretAccessKey: s3SecretAccessKey,
+    },
+  });
 
-	return s3Client;
+  return s3Client;
 };
 
 export const getSignedUploadUrl: GetSignedUploadUrlHandler = async (
-	path,
-	{ bucket },
+  path,
+  { bucket }
 ) => {
-	const s3Client = getS3Client();
-	try {
-		return await getS3SignedUrl(
-			s3Client,
-			new PutObjectCommand({
-				Bucket: bucket,
-				Key: path,
-				ContentType: "image/jpeg",
-			}),
-			{
-				expiresIn: 60,
-			},
-		);
-	} catch (e) {
-		console.error(e);
+  const s3Client = getS3Client();
+  try {
+    return await getS3SignedUrl(
+      s3Client,
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: path,
+        ContentType: 'image/jpeg',
+      }),
+      {
+        expiresIn: 60,
+      }
+    );
+  } catch (e) {
+    console.error(e);
 
-		throw new Error("Could not get signed upload url");
-	}
+    throw new Error('Could not get signed upload url');
+  }
 };
 
 export const getSignedUrl: GetSignedUrlHander = async (
-	path,
-	{ bucket, expiresIn },
+  path,
+  { bucket, expiresIn }
 ) => {
-	const s3Client = getS3Client();
-	try {
-		return getS3SignedUrl(
-			s3Client,
-			new GetObjectCommand({ Bucket: bucket, Key: path }),
-			{ expiresIn },
-		);
-	} catch (e) {
-		console.error(e);
-		throw new Error("Could not get signed url");
-	}
+  const s3Client = getS3Client();
+  try {
+    return getS3SignedUrl(
+      s3Client,
+      new GetObjectCommand({ Bucket: bucket, Key: path }),
+      { expiresIn }
+    );
+  } catch (e) {
+    console.error(e);
+    throw new Error('Could not get signed url');
+  }
 };
 
 export const uploadStreamToS3 = async ({
-	bucket,
-	key,
-	stream,
-	contentType,
+  bucket,
+  key,
+  stream,
+  contentType,
 }: {
-	bucket: string;
-	key: string;
-	stream: Readable;
-	contentType: string;
+  bucket: string;
+  key: string;
+  stream: Readable;
+  contentType: string;
 }) => {
-	const s3Client = getS3Client();
-	try {
-		await s3Client.send(
-			new PutObjectCommand({
-				Bucket: bucket,
-				Key: key,
-				Body: stream,
-				ContentType: contentType,
-			})
-		);
-		return true;
-	} catch (e) {
-		console.error(e);
-		throw new Error("Could not upload stream to S3");
-	}
+  const s3Client = getS3Client();
+  try {
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: stream,
+        ContentType: contentType,
+      })
+    );
+    return true;
+  } catch (e) {
+    console.error(e);
+    throw new Error('Could not upload stream to S3');
+  }
 };

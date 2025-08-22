@@ -1,6 +1,6 @@
-import { UserSchema, db } from "database";
-import { z } from "zod";
-import { protectedProcedure } from "../../../trpc/base";
+import { UserSchema, db } from 'database';
+import { z } from 'zod';
+import { protectedProcedure } from '../../../trpc/base';
 
 export const users = protectedProcedure
   .input(
@@ -8,7 +8,7 @@ export const users = protectedProcedure
       limit: z.number().optional().default(25),
       offset: z.number().optional().default(0),
       searchTerm: z.string().optional(),
-    }),
+    })
   )
   .output(
     z.object({
@@ -19,28 +19,28 @@ export const users = protectedProcedure
         })
       ),
       total: z.number(),
-    }),
+    })
   )
   .query(async ({ input: { limit, offset, searchTerm } }) => {
-    const sanitizedSearchTerm = (searchTerm ?? "").trim().toLowerCase();
+    const sanitizedSearchTerm = (searchTerm ?? '').trim().toLowerCase();
 
     const where = sanitizedSearchTerm
       ? {
-        OR: [
-          {
-            name: {
-              contains: sanitizedSearchTerm,
+          OR: [
+            {
+              name: {
+                contains: sanitizedSearchTerm,
+              },
             },
-          },
-        ],
-      }
+          ],
+        }
       : {};
 
     const users = await db.user.findMany({
       where,
       select: {
         name: true,
-        id: true
+        id: true,
       },
       take: limit,
       skip: offset,

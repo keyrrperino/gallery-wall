@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import SimpleButton from "@marketing/home/components/Button";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Logo } from "@shared/components/Logo";
-import { useUser } from "@saas/auth/hooks/use-user";
-import QRCodeGenerator from "@marketing/shared/components/QRCodeGenerator";
-import { apiClient } from "@shared/lib/api-client";
-import { supabase } from "../../../lib/supabaseClient";
+import { useState, useEffect, useCallback } from 'react';
+import SimpleButton from '@marketing/home/components/Button';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Logo } from '@shared/components/Logo';
+import { useUser } from '@saas/auth/hooks/use-user';
+import QRCodeGenerator from '@marketing/shared/components/QRCodeGenerator';
+import { apiClient } from '@shared/lib/api-client';
+import { supabase } from '../../../lib/supabaseClient';
 
 export default function PledgeCopy() {
   const router = useRouter();
   const { gifUrl, userGifRequestId } = useUser();
   const searchParams = useSearchParams();
-  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const noRemoveBackground = searchParams.get('noRemoveBackground');
   const additionUrl = noRemoveBackground
     ? `?noRemoveBackground=${noRemoveBackground}`
-    : "?";
+    : '?';
 
-  const [downloadPledgeUrl, setDownloadPledgeUrl] = useState<string>("");
+  const [downloadPledgeUrl, setDownloadPledgeUrl] = useState<string>('');
   const [downloadStatus, setDownloadStatus] = useState<{
     isDownloaded: boolean;
     downloadedAt: string | null;
@@ -37,7 +37,7 @@ export default function PledgeCopy() {
       }
     );
 
-  const customFilename = "pub_pledge_wall.gif";
+  const customFilename = 'pub_pledge_wall.gif';
 
   const redirectToThankYou = useCallback(() => {
     router.push(`/thank-you${additionUrl}`);
@@ -49,7 +49,7 @@ export default function PledgeCopy() {
       setDownloadStatus({
         isDownloaded: initialDownloadStatus.isDownloaded,
         downloadedAt: initialDownloadStatus.downloadedAt
-          ? typeof initialDownloadStatus.downloadedAt === "string"
+          ? typeof initialDownloadStatus.downloadedAt === 'string'
             ? initialDownloadStatus.downloadedAt
             : initialDownloadStatus.downloadedAt.toISOString()
           : null,
@@ -61,16 +61,16 @@ export default function PledgeCopy() {
   // Set up Supabase Realtime subscription for download status updates
   useEffect(() => {
     const channel = supabase
-      .channel("user-gif-request-changes")
+      .channel('user-gif-request-changes')
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "UPDATE",
-          schema: "public",
-          table: "UserGifRequest",
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'UserGifRequest',
         },
         (payload) => {
-          console.info("Realtime update received:", payload);
+          console.info('Realtime update received:', payload);
           const newRecord = payload.new as any;
 
           if (newRecord.isDownloaded !== undefined) {
@@ -95,26 +95,26 @@ export default function PledgeCopy() {
 
     const createTrackedDownloadUrl = async () => {
       if (!gifUrl && !cancelled) {
-        setDownloadPledgeUrl("");
+        setDownloadPledgeUrl('');
         return;
       }
 
       try {
         // Extract the path from the gifUrl if it's already a full URL
         let gifPath = gifUrl;
-        if (gifUrl?.includes("supabase")) {
+        if (gifUrl?.includes('supabase')) {
           // Extract the path from a Supabase URL
-          const urlParts = gifUrl.split("/");
-          const bucketIndex = urlParts.findIndex((part) => part === "gifs");
+          const urlParts = gifUrl.split('/');
+          const bucketIndex = urlParts.findIndex((part) => part === 'gifs');
           if (bucketIndex !== -1) {
-            gifPath = urlParts.slice(bucketIndex + 1).join("/");
+            gifPath = urlParts.slice(bucketIndex + 1).join('/');
           }
         }
 
         // Create tracked download URL with custom filename
         const { url } = await createTrackedDownloadUrlMutation.mutateAsync({
-          filePath: gifPath || "",
-          bucket: "gifs",
+          filePath: gifPath || '',
+          bucket: 'gifs',
           filename: customFilename,
           userGifRequestId: userGifRequestId || undefined,
         });
@@ -123,13 +123,13 @@ export default function PledgeCopy() {
           setDownloadPledgeUrl(url);
         }
       } catch (error) {
-        console.error("Failed to create tracked download URL:", error);
+        console.error('Failed to create tracked download URL:', error);
         if (!cancelled) {
           // Fallback to original gifUrl with download parameter
           setDownloadPledgeUrl(
             gifUrl
               ? `${gifUrl}?download=${encodeURIComponent(customFilename)}`
-              : ""
+              : ''
           );
         }
       }
@@ -153,15 +153,15 @@ export default function PledgeCopy() {
   }, [downloadStatus?.isDownloaded, redirectToThankYou]);
 
   return (
-    <div className="flex w-full h-full flex-col gap-12 items-center justify-start bg-white pb-20">
+    <div className="flex h-full w-full flex-col items-center justify-start gap-12 bg-white pb-20">
       <Logo />
       {/* TOP BAR */}
-      <h1 className="text-[80px] uppercase text-center leading-[1] -tracking-[1.6px] portrait:mx-[300px] landscape:mx-20">
+      <h1 className="text-center text-[80px] uppercase leading-[1] -tracking-[1.6px] portrait:mx-[300px] landscape:mx-20">
         Want a copy of your pledge?
       </h1>
 
       {/* INTRO TEXT */}
-      <p className="text-2xl text-center text-black/70 leading-[1.25]">
+      <p className="text-center text-2xl leading-[1.25] text-black/70">
         Your pledge has joined others on our Live Pledge Wall!
         <br />
         You&apos;re now part of a growing wave of support for Singapore&apos;s
@@ -169,9 +169,9 @@ export default function PledgeCopy() {
       </p>
 
       {/* DOWNLOAD MY PLEDGE SECTION */}
-      <div className="flex flex-col justify-between h-full items-center w-full portrait:mt-16 landscape:mt-0">
+      <div className="flex h-full w-full flex-col items-center justify-between portrait:mt-16 landscape:mt-0">
         <div className="flex flex-col gap-9">
-          <h2 className="text-[48px] font-text-bold uppercase">
+          <h2 className="font-text-bold text-[48px] uppercase">
             DOWNLOAD MY PLEDGE
           </h2>
 
@@ -183,7 +183,7 @@ export default function PledgeCopy() {
             />
             {downloadPledgeUrl && (
               <div className="flex flex-col items-center gap-4">
-                <p className="text-sm text-gray-600 text-center">
+                <p className="text-center text-sm text-gray-600">
                   Scan to download your pledge
                 </p>
               </div>
@@ -192,7 +192,7 @@ export default function PledgeCopy() {
         </div>
 
         <SimpleButton
-          className="self-center text-white rounded-full font-bold py-[26px] text-[32px] items-center justify-center w-[400px]"
+          className="w-[400px] items-center justify-center self-center rounded-full py-[26px] text-[32px] font-bold text-white"
           onClick={redirectToThankYou}
         >
           SKIP

@@ -1,6 +1,6 @@
-import { TRPCError, initTRPC } from "@trpc/server";
-import superjson from "superjson";
-import type { Context } from "./context";
+import { TRPCError, initTRPC } from '@trpc/server';
+import superjson from 'superjson';
+import type { Context } from './context';
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
@@ -8,7 +8,7 @@ const t = initTRPC.context<Context>().create({
 
 const isAuthenticatedMiddleware = t.middleware(({ ctx, next }) => {
   if (!ctx.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
   return next({
     ctx: {

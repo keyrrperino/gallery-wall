@@ -1,17 +1,17 @@
-describe("homepage", () => {
+describe('homepage', () => {
   beforeEach(() => {
-    cy.visit("/");
+    cy.visit('/');
   });
 
-  describe("navigation", () => {
-    "pending";
+  describe('navigation', () => {
+    'pending';
   });
 
-  describe("banner", () => {
-    "pending";
+  describe('banner', () => {
+    'pending';
   });
 
-  describe("dark mode", () => {
-    "pending";
+  describe('dark mode', () => {
+    'pending';
   });
 });

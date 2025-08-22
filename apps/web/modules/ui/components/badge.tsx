@@ -1,31 +1,31 @@
-import type { VariantProps } from "class-variance-authority";
-import { cva } from "class-variance-authority";
-import React from "react";
+import type { VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
+import React from 'react';
 
 export const badge = cva(
   [
-    "inline-block",
-    "rounded-full",
-    "px-3",
-    "py-1",
-    "text-xs",
-    "uppercase",
-    "font-semibold",
-    "leading-tight",
+    'inline-block',
+    'rounded-full',
+    'px-3',
+    'py-1',
+    'text-xs',
+    'uppercase',
+    'font-semibold',
+    'leading-tight',
   ],
   {
     variants: {
       status: {
-        success: ["bg-emerald-500/10", "text-emerald-500"],
-        info: ["bg-primary/10", "text-primary"],
-        warning: ["bg-amber-500/10", "text-amber-500"],
-        error: ["bg-rose-500/10", "text-rose-500"],
+        success: ['bg-emerald-500/10', 'text-emerald-500'],
+        info: ['bg-primary/10', 'text-primary'],
+        warning: ['bg-amber-500/10', 'text-amber-500'],
+        error: ['bg-rose-500/10', 'text-rose-500'],
       },
     },
     defaultVariants: {
-      status: "info",
+      status: 'info',
     },
-  },
+  }
 );
 
 export type BadgeProps = React.HtmlHTMLAttributes<HTMLDivElement> &
@@ -42,4 +42,4 @@ export const Badge = ({
   </span>
 );
 
-Badge.displayName = "Badge";
+Badge.displayName = 'Badge';

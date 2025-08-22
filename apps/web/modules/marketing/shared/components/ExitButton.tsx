@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import ConfirmExitModal from "./ConfirmExitModal";
-import { XIcon } from "lucide-react";
-import { Button } from "@ui/components/button";
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import ConfirmExitModal from './ConfirmExitModal';
+import { XIcon } from 'lucide-react';
+import { Button } from '@ui/components/button';
 
 export default function ExitButton() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const noRemoveBackground = searchParams.get("noRemoveBackground");
+  const noRemoveBackground = searchParams.get('noRemoveBackground');
   const additionUrl = noRemoveBackground
     ? `?noRemoveBackground=${noRemoveBackground}`
-    : "";
+    : '';
 
   const handleConfirm = () => {
     setOpen(false);
-    router.push("/" + additionUrl);
+    router.push('/' + additionUrl);
   };
 
   return (
@@ -26,11 +26,11 @@ export default function ExitButton() {
         variant="ghost"
         size="icon"
         onClick={() => setOpen(true)}
-        className="hover:opacity-70 transition"
+        className="transition hover:opacity-70"
         aria-label="Exit"
         asChild
       >
-        <XIcon color="black" className="w-12 h-12" strokeWidth={4} />
+        <XIcon color="black" className="h-12 w-12" strokeWidth={4} />
       </Button>
 
       {open && (

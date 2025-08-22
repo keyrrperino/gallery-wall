@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import Script from "next/script";
+import Script from 'next/script';
 
 const umamiTrackingId = process.env.NEXT_PUBLIC_UMAMI_TRACKING_ID!;
 
@@ -18,7 +18,7 @@ export function AnalyticsScript() {
 export function useAnalytics() {
   const trackEvent = (event: string, data?: Record<string, unknown>) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    if (typeof window === "undefined" || !(window as any).umami) {
+    if (typeof window === 'undefined' || !(window as any).umami) {
       return;
     }
 

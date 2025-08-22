@@ -1,5 +1,8 @@
-import { Storage } from "@google-cloud/storage";
-import type { GetSignedUploadUrlHandler, GetSignedUrlHander } from "../../types";
+import { Storage } from '@google-cloud/storage';
+import type {
+  GetSignedUploadUrlHandler,
+  GetSignedUrlHander,
+} from '../../types';
 
 let storage: Storage | null = null;
 
@@ -10,7 +13,7 @@ const getStorage = () => {
 
   const projectId = process.env.GCP_PROJECT_ID!;
   if (!projectId) {
-    throw new Error("Missing env variable GCP_PROJECT_ID");
+    throw new Error('Missing env variable GCP_PROJECT_ID');
   }
 
   storage = new Storage({ projectId });
@@ -20,7 +23,7 @@ const getStorage = () => {
 
 export const getSignedUploadUrl: GetSignedUploadUrlHandler = async (
   path,
-  { bucket },
+  { bucket }
 ) => {
   const storage = getStorage();
   try {
@@ -28,37 +31,34 @@ export const getSignedUploadUrl: GetSignedUploadUrlHandler = async (
       .bucket(bucket)
       .file(path)
       .getSignedUrl({
-        version: "v4",
-        action: "write",
+        version: 'v4',
+        action: 'write',
         expires: Date.now() + 15 * 60 * 1000, // 15 minutes
-        contentType: "application/octet-stream",
+        contentType: 'application/octet-stream',
       });
 
     return url;
   } catch (e) {
     console.error(e);
-    throw new Error("Could not get signed upload url");
+    throw new Error('Could not get signed upload url');
   }
 };
 
-export const getSignedUrl: GetSignedUrlHander = async (
-  path,
-  { bucket },
-) => {
+export const getSignedUrl: GetSignedUrlHander = async (path, { bucket }) => {
   const storage = getStorage();
   try {
     const [url] = await storage
       .bucket(bucket)
       .file(path)
       .getSignedUrl({
-        version: "v4",
-        action: "read",
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days 
+        version: 'v4',
+        action: 'read',
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
       });
 
     return url;
   } catch (e) {
     console.error(e);
-    throw new Error("Could not get signed url");
+    throw new Error('Could not get signed url');
   }
 };

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 interface QRCodeGeneratorProps {
   value: string;
@@ -11,7 +11,7 @@ interface QRCodeGeneratorProps {
 export default function QRCodeGenerator({
   value,
   size = 335,
-  className = "",
+  className = '',
 }: QRCodeGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,9 +34,9 @@ export default function QRCodeGenerator({
     setHasError(false);
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) {
-      console.error("QRCodeGenerator: Failed to get canvas context");
+      console.error('QRCodeGenerator: Failed to get canvas context');
       return;
     }
 
@@ -46,7 +46,7 @@ export default function QRCodeGenerator({
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&format=png&margin=35`;
 
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    img.crossOrigin = 'anonymous';
     img.onload = () => {
       ctx.drawImage(img, 0, 0, size, size);
       setIsLoading(false);
@@ -59,26 +59,26 @@ export default function QRCodeGenerator({
   }, [value, size]);
 
   return (
-    <div className={`inline-block relative ${className}`}>
+    <div className={`relative inline-block ${className}`}>
       <canvas
         ref={canvasRef}
         width={size}
         height={size}
-        className="rounded-md shadow-md border"
+        className="rounded-md border shadow-md"
       />
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-md">
+        <div className="absolute inset-0 flex items-center justify-center rounded-md bg-gray-100">
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            <p className="text-sm text-gray-600 mt-2">Generating QR Code...</p>
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
+            <p className="mt-2 text-sm text-gray-600">Generating QR Code...</p>
           </div>
         </div>
       )}
       {hasError && !isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-red-50 rounded-md border-2 border-red-200">
+        <div className="absolute inset-0 flex items-center justify-center rounded-md border-2 border-red-200 bg-red-50">
           <div className="text-center">
-            <p className="text-sm text-red-600 font-medium">QR Code Error</p>
-            <p className="text-xs text-red-500 mt-1">Check fallback display</p>
+            <p className="text-sm font-medium text-red-600">QR Code Error</p>
+            <p className="mt-1 text-xs text-red-500">Check fallback display</p>
           </div>
         </div>
       )}

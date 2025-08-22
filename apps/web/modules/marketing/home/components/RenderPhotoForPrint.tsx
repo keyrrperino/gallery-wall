@@ -1,5 +1,4 @@
-
-"use client";
+'use client';
 
 export function RenderPhotoForPrint() {
   return null;

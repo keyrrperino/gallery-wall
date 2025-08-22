@@ -1,10 +1,10 @@
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import { publicProcedure } from "../../../trpc/base";
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegPath from "ffmpeg-static";
-import { PassThrough } from "stream";
-import { getSignedUrl, uploadStreamToS3 } from "storage";
+import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
+import { publicProcedure } from '../../../trpc/base';
+import ffmpeg from 'fluent-ffmpeg';
+import ffmpegPath from 'ffmpeg-static';
+import { PassThrough } from 'stream';
+import { getSignedUrl, uploadStreamToS3 } from 'storage';
 
 ffmpeg.setFfmpegPath(ffmpegPath!);
 
@@ -21,25 +21,22 @@ export const processVideo = publicProcedure
       const videoUrl = await getSignedUrl(key, { bucket, expiresIn: 60 * 5 });
 
       // 2. Prepare S3 upload stream for GIF
-      const gifKey = key.replace(/\.webm$/, ".gif");
+      const gifKey = key.replace(/\.webm$/, '.gif');
       const passThrough = new PassThrough();
       const uploadPromise = uploadStreamToS3({
         bucket,
         key: gifKey,
         stream: passThrough,
-        contentType: "image/gif",
+        contentType: 'image/gif',
       });
 
       // 3. Convert to GIF using ffmpeg with the S3 URL as input, pipe to S3
       await new Promise<void>((resolve, reject) => {
         ffmpeg(videoUrl)
-          .outputOptions([
-            "-t 5",
-            "-vf", "fps=30,scale=1080:-1:flags=lanczos",
-          ])
-          .toFormat("gif")
-          .on("end", (_stdout, _stderr) => resolve())
-          .on("error", reject)
+          .outputOptions(['-t 5', '-vf', 'fps=30,scale=1080:-1:flags=lanczos'])
+          .toFormat('gif')
+          .on('end', (_stdout, _stderr) => resolve())
+          .on('error', reject)
           .pipe(passThrough, { end: true });
       });
 
@@ -48,6 +45,9 @@ export const processVideo = publicProcedure
 
       return { gifKey };
     } catch (err: any) {
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: err.message });
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: err.message,
+      });
     }
-  }); 
+  });

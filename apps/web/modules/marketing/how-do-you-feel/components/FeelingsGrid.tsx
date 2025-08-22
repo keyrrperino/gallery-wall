@@ -1,4 +1,4 @@
-import { FeelItem } from "./FeelItem";
+import { FeelItem } from './FeelItem';
 export function FeelingsGrid({
   feelings,
   selected,
@@ -8,18 +8,16 @@ export function FeelingsGrid({
   selected: string[];
   onPick: (feel: string) => void;
 }) {
-  const renderSpace = ([...Array(1)].map((value, i) => (
-      <button
-        key={i+'space'}
-        title={value}
-        className={`relative rounded-[1.4vw] h-[100px] text-[2vh] md:text-[3.3vh] md:py-[2vh] font-text-regular tracking-[2px] md:tracking-[3px]`}
-      >
+  const renderSpace = [...Array(1)].map((value, i) => (
+    <button
+      key={i + 'space'}
+      title={value}
+      className={`font-text-regular relative h-[100px] rounded-[1.4vw] text-[2vh] tracking-[2px] md:py-[2vh] md:text-[3.3vh] md:tracking-[3px]`}
+    ></button>
+  ));
 
-      </button>
-    )));
-    
   return (
-    <div className="w-full max-h-[1/3] grid grid-cols-2 md:grid-cols-3 gap-[1vw]">
+    <div className="grid max-h-[1/3] w-full grid-cols-2 gap-[1vw] md:grid-cols-3">
       {feelings.map((feel) => (
         <FeelItem
           key={feel}

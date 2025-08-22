@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 // @ts-expect-error package is not installed per default
-import mixpanel from "mixpanel-browser";
-import { useEffect } from "react";
+import mixpanel from 'mixpanel-browser';
+import { useEffect } from 'react';
 
 const mixpanelToken = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN!;
 
@@ -12,7 +12,7 @@ export function AnalyticsScript() {
     mixpanel.init(mixpanelToken, {
       debug: true,
       track_pageview: true,
-      persistence: "localStorage",
+      persistence: 'localStorage',
     });
   }, []);
 

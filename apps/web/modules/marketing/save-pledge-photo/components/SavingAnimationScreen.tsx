@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SavingAnimationScreen({
   onComplete,
@@ -30,7 +30,7 @@ export default function SavingAnimationScreen({
   }, [countdown, onComplete]);
 
   return (
-    <div className="relative w-full h-full bg-white">
+    <div className="relative h-full w-full bg-white">
       {/* Countdown */}
       <AnimatePresence>
         {!fly && countdown > 0 && (
@@ -40,9 +40,9 @@ export default function SavingAnimationScreen({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.3 }}
-            className="flex items-center justify-center z-50"
+            className="z-50 flex items-center justify-center"
           >
-            <span className="text-[100px] font-text-bold text-black -mt-24">
+            <span className="font-text-bold -mt-24 text-[100px] text-black">
               {countdown}
             </span>
           </motion.div>
@@ -52,18 +52,18 @@ export default function SavingAnimationScreen({
       {/* Image container with flying animation */}
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        initial={{ y: "-50%", x: "-50%" }}
+        initial={{ y: '-50%', x: '-50%' }}
         animate={
           fly
-            ? { y: "-2000%", transition: { duration: 1, ease: "easeInOut" } }
+            ? { y: '-2000%', transition: { duration: 1, ease: 'easeInOut' } }
             : {}
         }
       >
-        <div className="w-[560px] h-[560px] bg-gray-200 overflow-hidden rounded-md shadow-md -mt-24">
+        <div className="-mt-24 h-[560px] w-[560px] overflow-hidden rounded-md bg-gray-200 shadow-md">
           <img
             src={gifUrl}
             alt="saving selfie"
-            className="w-full h-full object-contain"
+            className="h-full w-full object-contain"
           />
         </div>
       </motion.div>

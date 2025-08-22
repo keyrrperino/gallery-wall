@@ -1,4 +1,4 @@
-import slugify from "slugify";
+import slugify from 'slugify';
 
 export type ContentStructureItem = {
   label: string;
@@ -29,18 +29,18 @@ export function getContentStructure({
   function addToContentItemArray(
     contentItemsArray: ContentStructureItem[],
     subPath: string,
-    item: (typeof documents)[number],
+    item: (typeof documents)[number]
   ) {
     const pathParts = item.path
-      .replace(new RegExp("^" + subPath + "[/]*"), "")
-      .split("/");
+      .replace(new RegExp('^' + subPath + '[/]*'), '')
+      .split('/');
 
     const rootItemPath = subPath
-      ? [subPath, pathParts[0]].join("/")
+      ? [subPath, pathParts[0]].join('/')
       : pathParts[0];
 
     let rootItem = contentItemsArray.find(
-      (contentItem) => contentItem.path === rootItemPath,
+      (contentItem) => contentItem.path === rootItemPath
     );
 
     const isPage = pathParts.length === 1;
@@ -51,7 +51,7 @@ export function getContentStructure({
         .sort((page) => (page.locale === locale ? -1 : 1))
         .at(0)?.data[pathParts[0]];
       const label = metaData
-        ? typeof metaData === "string"
+        ? typeof metaData === 'string'
           ? metaData
           : metaData.title
         : documents
@@ -79,16 +79,16 @@ export function getContentStructure({
   }
 
   documents.forEach((page) => {
-    addToContentItemArray(contentStructure, "", page);
+    addToContentItemArray(contentStructure, '', page);
   });
 
   // recusrively sort items and their children
-  function sortContentItems(items: ContentStructureItem[], basePath = "") {
+  function sortContentItems(items: ContentStructureItem[], basePath = '') {
     items.sort((a, b) => {
-      if (a.path === "") {
+      if (a.path === '') {
         return -1;
       }
-      if (b.path === "") {
+      if (b.path === '') {
         return 1;
       }
 
@@ -96,15 +96,15 @@ export function getContentStructure({
         meta
           .filter((meta) => meta.path === basePath)
           .sort((page) => (page.locale === locale ? -1 : 1))
-          .at(0)?.data ?? {},
-      ).findIndex(([key]) => key === a.path.replace(`${basePath}/`, ""));
+          .at(0)?.data ?? {}
+      ).findIndex(([key]) => key === a.path.replace(`${basePath}/`, ''));
 
       const bIndex = Object.entries(
         meta
           .filter((meta) => meta.path === basePath)
           .sort((page) => (page.locale === locale ? -1 : 1))
-          .at(0)?.data ?? {},
-      ).findIndex(([key]) => key === b.path.replace(`${basePath}/`, ""));
+          .at(0)?.data ?? {}
+      ).findIndex(([key]) => key === b.path.replace(`${basePath}/`, ''));
 
       // use position index from meta file or put the item at the end of the list
       return (
@@ -126,7 +126,7 @@ export function getContentStructure({
 }
 
 export function getActivePathFromUrlParam(path: string | string[]) {
-  return Array.isArray(path) ? path.join("/") : path || "";
+  return Array.isArray(path) ? path.join('/') : path || '';
 }
 
 export function getLocalizedDocumentWithFallback<
@@ -140,7 +140,7 @@ export function getLocalizedDocumentWithFallback<
 export function slugifyHeadline(headline: string) {
   return slugify(headline, {
     lower: true,
-    replacement: "-",
+    replacement: '-',
     trim: true,
     strict: true,
     remove: /[*+~.()'"!:@]/g,

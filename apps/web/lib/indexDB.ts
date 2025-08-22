@@ -1,6 +1,6 @@
-export const DB_NAME = "SelfieVideoDB";
-export const STORE_NAME = "videos";
-export const KEY = "videoPreviewBlob";
+export const DB_NAME = 'SelfieVideoDB';
+export const STORE_NAME = 'videos';
+export const KEY = 'videoPreviewBlob';
 
 export function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

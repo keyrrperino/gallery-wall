@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import SimpleButton from "@marketing/home/components/Button";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import SimpleButton from '@marketing/home/components/Button';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 export default function PhotoPreview({
   onRetake,
@@ -14,7 +14,7 @@ export default function PhotoPreview({
   onRetake: () => void;
   onUsePhoto: () => void;
   gifUrl: string;
-  phase: "preview" | "saving" | "done";
+  phase: 'preview' | 'saving' | 'done';
   onComplete: () => void;
 }) {
   const headerText = "Here's your unique pledge photo!";
@@ -23,7 +23,7 @@ export default function PhotoPreview({
   const [fly, setFly] = useState(false);
 
   useEffect(() => {
-    if (phase === "preview") {
+    if (phase === 'preview') {
       return;
     }
 
@@ -42,48 +42,48 @@ export default function PhotoPreview({
     }
   }, [countdown, onComplete]);
   return (
-    <div className="flex w-full h-full flex-col items-center bg-white gap-16 relative">
+    <div className="relative flex h-full w-full flex-col items-center gap-16 bg-white">
       <motion.div
         key={countdown}
-        initial={phase === "saving" ? { opacity: 0, scale: 0.8 } : false}
-        animate={phase === "saving" ? { opacity: 1, scale: 1 } : false}
-        transition={phase === "saving" ? { duration: 0.3 } : undefined}
-        className="flex items-center justify-center z-50"
+        initial={phase === 'saving' ? { opacity: 0, scale: 0.8 } : false}
+        animate={phase === 'saving' ? { opacity: 1, scale: 1 } : false}
+        transition={phase === 'saving' ? { duration: 0.3 } : undefined}
+        className="z-50 flex items-center justify-center"
       >
-        <h1 className="text-[80px] uppercase text-center px-10 leading-[1] mx-20">
-          {phase === "saving" && countdown > 0 && !fly && countdown}
-          {phase === "preview" && "HERE'S YOUR UNIQUE PLEDGE PHOTO!"}
+        <h1 className="mx-20 px-10 text-center text-[80px] uppercase leading-[1]">
+          {phase === 'saving' && countdown > 0 && !fly && countdown}
+          {phase === 'preview' && "HERE'S YOUR UNIQUE PLEDGE PHOTO!"}
         </h1>
       </motion.div>
 
       <motion.div
-        className="flex-grow flex items-center justify-center w-full -mt-[4vh]"
+        className="-mt-[4vh] flex w-full flex-grow items-center justify-center"
         animate={{
-          y: fly ? "-2000%" : 0,
-          transition: { duration: 1, ease: "easeInOut" },
+          y: fly ? '-2000%' : 0,
+          transition: { duration: 1, ease: 'easeInOut' },
         }}
       >
-        <div className="w-[560px] h-[560px] bg-gray-200 overflow-hidden rounded-md shadow-md">
+        <div className="h-[560px] w-[560px] overflow-hidden rounded-md bg-gray-200 shadow-md">
           <img
             src={gifUrl}
             alt="selfie preview"
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         </div>
       </motion.div>
 
-      {phase === "preview" && (
+      {phase === 'preview' && (
         <div className="flex flex-row justify-between gap-9">
           <SimpleButton
             onClick={onRetake}
-            className="text-[3vw] text-[#20409A] font-text-bold bg-transparent uppercase py-[26px] w-[428px]"
+            className="font-text-bold w-[428px] bg-transparent py-[26px] text-[3vw] uppercase text-[#20409A]"
           >
             Take Another Selfie
           </SimpleButton>
 
           <SimpleButton
             onClick={onUsePhoto}
-            className="text-[3vw] font-text-bold py-[26px] uppercase w-[428px]"
+            className="font-text-bold w-[428px] py-[26px] text-[3vw] uppercase"
           >
             This looks good!
           </SimpleButton>

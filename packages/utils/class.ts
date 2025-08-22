@@ -1,63 +1,67 @@
-
 export function classNames(...classes: any[]) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ');
 }
 
 export async function createFineTune(headers: HeadersInit, payload: object) {
-
-  const res = await fetch(process.env.ASTRIA_API_DOMAIN + "/tunes", {
-    method: "POST",
+  const res = await fetch(process.env.ASTRIA_API_DOMAIN + '/tunes', {
+    method: 'POST',
     headers,
     body: JSON.stringify(payload),
   });
 
   if (![200, 201].includes(res.status)) {
-    throw new Error("Something went wrong!")
+    throw new Error('Something went wrong!');
   }
 
-  return await res.json() as object;
+  return (await res.json()) as object;
 }
 
-export const uploadImageUrlToGCP = async (imageUrl: string, signedUploadUrl: string) => {
+export const uploadImageUrlToGCP = async (
+  imageUrl: string,
+  signedUploadUrl: string
+) => {
   if (!imageUrl) {
-    return {}
+    return {};
   }
 
-  let file
+  let file;
   try {
     const response = await fetch(imageUrl);
     const arrayBuffer = await response.arrayBuffer();
     const fileResponse = {
       data: arrayBuffer,
       status: response.status,
-      statusText: response.statusText
+      statusText: response.statusText,
     };
 
-
-    console.log("axios image url blob response: ", fileResponse.status, fileResponse.statusText)
+    console.log(
+      'axios image url blob response: ',
+      fileResponse.status,
+      fileResponse.statusText
+    );
 
     // Convert the Buffer into a Stream
     try {
-      file = Buffer.from(arrayBuffer)
+      file = Buffer.from(arrayBuffer);
     } catch (e) {
-      console.log("erorr file = Readable.from(fileResponse.data)", e)
+      console.log('erorr file = Readable.from(fileResponse.data)', e);
     }
   } catch (error) {
-    console.log("error fetching file: ", error)
+    console.log('error fetching file: ', error);
   }
 
   const responseUploadFile = await fetch(signedUploadUrl, {
-    method: "PUT",
+    method: 'PUT',
     headers: {
-      "Content-Type": "application/octet-stream",
+      'Content-Type': 'application/octet-stream',
     },
     body: file,
   });
 
-  console.log({ responseUploadFile })
+  console.log({ responseUploadFile });
 
   return responseUploadFile.url;
-}
+};
 
 export const convertImageUrlToBase64 = async (imageUrl: string) => {
   if (!imageUrl) {
@@ -78,10 +82,10 @@ export const convertImageUrlToBase64 = async (imageUrl: string) => {
       reader.readAsDataURL(blob);
     });
   } catch (error) {
-    console.error("Error fetching file: ", error);
+    console.error('Error fetching file: ', error);
     return null;
   }
-}
+};
 
 export function getBase64VersionDate() {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');

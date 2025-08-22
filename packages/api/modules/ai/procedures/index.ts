@@ -1,2 +1,1 @@
-export * from "./facegen";
-
+export * from './facegen';

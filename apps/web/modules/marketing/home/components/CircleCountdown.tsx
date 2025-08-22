@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 const CircularCountdown = ({ timer }) => {
   const [percent, setPercent] = useState(100);

@@ -1,3 +1,3 @@
 // export * from "./gcp";
-export * from "./supabase";
-export * from "./s3";
+export * from './supabase';
+export * from './s3';

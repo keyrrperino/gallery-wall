@@ -1,6 +1,6 @@
-import SimpleButton from "@marketing/home/components/Button";
-import { PledgeStyleEnum } from "../types";
-import { PledgeSlider } from "./PledgeSlider";
+import SimpleButton from '@marketing/home/components/Button';
+import { PledgeStyleEnum } from '../types';
+import { PledgeSlider } from './PledgeSlider';
 
 const PLEDGES: {
   image: string;
@@ -8,15 +8,15 @@ const PLEDGES: {
 }[] = [
   {
     style: PledgeStyleEnum.SUPPORT,
-    image: "/images/frames/frame-1.svg",
+    image: '/images/frames/frame-1.svg',
   },
   {
     style: PledgeStyleEnum.FUTURE,
-    image: "/images/frames/frame-2.svg",
+    image: '/images/frames/frame-2.svg',
   },
   {
     style: PledgeStyleEnum.CARE,
-    image: "/images/frames/frame-3.svg",
+    image: '/images/frames/frame-3.svg',
   },
 ];
 
@@ -34,18 +34,18 @@ export default function PickAFrame({
   };
 
   return (
-    <div className="flex flex-col items-start justify-between overflow-hidden bg-white text-black h-full w-full">
+    <div className="flex h-full w-full flex-col items-start justify-between overflow-hidden bg-white text-black">
       <div className="flex flex-col gap-9 px-10">
-        <h1 className="font-text-bold text-[80px] uppercase -tracking-[1.6px] leading-[100%]">
+        <h1 className="font-text-bold text-[80px] uppercase leading-[100%] -tracking-[1.6px]">
           PICK A FRAME AND YOUR PLEDGE MESSAGE
         </h1>
-        <p className="text-2xl text-black/70 leading-[150%]">
+        <p className="text-2xl leading-[150%] text-black/70">
           Choose one pledge to appear with your frame!
         </p>
       </div>
       <PledgeSlider pledges={PLEDGES} selected={selected} onPick={handlePick} />
       <SimpleButton
-        className="self-center text-white rounded-full font-bold py-[26px] text-[32px] items-center justify-center w-[400px] mx-auto"
+        className="mx-auto w-[400px] items-center justify-center self-center rounded-full py-[26px] text-[32px] font-bold text-white"
         disabled={selected === null}
         onClick={() => onContinue(selected)}
       >

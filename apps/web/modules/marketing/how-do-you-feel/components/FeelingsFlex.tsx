@@ -1,4 +1,4 @@
-import { FeelItem } from "./FeelItem";
+import { FeelItem } from './FeelItem';
 export function FeelingsFlex({
   feelings,
   selected,
@@ -9,7 +9,7 @@ export function FeelingsFlex({
   onPick: (feel: string) => void;
 }) {
   return (
-    <div className="w-full flex flex-wrap gap-x-5 gap-y-8">
+    <div className="flex w-full flex-wrap gap-x-5 gap-y-8">
       {feelings.map((feel) => (
         <FeelItem
           key={feel}

@@ -21,7 +21,7 @@ export type TuneResponse = {
   ckpt_urls: string[];
   url: string;
   orig_images: string[];
-}
+};
 
 export type PromptResponse = {
   id: number;
@@ -37,8 +37,8 @@ export type PromptResponse = {
   num_images: number;
   controlnet_txt2img: boolean;
   url: string;
-  images: string[]
-}
+  images: string[];
+};
 
 // tune:
 // {

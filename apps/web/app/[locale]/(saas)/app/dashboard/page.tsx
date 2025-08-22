@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
-import { database } from "../../../../../lib/firebaseClient";
-import { ref, set, onValue, serverTimestamp, push } from "firebase/database";
-import { supabase } from "../../../../../lib/supabaseClient";
+import dynamic from 'next/dynamic';
+import { useState, useEffect } from 'react';
+import { database } from '../../../../../lib/firebaseClient';
+import { ref, set, onValue, serverTimestamp, push } from 'firebase/database';
+import { supabase } from '../../../../../lib/supabaseClient';
 
-const GalleryWallContent = dynamic(() => import("@marketing/gallery-wall/GalleryWall"), { ssr: false });
+const GalleryWallContent = dynamic(
+  () => import('@marketing/gallery-wall/GalleryWall'),
+  { ssr: false }
+);
 
 export default function GalleryWall() {
   // // Add or update an image in the gallery
@@ -338,7 +341,7 @@ export default function GalleryWall() {
   // };
 
   return (
-    <div className="w-full h-[100%] grid overflow-scroll">
+    <div className="grid h-[100%] w-full overflow-scroll">
       <GalleryWallContent />
     </div>
   );
