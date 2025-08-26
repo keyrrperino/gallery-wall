@@ -23,7 +23,7 @@ export default function PinEntry() {
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
 
-  const samplePin = 1234; // ✅ your sample PIN
+  const samplePin = '0826'; // ✅ your sample PIN
 
   async function getBlobFromIndexedDB(): Promise<Blob | null> {
     const db = await openDB();
@@ -54,7 +54,7 @@ export default function PinEntry() {
       setPin(newPin);
 
       if (newPin.length === 4) {
-        if (parseInt(newPin) !== samplePin) {
+        if (newPin !== samplePin) {
           triggerError();
         } else {
           triggerSuccess();
