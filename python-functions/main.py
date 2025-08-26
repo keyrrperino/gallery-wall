@@ -42,21 +42,24 @@ FRAME_OVERLAY_PATH = os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.d
 
 FRAME_MAP = {
     "care": {
-        "color": (43, 144, 208),
+        # "color": (43, 144, 208),
+        "color": (255, 255, 255),
         "frames": [
             os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"blue-{shape}.png"))
             for shape in ["star", "sun", "diamond", "circle", "hexagon"]
         ]
     },
     "future": {
-        "color": (114, 143, 61),
+        # "color": (114, 143, 61),
+        "color": (255, 255, 255),
         "frames": [
             os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"green-{shape}.png"))
             for shape in ["star", "sun", "diamond", "circle", "hexagon"]
         ]
     },
     "support": {
-        "color": (247, 235, 223),
+        # "color": (247, 235, 223),
+        "color": (255, 255, 255),
         "frames": [
             os.environ.get("FRAME_OVERLAY_PATH", os.path.join(os.path.dirname(__file__), "lib", "frames", f"dry-orange-{shape}.png"))
             for shape in ["star", "sun", "diamond", "circle", "hexagon"]
@@ -64,62 +67,18 @@ FRAME_MAP = {
     },
 }
 
-@app.post("/remove-image-background")
-async def remove_image_background(request: Request):
-    image_url = request.query_params.get("imageUrl")
-    user_gif_request_id = request.query_params.get("userGifRequestId")
-    user_id = request.query_params.get("userId")
-    frame_number = request.query_params.get("frameNumber")
 
-    if not all([image_url, user_gif_request_id, user_id, frame_number]):
-        raise HTTPException(status_code=400, detail="Missing required parameters.")
+# Clean frame overlay mapping per pledge
+CLEAN_FRAME_MAP = {
+    "care": os.path.join(os.path.dirname(__file__), "lib", "frames", "clean-frames", "blue.png"),
+    "future": os.path.join(os.path.dirname(__file__), "lib", "frames", "clean-frames", "green.png"),
+    "support": os.path.join(os.path.dirname(__file__), "lib", "frames", "clean-frames", "dry.png"),
+}
 
-    # Download the image
-    try:
-        response = requests.get(image_url)
-        response.raise_for_status()
-        input_image = Image.open(io.BytesIO(response.content)).convert("RGBA")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to download image: {e}")
-
-    # Remove background
-    try:
-        output_image = remove(input_image, session=session)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Background removal failed: {e}")
-
-    # Composite over white background
-    try:
-        white_bg = Image.new("RGBA", output_image.size, (255, 255, 255, 255))
-        composited = Image.alpha_composite(white_bg, output_image).convert("RGB")
-        buf = io.BytesIO()
-        composited.save(buf, format="PNG")
-        buf.seek(0)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Compositing failed: {e}")
-
-    # Upload to Supabase Storage
-    key = f"frames/{user_id}/{user_gif_request_id}/{frame_number}-composited.png"
-    try:
-        res = supabase.storage.from_(SUPABASE_BUCKET).upload(
-            key,
-            buf.getvalue(),
-            file_options={"content-type": "image/png", "upsert": "true"}  # <-- "true" as a string
-        )
-        # Get signed URL
-        signed = supabase.storage.from_(SUPABASE_BUCKET).create_signed_url(key, 631152000)
-        signed_url = signed.get("signedURL") or signed.get("signed_url") or signed.get("url")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Supabase upload failed: {e}")
-
-    return JSONResponse({
-        "status": "SUCCESS",
-        "imageUrlComposited": signed_url,
-        "key": key
-    })
+STICKER_TYPES = ["circle", "diamond", "star", "hexagon", "sun"]
 
 
-@app.post("/process-frames-to-gif")
+@app.post("/process-frames-to-gif-old")
 async def process_frames_to_gif(
     userGifRequestId: str = Form(...),
     userId: str = Form(...),
@@ -194,7 +153,7 @@ async def process_frames_to_gif(
         # Use ImageMagick to create a high-quality GIF
         delay = 17 if len(processed_images) == 12 else 8
         convert_cmd = [
-            "convert",
+            "magick",
             "-delay", str(delay),
             "-loop", "0",
             *frame_paths,
@@ -226,8 +185,9 @@ async def process_frames_to_gif(
         "key": key
     })
 
-@app.post("/process-frames-to-gif-no-remove-background")
-async def process_frames_to_gif_no_background_remove(
+
+@app.post("/process-frames-to-gif")
+async def process_frames_to_gif_with_sticker(
     userGifRequestId: str = Form(...),
     userId: str = Form(...),
     images: List[UploadFile] = File(...),
@@ -235,28 +195,73 @@ async def process_frames_to_gif_no_background_remove(
 ):
     if pledge not in FRAME_MAP:
         raise HTTPException(status_code=400, detail=f"Invalid pledge: {pledge}")
-    frame_choices = FRAME_MAP[pledge]["frames"]
-    # Pick a random overlay frame for this request
-    overlay_frame_path = random.choice(frame_choices)
+
+    color = FRAME_MAP[pledge]["color"]
+
+    # Load clean frame overlay for this pledge
+    clean_frame_path = CLEAN_FRAME_MAP.get(pledge)
+    if not clean_frame_path or not os.path.exists(clean_frame_path):
+        raise HTTPException(status_code=500, detail=f"Missing clean frame for pledge '{pledge}' at '{clean_frame_path}'")
     try:
-        overlay_frame = Image.open(overlay_frame_path).convert("RGBA")
+        clean_frame_overlay = Image.open(clean_frame_path).convert("RGBA")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to load overlay frame: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to load clean frame overlay: {e}")
+
+    # Choose a random animated sticker type and load its 24 frames
+    chosen_sticker_type = random.choice(STICKER_TYPES)
+    sticker_dir = os.path.join(os.path.dirname(__file__), "lib", "frames", "animated-stickers", chosen_sticker_type)
+    try:
+        sticker_frames: List[Image.Image] = []
+        for i in range(1, 25):  # 1..24
+            frame_path = os.path.join(sticker_dir, f"{i}.png")
+            if not os.path.exists(frame_path):
+                raise FileNotFoundError(f"Sticker frame not found: {frame_path}")
+            sticker_frames.append(Image.open(frame_path).convert("RGBA"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load sticker frames: {e}")
 
     async def process_single_image(idx, upload_file):
         try:
             img_bytes = await upload_file.read()
             img = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
+            # Remove background
+            out_img = await asyncio.to_thread(remove, img, session=session)
             # Center the 672x672 image on a 720x720 canvas
-            if img.width != 672 or img.height != 672:
-                img = img.resize((672, 672), Image.LANCZOS)
+            if out_img.width != 672 or out_img.height != 672:
+                out_img = out_img.resize((672, 672), Image.LANCZOS)
             base_canvas = Image.new("RGBA", (720, 720), (0, 0, 0, 0))
             offset = ((720 - 672) // 2, (720 - 672) // 2)
-            base_canvas.paste(img, offset, img)
-            # Overlay the frame (overlay_frame should be 720x720)
-            composited = Image.alpha_composite(base_canvas, overlay_frame)
-            # Do NOT add a background color, keep as RGBA
-            return composited
+            base_canvas.paste(out_img, offset, out_img)
+
+            # First overlay: clean frame (assumed 720x720)
+            composited = Image.alpha_composite(base_canvas, clean_frame_overlay)
+
+            # Second overlay: animated sticker frame centered
+            if len(images) == 24:
+                sticker_idx = idx % 24
+            elif len(images) == 12:
+                sticker_idx = (idx * 2) % 24
+            else:
+                raise Exception(f"Expected 12 or 24 images, got {len(images)}")
+
+            sticker_im = sticker_frames[sticker_idx]
+            if sticker_im.mode != "RGBA":
+                sticker_im = sticker_im.convert("RGBA")
+
+            # Paste the sticker centered onto composited RGBA canvas
+            if sticker_im.size != composited.size:
+                # paste_x = (composited.width - sticker_im.width) // 2
+                # paste_y = (composited.height - sticker_im.height) // 2
+                paste_x = (composited.width - sticker_im.width) - 40
+                paste_y = (composited.height - sticker_im.height) - 90
+                composited.paste(sticker_im, (paste_x, paste_y), sticker_im)
+            else:
+                composited = Image.alpha_composite(composited, sticker_im)
+
+            # Remove transparency by pasting onto solid background color
+            background = Image.new("RGB", composited.size, color)
+            background.paste(composited, mask=composited.split()[-1])
+            return background
         except Exception as e:
             raise Exception(f"Frame {idx+1} failed: {e}")
 
@@ -268,7 +273,7 @@ async def process_frames_to_gif_no_background_remove(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image processing failed: {e}")
 
-    # Save as GIF (12 or 24 frames)
+    # Validate frames
     if len(processed_images) not in (12, 24):
         raise HTTPException(status_code=500, detail=f"Expected 12 or 24 processed images, got {len(processed_images)}")
     base_size = processed_images[0].size
@@ -278,7 +283,8 @@ async def process_frames_to_gif_no_background_remove(
         if img.size != base_size:
             raise HTTPException(status_code=500, detail=f"Frame {idx+1} size {img.size} does not match first frame size {base_size}")
 
-    import tempfile, os
+    # Encode GIF via ImageMagick for quality
+    import tempfile
     frame_buffers = []
     for idx, img in enumerate(processed_images):
         buf = io.BytesIO()
@@ -293,16 +299,17 @@ async def process_frames_to_gif_no_background_remove(
                 f.write(buf.read())
             frame_paths.append(frame_path)
         gif_path = os.path.join(tmpdir, "output.gif")
-        # Use ImageMagick to create a high-quality GIF
         delay = 17 if len(processed_images) == 12 else 8
         convert_cmd = [
-            "convert",
+            "magick",
             "-delay", str(delay),
             "-loop", "0",
             *frame_paths,
             "-layers", "OptimizeTransparency",
             gif_path
         ]
+        
+
         try:
             subprocess.run(convert_cmd, check=True)
         except Exception as e:
@@ -310,7 +317,7 @@ async def process_frames_to_gif_no_background_remove(
         with open(gif_path, "rb") as f:
             gif_bytes = f.read()
 
-    key = f"gifs/{userId}/{userGifRequestId}/final.gif"
+    key = f"gifs/{userId}/{userGifRequestId}/final_with_sticker.gif"
     try:
         res = supabase.storage.from_(SUPABASE_BUCKET).upload(
             key,
@@ -325,6 +332,6 @@ async def process_frames_to_gif_no_background_remove(
     return JSONResponse({
         "status": "SUCCESS",
         "gifUrl": signed_url,
-        "key": key
+        "key": key,
+        "stickerType": chosen_sticker_type,
     })
-
