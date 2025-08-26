@@ -357,6 +357,7 @@ export default function SelfieCameraMode({
               loop
               muted
               playsInline
+              webkit-playsinline
             >
               <track kind="captions" />
             </video>
