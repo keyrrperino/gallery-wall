@@ -52,12 +52,12 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Gallery Wall" />
 
         {/* Apple Touch Icons */}
-        <link rel="apple-touch-icon" href="/images/pub-logo-transparent.webp" />
+        <link rel="apple-touch-icon" href="/images/riding-the-tides-logo.webp" />
 
         {/* Windows/MS */}
         <meta
           name="msapplication-TileImage"
-          content="/images/pub-logo-transparent.webp"
+          content="/images/riding-the-tides-logo.webp"
         />
         <meta name="msapplication-TileColor" content="#2563eb" />
 
