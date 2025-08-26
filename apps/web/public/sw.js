@@ -4,7 +4,7 @@ const urlsToCache = [
   "/favicon.ico",
   "/images/background.svg",
   "/images/hero.svg",
-  "/images/pub-logo-transparent.webp",
+  "/images/riding-the-tides-logo.webp",
   // Add other critical assets that should be cached
 ];
 
