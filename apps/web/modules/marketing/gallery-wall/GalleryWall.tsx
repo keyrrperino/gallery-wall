@@ -507,7 +507,7 @@ export const GalleryWall: React.FC = () => {
                 src={`${img.gifUrl}&v=${getBase64VersionDate()}`}
                 draggable={false}
                 alt="Gallery"
-                className="h-auto w-[200px] cursor-none object-cover"
+                className="h-auto w-[262px] cursor-none object-cover"
                 style={{
                   transition: 'box-shadow 0.2s',
                   boxShadow:
