@@ -482,7 +482,7 @@ export const GalleryWall: React.FC = () => {
     <>
       {shuffledImages.map((src, index) => (
         <button key={index}>
-          <img src={src} draggable="false" alt="Gallery" className="h-auto w-[200px] cursor-none object-cover" style={{ transition: "box-shadow 0.2s" }} />
+          <img src={src} draggable="false" alt="Gallery" className="h-auto w-[262px] cursor-none object-cover" style={{ transition: "box-shadow 0.2s" }} />
         </button>
       ))}
     </>
@@ -523,7 +523,7 @@ export const GalleryWall: React.FC = () => {
             </button>
           ))}
 
-          {renderMockImages}
+          {/* {renderMockImages} */}
         </div>
       </div>
       {(modalOpen || isClosing || isOpening) && modalImage && (
