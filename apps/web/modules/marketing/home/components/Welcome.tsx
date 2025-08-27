@@ -41,7 +41,7 @@ export default function HomePage() {
           <p className="text-center text-2xl leading-[1.25] text-black/70">
             Join us in taking a stand for coastal protection in Singapore!{' '}
             <br />
-            In just a few quick steps, you’ll create your own personalized
+            In just a few quick steps, you’ll create your own personalised
             pledge photo to share with the world and be part of a live pledge
             wall growing with every submission.
           </p>
