@@ -72,6 +72,8 @@ model UserGifRequest {
   isDownloaded   Boolean       @default(false)
   downloadedAt   DateTime?
   requestStatus  RequestStatus
+  frameType      String        @default("pending")
+  feelings       String[]      @default([])
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now())
 
