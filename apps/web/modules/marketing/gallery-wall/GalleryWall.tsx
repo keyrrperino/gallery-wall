@@ -435,6 +435,31 @@ export const GalleryWall: React.FC = () => {
     setIsClosing(true);
   }, []);
 
+  // Delete (mark FAILED) without triggering isShowed flow
+  const handleDelete = useCallback(async () => {
+    if (!modalImage) {
+      return;
+    }
+    try {
+      await supabase
+        .from('UserGifRequest')
+        .update({ requestStatus: RequestStatusSchema.Enum.FAILED })
+        .eq('id', modalImage.id);
+
+      setImages((imgs) => imgs.filter((i) => i.id !== modalImage.id));
+      setQueueImages((q) => q.filter((i) => i.id !== modalImage.id));
+
+      setModalOpen(false);
+      setIsClosing(false);
+      setIsOpening(false);
+      setOriginRect(null);
+      setModalRect(null);
+      setModalImage(null);
+    } catch (error) {
+      console.error('Failed to mark as FAILED:', error);
+    }
+  }, [modalImage]);
+
   // After animation, remove modal and update isShowed in Supabase
   useEffect(() => {
     if (!isClosing) {
@@ -482,14 +507,14 @@ export const GalleryWall: React.FC = () => {
     <>
       {shuffledImages.map((src, index) => (
         <button key={index}>
-          <img src={src} draggable="false" alt="Gallery" className="h-auto w-[262px] cursor-none object-cover" style={{ transition: "box-shadow 0.2s" }} />
+          <img src={src} draggable="false" alt="Gallery" className="h-auto w-[262px] object-cover" style={{ transition: "box-shadow 0.2s" }} />
         </button>
       ))}
     </>
   );
 
   return (
-    <div className="w-[100%] cursor-none">
+    <div className="w-[100%]">
       <div className="flex h-[100%] w-full items-center justify-center gap-4 overflow-auto bg-black p-8">
         <div className="flex w-full flex-wrap justify-center gap-x-0 gap-y-0">
           {images.map((img, idx) => (
@@ -507,7 +532,7 @@ export const GalleryWall: React.FC = () => {
                 src={`${img.gifUrl}&v=${getBase64VersionDate()}`}
                 draggable={false}
                 alt="Gallery"
-                className="h-auto w-[262px] cursor-none object-cover"
+                className="h-auto w-[262px] object-cover"
                 style={{
                   transition: 'box-shadow 0.2s',
                   boxShadow:
@@ -609,6 +634,12 @@ export const GalleryWall: React.FC = () => {
                     }
             }
           />
+          <button
+            onClick={handleDelete}
+            className="absolute right-6 top-6 rounded bg-red-600 px-4 py-2 text-white hover:bg-red-500 z-10"
+          >
+            Delete
+          </button>
         </div>
       )}
     </div>
