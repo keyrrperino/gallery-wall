@@ -12,7 +12,7 @@ import { ProgressBar } from '@marketing/shared/components/ProgressBar';
 import ExitButton from '@marketing/shared/components/ExitButton';
 import { PledgeStyleEnum } from '@marketing/what-is-your-pledge/types';
 import { supabase } from '../../../lib/supabaseClient';
-import { FrameTypeSchema, RequestStatusSchema } from '../../../../../packages/database';
+import { RequestStatusSchema } from '../../../../../packages/database';
 import { Button } from './button';
 import { useUser } from '@saas/auth/hooks/use-user';
 import { cn } from '@ui/lib';
