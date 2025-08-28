@@ -142,15 +142,15 @@ export default function PledgeCopy() {
     };
   }, [gifUrl]);
 
-  // Redirect to thank you page when download is detected
-  useEffect(() => {
-    if (downloadStatus?.isDownloaded) {
-      // Small delay to ensure download completed, then redirect
-      setTimeout(() => {
-        redirectToThankYou();
-      }, 1000);
-    }
-  }, [downloadStatus?.isDownloaded, redirectToThankYou]);
+  // // Redirect to thank you page when download is detected
+  // useEffect(() => {
+  //   if (downloadStatus?.isDownloaded) {
+  //     // Small delay to ensure download completed, then redirect
+  //     setTimeout(() => {
+  //       redirectToThankYou();
+  //     }, 1000);
+  //   }
+  // }, [downloadStatus?.isDownloaded, redirectToThankYou]);
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-start gap-12 bg-white pb-20">
@@ -195,7 +195,7 @@ export default function PledgeCopy() {
           className="w-[400px] items-center justify-center self-center rounded-full py-[26px] text-[32px] font-bold text-white"
           onClick={redirectToThankYou}
         >
-          SKIP
+          CONTINUE
         </SimpleButton>
       </div>
     </div>
